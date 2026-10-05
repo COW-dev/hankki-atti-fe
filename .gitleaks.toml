@@ -1,0 +1,12 @@
+# gitleaks 설정 — 기본 룰셋 확장
+[extend]
+useDefault = true
+
+[allowlist]
+description = "오탐 제외"
+paths = [
+  # pre-commit 훅 자체의 탐지 패턴 문자열
+  '''\.githooks/.*''',
+  # 패키지 무결성 해시
+  '''pnpm-lock\.yaml''',
+]

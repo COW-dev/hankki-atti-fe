@@ -1,0 +1,77 @@
+name: CI
+
+# push는 main에만 건다. 작업 브랜치까지 걸면 PR마다 push CI와 PR CI가 중복 실행된다.
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+# PR은 새 push가 오면 이전 실행을 취소한다
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # pnpm 버전은 package.json의 packageManager를 따른다
+      - uses: pnpm/action-setup@v6
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Format
+        run: pnpm format:check
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Build
+        run: pnpm build
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Run gitleaks (시크릿 스캔)
+        run: |
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.30.1 \
+            git /repo --config /repo/.gitleaks.toml \
+            --no-banner --redact --exit-code 1
+
+  agent-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: 에이전트 설정 구조 검증 (심링크/CLAUDE.md)
+        run: |
+          set -e
+          test -d .agents/commands || { echo "::error::.agents/commands 없음"; exit 1; }
+          test -L .claude/commands && test -e .claude/commands || { echo "::error::.claude/commands 심링크 깨짐"; exit 1; }
+          test -L .codex/commands && test -e .codex/commands || { echo "::error::.codex/commands 심링크 깨짐"; exit 1; }
+          grep -q "@AGENTS.md" CLAUDE.md || { echo "::error::CLAUDE.md에 @AGENTS.md import 없음"; exit 1; }
+          test -f docs/design-system.md || { echo "::error::docs/design-system.md 없음"; exit 1; }
+          echo "OK"
