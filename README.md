@@ -1,36 +1,27 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 한끼아띠 프론트엔드
 
-## Getting Started
+명지대학교 장애학생지원센터 · 장애학생 서포터즈 "아띠"와 함께 만드는 장애학생 식사 도우미 매칭 서비스의 사용자 앱(모바일 웹)입니다.
 
-First, run the development server:
+- 기술: Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4 · pnpm
+- 디자인: Figma "10 목업" · 디자인 시스템 정리 [docs/design-system.md](docs/design-system.md)
+- 작업 규칙: [AGENTS.md](AGENTS.md)
+
+## 시작하기
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+cp .env.example .env.local      # 백엔드 주소 (기본 http://localhost:8080)
+bash scripts/setup-hooks.sh     # Git 훅 (main 직접 커밋 차단 · 시크릿 차단)
+pnpm dev                        # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+백엔드는 [hankki-atti-be](https://github.com/COW-dev/hankki-atti-be)에서 `./gradlew bootRun`으로 띄웁니다.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 명령어
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| 명령 | 내용 |
+|---|---|
+| `pnpm dev` | 개발 서버 |
+| `pnpm check` | 린트 + 포맷 검사 + 타입 검사 + 테스트 (커밋 전) |
+| `pnpm test` | 테스트 |
+| `pnpm build` | 프로덕션 빌드 |

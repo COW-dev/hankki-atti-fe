@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+.next/
+next-env.d.ts
+public/
+.ai-workspace/
+# 문서는 표·줄바꿈을 손으로 맞춘다
+*.md
