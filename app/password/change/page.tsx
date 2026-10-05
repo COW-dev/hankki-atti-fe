@@ -14,6 +14,9 @@ import { ErrorCode } from "@/lib/api/error-codes";
 import { useAuth } from "@/lib/auth/AuthProvider";
 import { checkPassword, PASSWORD_MAX_LENGTH } from "@/lib/auth/password-policy";
 
+// 규칙 아이콘은 Figma에서 16px(캡션 14px 기준) — 큰 글씨에서도 글자와 같은 비율로 커지게 한다
+const RULE_ICON_SIZE = "calc(var(--font-caption) * 8 / 7)";
+
 // S-PW 첫 로그인 비밀번호 변경 (Figma 206:1115)
 export default function PasswordChangePage() {
   const router = useRouter();
@@ -83,7 +86,7 @@ export default function PasswordChangePage() {
           <ul id="password-rules" aria-live="polite" className="flex w-full flex-col gap-1.5">
             {results.map((rule) => (
               <li key={rule.label} className="flex items-center gap-1.5">
-                <Icon name={rule.passed ? "check" : "dash"} />
+                <Icon name={rule.passed ? "check" : "dash"} size={RULE_ICON_SIZE} />
                 <span
                   className={`whitespace-nowrap ${
                     rule.passed
