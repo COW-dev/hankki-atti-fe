@@ -100,11 +100,11 @@
  *   M     — 도우미
  *   admin — 관리자 (데스크톱)
  *   큰 글씨 — 접근성 모드. <html data-text-size="large">이면 L·M 대신 이 값을 쓴다
- * display는 목업 화면에서 확인하지 못해 디자인 시스템 표 값을 쓴다 (관리자 24만 확인).
+ * display는 L(M-01 소개 화면)·관리자만 목업 변수로 확인했다. M·큰 글씨는 디자인 시스템 표 값이다.
  */
 :root,
 [data-size="L"] {
-  --font-display: 26px;
+  --font-display: 24px;
   --font-title: 18px;
   --font-body: 16px;
   --font-label: 16px;

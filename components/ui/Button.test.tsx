@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { Button } from "@/components/ui/Button";
+import { Button, ButtonLink } from "@/components/ui/Button";
 
 describe("Button", () => {
   it("inactive면 포커스는 받지만 누를 수 없다", async () => {
@@ -46,5 +46,12 @@ describe("Button", () => {
     render(<Button>도우미 신청하기</Button>);
 
     expect(screen.getByRole("button")).toHaveAttribute("type", "button");
+  });
+
+  it("ButtonLink는 버튼 모양이어도 링크로 읽히고 주소를 가진다", () => {
+    render(<ButtonLink href="/login">로그인</ButtonLink>);
+
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "로그인" })).toHaveAttribute("href", "/login");
   });
 });

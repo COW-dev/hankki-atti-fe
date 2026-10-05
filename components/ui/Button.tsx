@@ -1,15 +1,20 @@
-import type { ButtonHTMLAttributes } from "react";
+import Link from "next/link";
+import type { ButtonHTMLAttributes, ComponentProps } from "react";
 
 type ButtonVariant = "primary" | "secondary" | "tertiary" | "danger";
 type ButtonSize = "large" | "small";
 
-type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+type ButtonLook = {
   // primary = 화면의 핵심 동작(화면당 1개) · secondary = 보조 · tertiary = 텍스트 버튼 · danger = 파괴적 동작
   variant?: ButtonVariant;
   size?: ButtonSize;
-  // 조건을 다 채우기 전: 포커스는 받되(이유를 읽어 줄 수 있게) 누를 수 없는 모양 (A11Y 공통 규칙)
-  inactive?: boolean;
 };
+
+type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
+  ButtonLook & {
+    // 조건을 다 채우기 전: 포커스는 받되(이유를 읽어 줄 수 있게) 누를 수 없는 모양 (A11Y 공통 규칙)
+    inactive?: boolean;
+  };
 
 const VARIANT_CLASS: Record<ButtonVariant, string> = {
   primary: "bg-(--color-bg-button-primary) text-(--color-text-on-brand) active:bg-(--color-bg-brand-pressed)",
@@ -22,6 +27,9 @@ const SIZE_CLASS: Record<ButtonSize, string> = {
   large: "min-h-(--control-height) min-w-(--control-height) px-(--control-padding-x)",
   small: "min-h-(--control-height-sm) min-w-(--control-height-sm) px-(--space-md)",
 };
+
+const BASE_CLASS =
+  "typo-body-strong flex items-center justify-center gap-(--space-xs) rounded-(--radius-control) py-(--space-xs)";
 
 /**
  * Figma Button (68:73): Style 4종 × Size 2종. 높이는 크기 모드(control/height)를 따른다.
@@ -52,10 +60,28 @@ export function Button({
         }
         onClick?.(event);
       }}
-      className={`typo-body-strong flex items-center justify-center gap-(--space-xs) rounded-(--radius-control) py-(--space-xs) ${SIZE_CLASS[size]} ${look} ${className ?? ""}`}
+      className={`${BASE_CLASS} ${SIZE_CLASS[size]} ${look} ${className ?? ""}`}
       {...props}
     >
       {children}
     </button>
+  );
+}
+
+/**
+ * 버튼 모양의 화면 이동 링크. 이동은 <a>여야 스크린리더가 "링크"로 읽고 새 탭 열기도 된다.
+ * 누르면 무언가를 처리하는 동작(제출·취소 등)에는 Button을 쓴다.
+ */
+export function ButtonLink({
+  variant = "primary",
+  size = "large",
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof Link> & ButtonLook) {
+  return (
+    <Link className={`${BASE_CLASS} ${SIZE_CLASS[size]} ${VARIANT_CLASS[variant]} ${className ?? ""}`} {...props}>
+      {children}
+    </Link>
   );
 }
