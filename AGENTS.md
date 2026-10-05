@@ -110,9 +110,10 @@ docs/design-system.md   # 디자인 시스템 코드 정리본
 
 상세(토큰 표, 컴포넌트 목록과 Figma 노드 ID, 새 컴포넌트 추가 절차)는 [docs/design-system.md](docs/design-system.md).
 
-1. **원시값 금지** — 색·간격·모서리·글자 크기는 `styles/tokens.css`의 용도 토큰만 쓴다. `#hex`, `text-[15px]`, `bg-gray-100` 같은 Tailwind 기본 팔레트 금지
+1. **원시값 금지** — 색·모서리·글자 크기·조작 영역은 `styles/tokens.css`의 용도 토큰만 쓴다. `#hex`, `text-[15px]`, `bg-gray-100` 같은 Tailwind 기본 팔레트 금지
    - 참조 문법: `bg-(--color-bg-muted)`, `text-(--color-text-secondary)`, `gap-(--space-xs)`, `min-h-(--control-height)`
    - 원시 팔레트(`--brand-*`, `--gray-*`)는 tokens.css 안에서만 쓴다
+   - 간격은 Figma가 변수(space/*)에 연결한 곳은 토큰, 목업이 숫자로 둔 곳(예: 빈 상태 영역 gap 10)은 같은 값의 Tailwind 숫자 클래스(`gap-2.5`)를 쓴다. 가까운 토큰으로 바꾸지 않는다
 2. **글자는 텍스트 스타일 7개만** — `typo-display`, `typo-title`, `typo-body`, `typo-body-strong`, `typo-label`, `typo-caption`, `typo-caption-strong`. `font-bold`·`leading-*`를 따로 붙이지 않는다
 3. **크기 모드** — 화면은 `PageShell size="L" | "M"`으로 감싼다 (장애학생·비로그인 L, 도우미 M). 글자·버튼 높이·탭바·아이콘 크기가 모드를 따라 바뀌므로 **px로 높이·글자 크기를 고정하지 않는다**. 접근성 모드 "큰 글씨"는 `<html data-text-size="large">`로 모든 모드를 덮어쓴다
 4. **컴포넌트 먼저** — 화면에서 버튼·입력칸·안내를 직접 그리지 않고 `components/ui`를 쓴다. 없으면 Figma 컴포넌트를 보고 `components/ui`에 먼저 만든다
