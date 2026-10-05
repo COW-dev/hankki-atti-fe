@@ -72,7 +72,7 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 
 | 토큰 | L 장애학생·비로그인 | M 도우미 | 큰 글씨 | admin 관리자 |
 |---|---|---|---|---|
-| `--font-display` | 26* | 22* | 34* | 24 |
+| `--font-display` | 24 | 22* | 34* | 24 |
 | `--font-title` | 18 | 17 | 26 | 18* |
 | `--font-body` | 16 | 15 | 24 | 14 |
 | `--font-label` | 16 | 16 | 24 | 14 |
@@ -108,7 +108,7 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 
 | 컴포넌트 | Figma | 변형 | 코드 | 상태 |
 |---|---|---|---|---|
-| Button | 68:73 | Primary · Secondary · Tertiary · Danger × Large · Small | `ui/Button` | ✅ |
+| Button | 68:73 | Primary · Secondary · Tertiary · Danger × Large · Small | `ui/Button` (화면 이동은 `ButtonLink`) | ✅ |
 | TextField | 70:62 | Default · Focus · Error · Disabled | `ui/TextField` | ✅ (Disabled 미구현) |
 | Notice | 70:77 | Info · Success · Error · Warning | `ui/Notice` | 🟡 Error만 |
 | A11yToggle | 70:86 | Pressed true · false | `ui/A11yToggle` | ✅ (음성 읽기 미구현) |

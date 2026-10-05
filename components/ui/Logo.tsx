@@ -1,9 +1,10 @@
 /* eslint-disable @next/next/no-img-element -- Figma에서 내보낸 SVG를 그대로 그린다 (이미지 최적화 대상이 아님) */
 
-type LogoVariant = "large" | "topbar" | "footer";
+type LogoVariant = "hero" | "large" | "topbar" | "footer";
 
 // 쓰는 곳별 가로 크기 (Figma 목업 인스턴스). 세로는 원본 비율(722:500)을 따른다
 const WIDTH: Record<LogoVariant, number> = {
+  hero: 210,
   large: 150,
   topbar: 52,
   footer: 44,

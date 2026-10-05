@@ -43,7 +43,7 @@ plan.md가 현재 작업과 일치하지 않습니다 (기준: <브랜치>@<SHA>
 | 글자 | `typo-*` 7개만. `font-bold`·`leading-*`·`text-[15px]` 금지 |
 | 높이·글자 크기 | 크기 모드 토큰(`--control-height`, `--icon-size`)으로. px 고정 금지 |
 | 화면 틀 | `PageShell size="L"`(장애학생·비로그인) / `"M"`(도우미) |
-| 버튼 | `components/ui/Button`. 못 누르는 상태는 `inactive` (disabled 금지) |
+| 버튼 | `components/ui/Button`. 못 누르는 상태는 `inactive` (disabled 금지). 화면 이동은 같은 모양의 `ButtonLink` (`<a>`) |
 | 입력칸 | `components/ui/TextField` (label 필수, 오류는 `error`, 규칙 안내는 `describedBy`) |
 | 오류 안내 | `ErrorNotice` (role="alert") |
 | 아이콘 | `Icon name="..."` — 장식용, 의미는 텍스트로. 아이콘만 있는 버튼은 `aria-label` |
