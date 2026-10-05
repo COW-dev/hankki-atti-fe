@@ -1,20 +1,26 @@
-import { Footer } from "@/components/layout/Footer";
-import { Block, PageShell } from "@/components/layout/PageShell";
-import { TopBar } from "@/components/layout/TopBar";
-import { Logo } from "@/components/ui/Logo";
+"use client";
 
-// 첫 화면 자리. 소개 화면(M-01, Figma 203:104)과 로그인 이동은 인증 화면 작업에서 붙인다
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { ApiError } from "@/lib/api/client";
+import { ErrorCode } from "@/lib/api/error-codes";
+import { homePathOf, useAuth, type Me } from "@/lib/auth/AuthProvider";
+
+// 첫 화면: 로그인 상태에 따라 알맞은 화면으로 보낸다 (소개 화면 M-01은 아직 없다)
 export default function Home() {
-  return (
-    <PageShell size="L" topBar={<TopBar title="한끼아띠" />} footer={<Footer copyright />}>
-      <Block gap="md">
-        <div className="flex w-full flex-col items-center gap-(--space-md) py-(--space-xl)">
-          <Logo variant="large" />
-          <p className="typo-body text-center text-(--color-text-secondary)">
-            명지대학교 장애학생 식사 도우미 매칭 서비스
-          </p>
-        </div>
-      </Block>
-    </PageShell>
-  );
+  const router = useRouter();
+  const { status, authRequest } = useAuth();
+
+  useEffect(() => {
+    if (status === "anonymous") router.replace("/login");
+    if (status !== "authenticated") return;
+    authRequest<Me>("/api/me")
+      .then((me) => router.replace(homePathOf(me.role)))
+      .catch((error) => {
+        const mustChange = error instanceof ApiError && error.code === ErrorCode.PASSWORD_CHANGE_REQUIRED;
+        router.replace(mustChange ? "/password/change" : "/login");
+      });
+  }, [status, authRequest, router]);
+
+  return null;
 }
