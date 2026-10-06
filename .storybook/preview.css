@@ -1,0 +1,7 @@
+@import "tailwindcss";
+@import "@hankki/tokens/styles.css";
+
+@source "../apps/web";
+@source "../packages/ui/src";
+@source "../packages/icons/src";
+@source "./preview.tsx";
