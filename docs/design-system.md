@@ -1,10 +1,10 @@
 # 디자인 시스템
 
-Figma "06 디자인 시스템"(파일 `xc4O5yRWg6RXjpPGEUcbrE`, 페이지 68:2)을 코드 기준으로 정리한 문서다. 값이 다르면 Figma가 기준이고, 이 문서와 `styles/tokens.css`를 함께 고친다.
+Figma "06 디자인 시스템"(파일 `xc4O5yRWg6RXjpPGEUcbrE`, 페이지 68:2)을 코드 기준으로 정리한 문서다. 값이 다르면 Figma가 기준이고, 이 문서와 `packages/tokens/src/tokens.css`를 함께 고친다.
 
-- 토큰: `styles/tokens.css`
-- 텍스트 스타일·포커스 링: `app/globals.css`
-- 컴포넌트: `components/ui/`(디자인 시스템), `components/layout/`(화면 틀)
+- 토큰: `packages/tokens/src/tokens.css`
+- 텍스트 스타일·포커스 링: `packages/tokens/src/styles.css`
+- 컴포넌트: `packages/ui/src/`(공용 UI), `apps/web/components/`(앱 전용)
 
 ## 원칙
 
@@ -108,15 +108,15 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 
 | 컴포넌트 | Figma | 변형 | 코드 | 상태 |
 |---|---|---|---|---|
-| Button | 68:73 | Primary · Secondary · Tertiary · Danger × Large · Small | `ui/Button` (화면 이동은 `ButtonLink`) | ✅ |
-| TextField | 70:62 | Default · Focus · Error · Disabled | `ui/TextField` | ✅ (Disabled 미구현) |
-| Notice | 70:77 | Info · Success · Error · Warning | `ui/Notice` | 🟡 Error만 |
-| A11yToggle | 70:86 | Pressed true · false | `ui/A11yToggle` | ✅ (음성 읽기 미구현) |
-| Icon | 68:48 | 15종 | `ui/Icon` | 🟡 쓴 것만 `public/icons`에 있음 |
-| TopBar | 70:87 · 목업 201:3 | 뒤로 / 로고, 알림, 접근성 토글 | `layout/TopBar` | ✅ (알림 개수 미구현) |
-| TabBar | 70:141 | 장애학생 · 도우미 × Active 1~4 | `layout/TabBar` | 🟡 장애학생만 |
-| Footer | 목업 201:68 | copyright 유무 | `layout/Footer` | ✅ |
-| Logo | 목업 187:51 | large · topbar · footer | `ui/Logo` | ✅ Figma에서 한 장의 SVG로 내보냄. 포크 손잡이 레이어(187:47, 이미지 추적)는 내보내기에서 빠져 디자이너 확인 필요 |
+| Button | 68:73 | Primary · Secondary · Tertiary · Danger × Large · Small | `@hankki/ui` (`Button` / `ButtonLink`) (화면 이동은 `ButtonLink`) | ✅ |
+| TextField | 70:62 | Default · Focus · Error · Disabled | `@hankki/ui` (`TextField`) | ✅ (Disabled 미구현) |
+| Notice | 70:77 | Info · Success · Error · Warning | `@hankki/ui` (`ErrorNotice`) | 🟡 Error만 |
+| A11yToggle | 70:86 | Pressed true · false | `apps/web/components/ui/A11yToggle` | ✅ (음성 읽기 미구현) |
+| Icon | 68:48 | 15종 | `@hankki/icons` (`Icon`) | 🟡 쓴 것만 `packages/icons/svg`에 있음 |
+| TopBar | 70:87 · 목업 201:3 | 뒤로 / 로고, 알림, 접근성 토글 | `apps/web/components/layout/TopBar` | ✅ (알림 개수 미구현) |
+| TabBar | 70:141 | 장애학생 · 도우미 × Active 1~4 | `apps/web/components/layout/TabBar` | 🟡 장애학생만 |
+| Footer | 목업 201:68 | copyright 유무 | `apps/web/components/layout/Footer` | ✅ |
+| Logo | 목업 187:51 | large · topbar · footer | `apps/web/components/ui/Logo` | ✅ Figma에서 한 장의 SVG로 내보냄. 포크 손잡이 레이어(187:47, 이미지 추적)는 내보내기에서 빠져 디자이너 확인 필요 |
 | StatusTag | 68:92 | 성공 · 진행 · 종료 · 경고 · 오류 · 정보 · 중립 | — | ⬜ |
 | Chip | 68:99 | Default · Selected · Pressed · Disabled · Focus | — | ⬜ |
 | OptionTile | 228:180 | Checkbox · Radio × 5상태 (Checkbox 68:108 대체) | — | ⬜ |
@@ -133,7 +133,16 @@ Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만
 1. Figma MCP `get_design_context`로 컴포넌트 노드(위 표)를 읽는다. 스크린샷, 설명란, 변수를 확인한다
 2. 생성 코드의 값을 이 문서의 토큰과 텍스트 스타일로 바꾼다. 생성 코드에 들어 있는 `var(--x, 기본값)`의 기본값과 px 값은 지운다
 3. 상태 변형은 props로 받고, Pressed는 `active:`, Focus는 전역 포커스 링, Disabled는 `inactive`(`aria-disabled`)로 처리한다
-4. 에셋(SVG)은 `public/icons/` 또는 `public/images/`에 받아 두고 `Icon`/`img`로 쓴다
+4. 에셋(SVG)은 `packages/icons/svg/` 또는 `apps/web/public/images/`에 받아 두고 `Icon`/`img`로 쓴다
 5. 파일 상단 JSDoc에 Figma 노드 ID를 적는다
-6. 역할·이름·aria 속성·키보드 동작을 테스트한다 (`Xxx.test.tsx`)
+6. 역할·이름·aria 속성·키보드 동작을 테스트한다 (`Xxx.test.tsx`)와 기존 상태별 Storybook 스토리(`Xxx.stories.tsx`)
 7. 이 문서의 컴포넌트 표 상태를 바꾼다
+
+## 구조와 Storybook
+
+개발 시 [ARCHITECTURE.md](ARCHITECTURE.md)와 이 문서를 함께 참고한다. `pnpm storybook`으로 공용 UI와 앱 전용 컴포넌트를 확인하고, 스토리는 구현 옆에 둔다. 앱과 Storybook은 동일한 소스·토큰·Pretendard를 사용한다. 툴바에서 L·M 및 큰 글씨를 고른다. 미구현 변형은 스토리를 위해 새로 만들지 않는다.
+
+- 공용 Block은 `packages/ui/src/Block`에 있다. PageShell과 센터·브랜드 정보 및 기기 설정에 묶인 컴포넌트는 앱에 둔다.
+- 토큰·텍스트 스타일·포커스는 `@hankki/tokens/styles.css`를 가져온다. Tailwind 진입점은 패키지 소스를 명시적으로 탐색해야 한다.
+- 아이콘 원본은 `packages/icons/svg` 한곳에서 관리한다. `apps/web/public/icons` 심링크로 앱과 Storybook 모두 `/icons/*.svg`를 제공한다.
+- `pnpm test`는 기존 단위 테스트와 Storybook 상호작용·접근성 테스트를 실행한다. `pnpm exec playwright install chromium`으로 브라우저를 먼저 설치한다.

@@ -96,4 +96,4 @@ PR 초안을 `.ai-workspace/pr.md`에 저장하고 사용자에게 보여준 뒤
 - 사용자 확인 없이 단계를 건너뛰거나 자동 진행 금지
 - 어느 단계에서든 사용자가 중단을 요청하면 즉시 중단
 - 사용자 승인 없는 push 금지, PR 머지 절대 금지
-- 인증 관련 파일(`lib/auth/`, `lib/api/client.ts`) 수정이 포함된 경우 STEP 2 시작 전 별도 경고
+- 인증 관련 파일(`apps/web/lib/auth/`, `apps/web/lib/api/client.ts`) 수정이 포함된 경우 STEP 2 시작 전 별도 경고
