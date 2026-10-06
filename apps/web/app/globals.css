@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "@hankki/tokens/styles.css";
+
+/* workspace 패키지는 Tailwind 자동 탐색 밖에 있으므로 명시한다. */
+@source "../../../packages/ui/src";
+@source "../../../packages/icons/src";

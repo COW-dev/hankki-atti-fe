@@ -13,15 +13,19 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ],
     "paths": {
-      "@/*": ["./*"]
+      "@/*": ["./apps/web/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", ".next/dev/types/**/*.ts", "**/*.mts"],
-  "exclude": ["node_modules"]
+  "include": [
+    ".storybook/**/*.ts",
+    ".storybook/**/*.tsx",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "apps/web/components/**/*.stories.tsx",
+    "vitest.config.mts",
+    "vitest.setup.ts",
+    "vitest.shims.d.ts"
+  ],
+  "exclude": ["node_modules", "storybook-static", "apps/web/.next"]
 }

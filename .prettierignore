@@ -1,7 +1,11 @@
 pnpm-lock.yaml
-.next/
+**/.next/
 next-env.d.ts
-public/
+**/public/
+packages/icons/svg/
 .ai-workspace/
 # 문서는 표·줄바꿈을 손으로 맞춘다
 *.md
+
+storybook-static/
+.pnpm-store/

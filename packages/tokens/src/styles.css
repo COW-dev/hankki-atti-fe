@@ -1,0 +1,80 @@
+@import "./tokens.css";
+
+/*
+ * 토큰은 Tailwind 임의 값으로 참조한다: bg-(--color-bg-muted), h-(--control-height), gap-(--space-xs)
+ * 글자는 아래 텍스트 스타일 유틸리티 7개만 쓴다 (Figma 텍스트 스타일과 1:1). 크기는 크기 모드를 따라 바뀐다.
+ */
+/*
+ * 글꼴은 Pretendard (Figma는 설치 문제로 Noto Sans KR로 대신 그렸다).
+ * 한글 전체 파일은 2MB라, 화면에 나온 글자 조각만 받는 dynamic subset을 layout.tsx에서 불러온다
+ */
+@theme {
+  --font-sans: "Pretendard Variable", Pretendard, system-ui, sans-serif;
+}
+
+@utility typo-display {
+  font-size: var(--font-display);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+}
+
+@utility typo-title {
+  font-size: var(--font-title);
+  font-weight: 700;
+  line-height: 1.4;
+  letter-spacing: -0.005em;
+}
+
+@utility typo-body {
+  font-size: var(--font-body);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@utility typo-body-strong {
+  font-size: var(--font-body);
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+@utility typo-label {
+  font-size: var(--font-label);
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+@utility typo-caption {
+  font-size: var(--font-caption);
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+@utility typo-caption-strong {
+  font-size: var(--font-caption);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+/*
+ * 기본 스타일은 base 레이어에 둔다. 레이어 밖에 두면 Tailwind 유틸리티(outline-none 등)보다 우선해서
+ * 컴포넌트가 덮어쓸 수 없다.
+ */
+@layer base {
+  body {
+    background: var(--color-bg-subtle);
+    color: var(--color-text-primary);
+    /* 한글이 글자 단위로 끊겨 한 글자만 다음 줄로 넘어가지 않게 (큰 글씨에서 잘 보인다) */
+    word-break: keep-all;
+    overflow-wrap: break-word;
+  }
+
+  /*
+   * 키보드 포커스: 2px 간격 + 3px border/focus 링 (디자인 시스템 2026-10-01 개정, 흰 배경 대비 3.98:1).
+   * Figma는 box-shadow로 그렸지만, 부모의 overflow에 잘리지 않고 고대비 모드에서도 보이도록 outline으로 그린다.
+   */
+  :focus-visible {
+    outline: 3px solid var(--color-border-focus);
+    outline-offset: 2px;
+  }
+}
