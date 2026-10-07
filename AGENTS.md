@@ -64,15 +64,17 @@ pnpm dev              # 로컬 실행 (http://localhost:3000) — 백엔드는 .
 pnpm lint             # ESLint
 pnpm format           # Prettier 적용 (pnpm format:check는 검사만)
 pnpm typecheck        # 라우트 타입 생성 후 tsc
-pnpm test             # Vitest 1회 실행 (pnpm test:watch는 감시 모드)
+pnpm test             # 단위 + Storybook 브라우저 테스트 (Chromium 필요) (pnpm test:watch는 감시 모드)
 pnpm build            # 프로덕션 빌드
+pnpm storybook        # Storybook (http://localhost:6006)
+pnpm build-storybook  # Storybook 정적 빌드
 pnpm check            # lint + format:check + typecheck + test — 커밋 전에 돌린다
 ```
 
 **최초 셋업 (clone 후 1회)**
 ```bash
 pnpm install
-cp .env.example .env.local
+cp apps/web/.env.example apps/web/.env.local
 bash scripts/setup-hooks.sh   # Git 훅 활성화 (main 직접 커밋 차단·시크릿 차단·커밋 메시지 자동 생성)
 ```
 - 로컬에 gitleaks가 없으면 훅은 grep 폴백으로 동작한다 (`brew install gitleaks` 권장)
@@ -82,43 +84,41 @@ bash scripts/setup-hooks.sh   # Git 훅 활성화 (main 직접 커밋 차단·�
 
 ## 디렉토리 구조
 
-```
-app/                    # 라우트만. page.tsx는 화면 조립(컴포넌트 배치 + 데이터 연결)만 한다
-├── layout.tsx          # html lang="ko", 글꼴, AuthProvider
-├── globals.css         # Tailwind, 텍스트 스타일 유틸리티(typo-*), 포커스 링
-└── {경로}/page.tsx     # 파일 상단 주석에 화면 ID와 Figma 노드 ID를 적는다
-components/
-├── ui/                 # 디자인 시스템 컴포넌트 (Figma "06 디자인 시스템"과 1:1) — 도메인 지식을 넣지 않는다
-└── layout/             # 화면 틀: PageShell(크기 모드), TopBar, TabBar, Footer
-lib/
-├── api/                # client.ts(apiRequest·ApiError), error-codes.ts(백엔드 오류 code)
-└── auth/               # AuthProvider(토큰·재발급), useSessionGuard(접근 제어), password-policy
-styles/tokens.css       # 디자인 토큰 (색·간격·모서리·크기 모드)
-public/icons/           # Figma에서 내려받은 SVG 아이콘 (Icon name="파일명")
-public/images/          # 로고 등 이미지
-docs/design-system.md   # 디자인 시스템 코드 정리본
+```text
+apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
+├── app/                # 라우트·화면 조립
+├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
+├── lib/                # API·인증·도메인 로직
+└── public/             # 앱 이미지, icons는 packages/icons/svg 심링크
+packages/
+├── ui/src/             # 공용 UI: 컴포넌트별 구현·스토리·테스트·index
+├── tokens/src/         # tokens.css, styles.css(텍스트 스타일·포커스)
+└── icons/              # src/Icon, Figma 원본 svg/
+.storybook/             # 공용 UI와 앱 컴포넌트의 Storybook
 ```
 
 - 컴포넌트 파일은 PascalCase(`TextField.tsx`), 훅은 `useXxx.ts`, 그 밖의 모듈은 kebab-case(`error-codes.ts`)
 - 테스트는 대상 옆에 `Xxx.test.tsx` / `xxx.test.ts`로 둔다
-- 한 도메인에서만 쓰는 컴포넌트·훅이 늘어나면 `features/{도메인}/`(예: `features/requests/`)을 만들고, 처음 만들 때 이 섹션에 추가한다
-- 경로 별칭은 `@/`(레포 루트)만 쓴다
+- 한 도메인에서만 쓰는 컴포넌트·훅이 늘어나면 `apps/web/features/{도메인}/`(예: `features/requests/`)을 만들고, 처음 만들 때 이 섹션에 추가한다
+- 경로 별칭은 `@/`(apps/web 루트)만 쓴다. 공용 패키지는 `@hankki/ui`, `@hankki/tokens`, `@hankki/icons`, 패키지 내부는 상대 경로를 쓴다
 
 ---
 
 ## 디자인 시스템 규칙
 
+개발 시 [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)와 [docs/design-system.md](docs/design-system.md)를 함께 참고한다. 구조·의존성은 아키텍처 문서를, 토큰·스타일·크기 모드·컴포넌트·접근성은 디자인 시스템 문서를 따른다.
+
 상세(토큰 표, 컴포넌트 목록과 Figma 노드 ID, 새 컴포넌트 추가 절차)는 [docs/design-system.md](docs/design-system.md).
 
-1. **원시값 금지** — 색·모서리·글자 크기·조작 영역은 `styles/tokens.css`의 용도 토큰만 쓴다. `#hex`, `text-[15px]`, `bg-gray-100` 같은 Tailwind 기본 팔레트 금지
+1. **원시값 금지** — 색·모서리·글자 크기·조작 영역은 `packages/tokens/src/tokens.css`의 용도 토큰만 쓴다. `#hex`, `text-[15px]`, `bg-gray-100` 같은 Tailwind 기본 팔레트 금지
    - 참조 문법: `bg-(--color-bg-muted)`, `text-(--color-text-secondary)`, `gap-(--space-xs)`, `min-h-(--control-height)`
    - 원시 팔레트(`--brand-*`, `--gray-*`)는 tokens.css 안에서만 쓴다
    - 간격은 Figma가 변수(space/*)에 연결한 곳은 토큰, 목업이 숫자로 둔 곳(예: 빈 상태 영역 gap 10)은 같은 값의 Tailwind 숫자 클래스(`gap-2.5`)를 쓴다. 가까운 토큰으로 바꾸지 않는다
 2. **글자는 텍스트 스타일 7개만** — `typo-display`, `typo-title`, `typo-body`, `typo-body-strong`, `typo-label`, `typo-caption`, `typo-caption-strong`. `font-bold`·`leading-*`를 따로 붙이지 않는다
 3. **크기 모드** — 화면은 `PageShell size="L" | "M"`으로 감싼다 (장애학생·비로그인 L, 도우미 M). 글자·버튼 높이·탭바·아이콘 크기가 모드를 따라 바뀌므로 **px로 높이·글자 크기를 고정하지 않는다**. 접근성 모드 "큰 글씨"는 `<html data-text-size="large">`로 모든 모드를 덮어쓴다
-4. **컴포넌트 먼저** — 화면에서 버튼·입력칸·안내를 직접 그리지 않고 `components/ui`를 쓴다. 없으면 Figma 컴포넌트를 보고 `components/ui`에 먼저 만든다
+4. **컴포넌트 먼저** — 화면에서 버튼·입력칸·안내를 직접 그리지 않고 `packages/ui/src`를 쓴다. 없으면 Figma 컴포넌트를 보고 `packages/ui/src`에 먼저 만든다. 구현·스토리·테스트는 컴포넌트 폴더에 함께 둔다
 5. **Figma가 기준** — 새 화면·컴포넌트는 Figma MCP `get_design_context`(노드 ID)로 값을 확인하고 만든다. 스크린샷 눈대중 금지. 생성 코드는 그대로 붙이지 않고 이 프로젝트 토큰·컴포넌트로 옮긴다
-6. **에셋** — 아이콘·이미지는 Figma에서 받은 파일을 `public/`에 그대로 두고 `Icon`/`img`로 쓴다. 다시 그리거나 경로를 손대지 않는다
+6. **에셋** — 아이콘·이미지는 Figma에서 받은 파일을 `packages/icons/svg/` 또는 `apps/web/public/images/`에 그대로 두고 `Icon`/`img`로 쓴다. 다시 그리거나 경로를 손대지 않는다
 7. **목업 개정(2026-10-01) 원칙** — 배경 bg/subtle 위에 흰 블록(`Block`), 민트(brand/200)는 주 버튼과 선택 상태에만, 그림자는 모달·알림 패널만
 
 ---
@@ -141,7 +141,7 @@ Figma A11Y 공통 규칙(31:2)을 코드 기준으로 옮겼다. 위반은 기�
 
 ## 코딩 컨벤션
 
-- 들여쓰기 2칸 스페이스, 한 줄 120자 — Prettier가 맞춘다 (`pnpm format`)
+- 들여쓰기 2칸 스페이스, 한 줄 100자, 작은따옴표 — Prettier가 맞춘다 (`pnpm format`)
 - `any` 금지, 타입 단언(`as`)은 API 응답 경계에서만
 - 컴포넌트는 named export, 라우트(`page.tsx`, `layout.tsx`)만 default export
 - `"use client"`는 상태·이벤트·브라우저 API가 필요한 파일에만 붙인다
@@ -151,7 +151,7 @@ Figma A11Y 공통 규칙(31:2)을 코드 기준으로 옮겼다. 위반은 기�
 ### API · 인증
 
 - 서버 호출은 `apiRequest`(로그인 전) / `useAuth().authRequest`(로그인 후)만 쓴다. 컴포넌트에서 `fetch` 직접 호출 금지
-- 오류 분기는 `message`가 아니라 `ApiError.code`로 한다. 쓰는 code는 `lib/api/error-codes.ts`에 추가한다
+- 오류 분기는 `message`가 아니라 `ApiError.code`로 한다. 쓰는 code는 `apps/web/lib/api/error-codes.ts`에 추가한다
 - access 토큰은 메모리에만 둔다. **localStorage·sessionStorage·쿠키에 토큰을 저장하지 않는다**. refresh 토큰은 백엔드가 주는 HttpOnly 쿠키라 JS에서 다루지 않는다
 - refresh는 `refreshOnce()`로만 부른다 — 같은 refresh 토큰을 두 번 쓰면 서버가 탈취로 보고 계정의 토큰을 모두 폐기한다
 - 로그인이 필요한 화면은 `useSessionGuard(역할)`로 감싼다. 숨김은 보조일 뿐이고 권한 판단은 서버가 한다
@@ -160,20 +160,20 @@ Figma A11Y 공통 규칙(31:2)을 코드 기준으로 옮겼다. 위반은 기�
 
 - **블라인드는 서버 책임** — 매칭 전 도우미 화면에는 서버가 준 필드만 그린다. 받은 개인정보를 화면에서 숨기는 방식으로 해결하지 않는다 (그런 응답을 받으면 백엔드에 알린다)
 - **장애 정보는 민감정보** — 장애 유형·특이사항을 `console`·에러 리포트에 남기지 않는다
-- **상태 표시** — API는 enum 코드만 준다. 표시 문구는 프론트가 매핑하고, 매핑 표는 한곳(`lib/labels/` 등, 처음 만들 때 이 섹션에 추가)에 둔다
+- **상태 표시** — API는 enum 코드만 준다. 표시 문구는 프론트가 매핑하고, 매핑 표는 한곳(`apps/web/lib/labels/` 등, 처음 만들 때 이 섹션에 추가)에 둔다
 - **시간** — 신청 시각은 30분 단위, 이용 시간 1시간, 모든 시각은 Asia/Seoul 기준으로 표시한다
 
 ---
 
 ## 테스트 컨벤션
 
-**작성 의무**: `lib/`의 로직, `components/ui`의 동작·접근성 속성을 새로 만들거나 바꾸면 테스트를 함께 쓴다. 화면(`app/`)은 로직을 `lib/`로 빼서 테스트한다.
+**작성 의무**: `apps/web/lib/`의 로직, `packages/ui/src`의 동작·접근성 속성을 새로 만들거나 바꾸면 테스트를 함께 쓴다. 화면(`apps/web/app/`)은 로직을 `apps/web/lib/`로 빼서 테스트한다.
 
 | 대상 | 무엇을 검증 | 도구 |
 |---|---|---|
-| `lib/` | 입력·출력, 오류 분기, 재시도·중복 방지 | Vitest (`fetch`는 `vi.stubGlobal`) |
-| `components/ui` | 키보드 동작, 역할·이름·aria 속성 | Testing Library + user-event |
-| `components/layout`, `app/` | 필요할 때만 (복잡한 분기가 생기면 로직을 빼서 테스트) | |
+| `apps/web/lib/` | 입력·출력, 오류 분기, 재시도·중복 방지 | Vitest (`fetch`는 `vi.stubGlobal`) |
+| `packages/ui/src` | 키보드 동작, 역할·이름·aria 속성 | Testing Library + user-event |
+| `apps/web/components/layout`, `apps/web/app/` | 필요할 때만 (복잡한 분기가 생기면 로직을 빼서 테스트) | |
 
 **작성 규칙**
 - 요소는 역할과 이름으로 찾는다 (`getByRole("button", { name: "로그인" })`). `data-testid`·클래스 선택자는 쓰지 않는다 — 스크린리더가 찾을 수 없으면 테스트도 못 찾아야 한다
@@ -218,7 +218,7 @@ Figma A11Y 공통 규칙(31:2)을 코드 기준으로 옮겼다. 위반은 기�
 2. **force push 금지** — `git push --force` 절대 실행 금지
 3. **main 직접 커밋/push 금지** — 작업은 항상 작업 브랜치에서 한다 (pre-commit 훅이 로컬에서 차단)
 4. **민감정보 커밋 금지** — `.env.local`, API 키, 토큰, 계정 정보 커밋 금지. `NEXT_PUBLIC_*` 변수는 브라우저에 그대로 노출되므로 비밀값을 넣지 않는다
-5. **인증 변경 사람 리뷰 필수** — `lib/auth/`, `lib/api/client.ts`의 토큰·쿠키 처리를 바꾸면 반드시 사람이 리뷰 후 병합
+5. **인증 변경 사람 리뷰 필수** — `apps/web/lib/auth/`, `apps/web/lib/api/client.ts`의 토큰·쿠키 처리를 바꾸면 반드시 사람이 리뷰 후 병합
 6. **커밋 전 사용자 승인 필수** — 커밋 메시지 제안 후 승인 대기, 자동 커밋 금지
 
 **허용되는 것**

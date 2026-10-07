@@ -32,8 +32,8 @@ git diff HEAD                 # 아직 커밋하지 않은 변경
 - [ ] 글자에 `typo-*` 외의 `font-bold`·`leading-*`·`text-[Npx]`를 쓰지 않았는가
 - [ ] 버튼 높이·글자 크기·아이콘 크기를 px로 고정하지 않았는가 (크기 모드 토큰 사용)
 - [ ] 화면이 `PageShell`의 올바른 `size`(장애학생·비로그인 L, 도우미 M)를 쓰는가
-- [ ] 버튼·입력칸·안내를 화면에서 직접 그리지 않고 `components/ui`를 썼는가
-- [ ] 새 `components/ui` 컴포넌트에 Figma 노드 ID가 있고 `docs/design-system.md` 표를 갱신했는가
+- [ ] 버튼·입력칸·안내를 화면에서 직접 그리지 않고 `packages/ui/src`를 썼는가
+- [ ] 새 `packages/ui/src` 컴포넌트에 Figma 노드 ID가 있고 `docs/design-system.md` 표를 갱신했는가
 - [ ] 민트(brand/200) 위에 흰 글자가 없는가, 민트를 주 버튼·선택 상태 외에 쓰지 않았는가
 - [ ] 문구가 목업과 같은가, "신청" 용어를 썼는가
 
@@ -53,7 +53,7 @@ git diff HEAD                 # 아직 커밋하지 않은 변경
 - [ ] 오류 분기를 `message`가 아니라 `ApiError.code`로 하는가
 - [ ] 토큰을 localStorage·sessionStorage·쿠키에 저장하지 않는가
 - [ ] 보호 화면에 `useSessionGuard`가 있는가
-- [ ] `lib/auth/`, `lib/api/client.ts`가 수정됐다면 사람 리뷰 필요를 명시했는가
+- [ ] `apps/web/lib/auth/`, `apps/web/lib/api/client.ts`가 수정됐다면 사람 리뷰 필요를 명시했는가
 
 **[도메인 규칙]**
 - [ ] 매칭 전 도우미 화면에 학생 개인정보를 그리지 않는가 (화면 숨김으로 처리하지 않았는가)
@@ -66,7 +66,7 @@ git diff HEAD                 # 아직 커밋하지 않은 변경
 - [ ] 목록 key가 index가 아닌 고유값인가
 
 **[테스트]**
-- [ ] 새 `lib/` 로직과 `components/ui` 동작에 테스트가 있는가
+- [ ] 새 `apps/web/lib/` 로직과 `packages/ui/src` 동작에 테스트가 있는가
 - [ ] 역할·이름으로 요소를 찾는가 (`data-testid` 없음)
 - [ ] assertion 없는 테스트, 스냅샷 테스트가 없는가
 

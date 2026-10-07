@@ -43,8 +43,8 @@ plan.md가 현재 작업과 일치하지 않습니다 (기준: <브랜치>@<SHA>
 | 글자 | `typo-*` 7개만. `font-bold`·`leading-*`·`text-[15px]` 금지 |
 | 높이·글자 크기 | 크기 모드 토큰(`--control-height`, `--icon-size`)으로. px 고정 금지 |
 | 화면 틀 | `PageShell size="L"`(장애학생·비로그인) / `"M"`(도우미) |
-| 버튼 | `components/ui/Button`. 못 누르는 상태는 `inactive` (disabled 금지). 화면 이동은 같은 모양의 `ButtonLink` (`<a>`) |
-| 입력칸 | `components/ui/TextField` (label 필수, 오류는 `error`, 규칙 안내는 `describedBy`) |
+| 버튼 | `@hankki/ui`의 `Button`. 못 누르는 상태는 `inactive` (disabled 금지). 화면 이동은 같은 모양의 `ButtonLink` (`<a>`) |
+| 입력칸 | `@hankki/ui`의 `TextField` (label 필수, 오류는 `error`, 규칙 안내는 `describedBy`) |
 | 오류 안내 | `ErrorNotice` (role="alert") |
 | 아이콘 | `Icon name="..."` — 장식용, 의미는 텍스트로. 아이콘만 있는 버튼은 `aria-label` |
 | API | `apiRequest` / `useAuth().authRequest`. `fetch` 직접 호출 금지, 분기는 `ApiError.code` |
@@ -70,7 +70,7 @@ pnpm format
 - 수정 방향 제안 후 승인 대기
 
 ### 4. 테스트 작성 및 실행 (필수)
-`lib/` 로직과 `components/ui` 동작의 테스트를 함께 작성한다.
+`lib/` 로직과 `packages/ui/src` 동작의 테스트를 함께 작성한다.
 
 > 작성 기준 → **AGENTS.md — 테스트 컨벤션 섹션 참고**
 
@@ -93,4 +93,4 @@ pnpm format
 - 자동 커밋/푸시 절대 금지
 - 계획에 없는 파일 수정 금지
 - 계획에 없는 리팩토링, 코드 정리 금지
-- 인증 관련 파일(`lib/auth/`, `lib/api/client.ts`) 수정 포함 시 구현 전 사용자에게 재확인
+- 인증 관련 파일(`apps/web/lib/auth/`, `apps/web/lib/api/client.ts`) 수정 포함 시 구현 전 사용자에게 재확인
