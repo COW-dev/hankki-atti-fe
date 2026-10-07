@@ -1,7 +1,24 @@
+# dependencies
+node_modules
+
+# build outputs
+dist
+build
+.out
+.next
+coverage
+
+# static / generated
+public
+*.min.js
+*.map
+
+# config lock files
 pnpm-lock.yaml
-.next/
-next-env.d.ts
-public/
-.ai-workspace/
-# 문서는 표·줄바꿈을 손으로 맞춘다
+yarn.lock
+package-lock.json
+
+# misc
+.env
+
 *.md

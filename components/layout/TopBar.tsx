@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { A11yToggle } from "@/components/ui/A11yToggle";
-import { Icon } from "@/components/ui/Icon";
-import { Logo } from "@/components/ui/Logo";
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { A11yToggle } from '@/components/ui/A11yToggle';
+import { Icon } from '@/components/ui/Icon';
+import { Logo } from '@/components/ui/Logo';
 
 type TopBarProps = {
   // 화면마다 하나인 h1 (A11Y 공통 규칙)

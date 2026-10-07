@@ -2,10 +2,10 @@
 export const PASSWORD_MAX_LENGTH = 64;
 
 export const PASSWORD_RULES = [
-  { label: "8자 이상", test: (value: string) => value.length >= 8 },
-  { label: "영문 포함", test: (value: string) => /[A-Za-z]/.test(value) },
-  { label: "숫자 포함", test: (value: string) => /\d/.test(value) },
-  { label: "특수문자 포함", test: (value: string) => /[^A-Za-z\d\s]/.test(value) },
+  { label: '8자 이상', test: (value: string) => value.length >= 8 },
+  { label: '영문 포함', test: (value: string) => /[A-Za-z]/.test(value) },
+  { label: '숫자 포함', test: (value: string) => /\d/.test(value) },
+  { label: '특수문자 포함', test: (value: string) => /[^A-Za-z\d\s]/.test(value) },
 ] as const;
 
 export function checkPassword(value: string) {

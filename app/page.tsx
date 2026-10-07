@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { Footer } from "@/components/layout/Footer";
-import { Block, PageShell } from "@/components/layout/PageShell";
-import { A11yToggle } from "@/components/ui/A11yToggle";
-import { ButtonLink } from "@/components/ui/Button";
-import { Logo } from "@/components/ui/Logo";
-import { ApiError } from "@/lib/api/client";
-import { ErrorCode } from "@/lib/api/error-codes";
-import { homePathOf, useAuth, type Me } from "@/lib/auth/AuthProvider";
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { Footer } from '@/components/layout/Footer';
+import { Block, PageShell } from '@/components/layout/PageShell';
+import { A11yToggle } from '@/components/ui/A11yToggle';
+import { ButtonLink } from '@/components/ui/Button';
+import { Logo } from '@/components/ui/Logo';
+import { ApiError } from '@/lib/api/client';
+import { ErrorCode } from '@/lib/api/error-codes';
+import { homePathOf, useAuth, type Me } from '@/lib/auth/AuthProvider';
 
-const STEPS = ["도우미를 신청해요", "지원하면 바로 알려드려요", "학식당에서 만나요"];
+const STEPS = ['도우미를 신청해요', '지원하면 바로 알려드려요', '학식당에서 만나요'];
 
 // M-01 소개 (Figma 203:104). 로그인한 사람은 소개 없이 역할별 첫 화면으로 보낸다
 // Figma의 부제("신청하면 도우미 학생이 지원해요")와 계정 안내("장애학생 계정은 센터에서 만들어 드려요")는 명세에 없어 넣지 않는다
@@ -20,17 +20,18 @@ export default function Home() {
   const { status, authRequest } = useAuth();
 
   useEffect(() => {
-    if (status !== "authenticated") return;
-    authRequest<Me>("/api/me")
+    if (status !== 'authenticated') return;
+    authRequest<Me>('/api/me')
       .then((me) => router.replace(homePathOf(me.role)))
       .catch((error) => {
-        const mustChange = error instanceof ApiError && error.code === ErrorCode.PASSWORD_CHANGE_REQUIRED;
-        router.replace(mustChange ? "/password/change" : "/login");
+        const mustChange =
+          error instanceof ApiError && error.code === ErrorCode.PASSWORD_CHANGE_REQUIRED;
+        router.replace(mustChange ? '/password/change' : '/login');
       });
   }, [status, authRequest, router]);
 
   // 로그인 여부를 확인하는 동안은 그리지 않는다 — 로그인한 사람에게 소개 화면이 잠깐 보이지 않게
-  if (status !== "anonymous") return null;
+  if (status !== 'anonymous') return null;
 
   return (
     <PageShell size="L" topBar={<IntroHeader />} footer={<Footer copyright />}>

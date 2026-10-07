@@ -1,7 +1,7 @@
-import { useId, type InputHTMLAttributes } from "react";
-import { Icon } from "@/components/ui/Icon";
+import { useId, type InputHTMLAttributes } from 'react';
+import { Icon } from '@/components/ui/Icon';
 
-type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, "id"> & {
+type TextFieldProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'id'> & {
   label: string;
   error?: string;
   // 규칙 안내처럼 입력칸 아래에 붙는 설명의 id (aria-describedby로 연결)
@@ -15,11 +15,11 @@ export function TextField({ label, error, describedBy, className, ...inputProps 
   const id = useId();
   const errorId = `${id}-error`;
   const ring = error
-    ? "shadow-[inset_0_0_0_var(--stroke-strong)_var(--color-border-danger)]"
-    : "focus-within:shadow-[inset_0_0_0_var(--stroke-strong)_var(--color-border-focus)]";
+    ? 'shadow-[inset_0_0_0_var(--stroke-strong)_var(--color-border-danger)]'
+    : 'focus-within:shadow-[inset_0_0_0_var(--stroke-strong)_var(--color-border-focus)]';
 
   return (
-    <div className={`flex w-full flex-col items-start gap-(--space-xs) ${className ?? ""}`}>
+    <div className={`flex w-full flex-col items-start gap-(--space-xs) ${className ?? ''}`}>
       <label htmlFor={id} className="typo-body-strong w-full text-(--color-text-primary)">
         {label}
       </label>
@@ -30,13 +30,18 @@ export function TextField({ label, error, describedBy, className, ...inputProps 
         <input
           id={id}
           aria-invalid={error ? true : undefined}
-          aria-describedby={[error ? errorId : null, describedBy].filter(Boolean).join(" ") || undefined}
+          aria-describedby={
+            [error ? errorId : null, describedBy].filter(Boolean).join(' ') || undefined
+          }
           className="typo-body w-full min-w-px flex-1 bg-transparent text-(--color-text-primary) outline-none placeholder:text-(--color-text-secondary) focus-visible:outline-none"
           {...inputProps}
         />
       </div>
       {error && (
-        <p id={errorId} className="typo-caption flex w-full items-center gap-(--space-2xs) text-(--color-text-danger)">
+        <p
+          id={errorId}
+          className="typo-caption flex w-full items-center gap-(--space-2xs) text-(--color-text-danger)"
+        >
           <Icon name="error" />
           {error}
         </p>

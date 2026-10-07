@@ -1,15 +1,20 @@
-"use client";
+'use client';
 
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
-import { ApiError, apiRequest } from "@/lib/api/client";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { ApiError, apiRequest } from '@/lib/api/client';
 
-export type Role = "STUDENT" | "HELPER" | "ADMIN";
+export type Role = 'STUDENT' | 'HELPER' | 'ADMIN';
 
-type LoginResponse = { accessToken: string; expiresIn: number; role: Role; mustChangePassword: boolean };
+type LoginResponse = {
+  accessToken: string;
+  expiresIn: number;
+  role: Role;
+  mustChangePassword: boolean;
+};
 type TokenResponse = { accessToken: string; expiresIn: number };
 export type Me = { accountId: number; loginId: string; role: Role; accessibilityMode: boolean };
 
-type AuthStatus = "loading" | "authenticated" | "anonymous";
+type AuthStatus = 'loading' | 'authenticated' | 'anonymous';
 
 type AuthContextValue = {
   status: AuthStatus;
@@ -18,7 +23,7 @@ type AuthContextValue = {
   logout: () => Promise<void>;
   authRequest: <T>(
     path: string,
-    options?: { method?: "GET" | "POST" | "PATCH" | "DELETE"; body?: unknown },
+    options?: { method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'; body?: unknown },
   ) => Promise<T>;
 };
 
@@ -30,9 +35,11 @@ let refreshInFlight: Promise<TokenResponse> | null = null;
 
 function refreshOnce(): Promise<TokenResponse> {
   if (!refreshInFlight) {
-    refreshInFlight = apiRequest<TokenResponse>("/api/auth/refresh", { method: "POST" }).finally(() => {
-      refreshInFlight = null;
-    });
+    refreshInFlight = apiRequest<TokenResponse>('/api/auth/refresh', { method: 'POST' }).finally(
+      () => {
+        refreshInFlight = null;
+      },
+    );
   }
   return refreshInFlight;
 }
@@ -42,26 +49,32 @@ function refreshOnce(): Promise<TokenResponse> {
  */
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [status, setStatus] = useState<AuthStatus>("loading");
+  const [status, setStatus] = useState<AuthStatus>('loading');
 
   useEffect(() => {
     refreshOnce()
       .then((tokens) => {
         setAccessToken(tokens.accessToken);
-        setStatus("authenticated");
+        setStatus('authenticated');
       })
-      .catch(() => setStatus("anonymous"));
+      .catch(() => setStatus('anonymous'));
   }, []);
 
   const login = useCallback(async (loginId: string, password: string) => {
-    const result = await apiRequest<LoginResponse>("/api/auth/login", { method: "POST", body: { loginId, password } });
+    const result = await apiRequest<LoginResponse>('/api/auth/login', {
+      method: 'POST',
+      body: { loginId, password },
+    });
     setAccessToken(result.accessToken);
-    setStatus("authenticated");
+    setStatus('authenticated');
     return result;
   }, []);
 
   const authRequest = useCallback(
-    async <T,>(path: string, options: { method?: "GET" | "POST" | "PATCH" | "DELETE"; body?: unknown } = {}) => {
+    async <T,>(
+      path: string,
+      options: { method?: 'GET' | 'POST' | 'PATCH' | 'DELETE'; body?: unknown } = {},
+    ) => {
       try {
         return await apiRequest<T>(path, { ...options, accessToken });
       } catch (error) {
@@ -73,7 +86,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           return await apiRequest<T>(path, { ...options, accessToken: tokens.accessToken });
         } catch (retryError) {
           setAccessToken(null);
-          setStatus("anonymous");
+          setStatus('anonymous');
           throw retryError;
         }
       }
@@ -84,8 +97,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const changePassword = useCallback(
     async (currentPassword: string, newPassword: string) => {
       // 비밀번호를 바꾸면 다른 기기는 로그아웃되고, 지금 기기는 새 토큰을 받는다
-      const tokens = await authRequest<TokenResponse>("/api/auth/password", {
-        method: "PATCH",
+      const tokens = await authRequest<TokenResponse>('/api/auth/password', {
+        method: 'PATCH',
         body: { currentPassword, newPassword },
       });
       setAccessToken(tokens.accessToken);
@@ -94,9 +107,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
-    await apiRequest("/api/auth/logout", { method: "POST" }).catch(() => undefined);
+    await apiRequest('/api/auth/logout', { method: 'POST' }).catch(() => undefined);
     setAccessToken(null);
-    setStatus("anonymous");
+    setStatus('anonymous');
   }, []);
 
   const value = useMemo(
@@ -108,10 +121,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
 export function useAuth() {
   const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth는 AuthProvider 안에서만 쓸 수 있어요.");
+  if (!context) throw new Error('useAuth는 AuthProvider 안에서만 쓸 수 있어요.');
   return context;
 }
 
 export function homePathOf(role: Role) {
-  return role === "HELPER" ? "/matches" : "/requests";
+  return role === 'HELPER' ? '/matches' : '/requests';
 }

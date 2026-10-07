@@ -1,6 +1,6 @@
 // 백엔드 응답 형식 (ApiResult). 실패 응답에는 오류를 구분하는 code가 있다 — 분기는 message가 아니라 code로 한다 (error-codes.ts)
 type ApiResult<T> = {
-  resultType: "SUCCESS" | "FAIL";
+  resultType: 'SUCCESS' | 'FAIL';
   httpStatusCode: number;
   code?: string;
   message: string;
@@ -17,10 +17,10 @@ export class ApiError extends Error {
   }
 }
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
 
 type RequestOptions = {
-  method?: "GET" | "POST" | "PATCH" | "DELETE";
+  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
   body?: unknown;
   accessToken?: string | null;
 };
@@ -31,10 +31,10 @@ type RequestOptions = {
  */
 export async function apiRequest<T>(
   path: string,
-  { method = "GET", body, accessToken }: RequestOptions = {},
+  { method = 'GET', body, accessToken }: RequestOptions = {},
 ): Promise<T> {
   const headers: Record<string, string> = {};
-  if (body !== undefined) headers["Content-Type"] = "application/json";
+  if (body !== undefined) headers['Content-Type'] = 'application/json';
   if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
 
   let response: Response;
@@ -43,15 +43,19 @@ export async function apiRequest<T>(
       method,
       headers,
       body: body === undefined ? undefined : JSON.stringify(body),
-      credentials: "include",
+      credentials: 'include',
     });
   } catch {
-    throw new ApiError(0, undefined, "서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.");
+    throw new ApiError(0, undefined, '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요.');
   }
 
   const result = (await response.json().catch(() => null)) as ApiResult<T> | null;
-  if (!response.ok || result?.resultType !== "SUCCESS") {
-    throw new ApiError(response.status, result?.code, result?.message ?? "요청을 처리하지 못했어요.");
+  if (!response.ok || result?.resultType !== 'SUCCESS') {
+    throw new ApiError(
+      response.status,
+      result?.code,
+      result?.message ?? '요청을 처리하지 못했어요.',
+    );
   }
   return result.data as T;
 }

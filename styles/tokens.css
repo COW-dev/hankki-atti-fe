@@ -103,7 +103,7 @@
  * display는 L(M-01 소개 화면)·관리자만 목업 변수로 확인했다. M·큰 글씨는 디자인 시스템 표 값이다.
  */
 :root,
-[data-size="L"] {
+[data-size='L'] {
   --font-display: 24px;
   --font-title: 18px;
   --font-body: 16px;
@@ -116,7 +116,7 @@
   --icon-size: 24px;
 }
 
-[data-size="M"] {
+[data-size='M'] {
   --font-display: 22px;
   --font-title: 17px;
   --font-body: 15px;
@@ -129,7 +129,7 @@
   --icon-size: 20px;
 }
 
-[data-size="admin"] {
+[data-size='admin'] {
   --font-display: 24px;
   --font-title: 18px;
   --font-body: 14px;
@@ -141,9 +141,9 @@
   --icon-size: 18px;
 }
 
-:root[data-text-size="large"],
-:root[data-text-size="large"] [data-size="L"],
-:root[data-text-size="large"] [data-size="M"] {
+:root[data-text-size='large'],
+:root[data-text-size='large'] [data-size='L'],
+:root[data-text-size='large'] [data-size='M'] {
   --font-display: 34px;
   --font-title: 26px;
   --font-body: 24px;

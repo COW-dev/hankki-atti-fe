@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { useState, type FormEvent } from "react";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/Button";
-import { Footer } from "@/components/layout/Footer";
-import { Logo } from "@/components/ui/Logo";
-import { ErrorNotice } from "@/components/ui/Notice";
-import { Block, PageShell } from "@/components/layout/PageShell";
-import { TextField } from "@/components/ui/TextField";
-import { TopBar } from "@/components/layout/TopBar";
-import { ApiError } from "@/lib/api/client";
-import { ErrorCode } from "@/lib/api/error-codes";
-import { homePathOf, useAuth } from "@/lib/auth/AuthProvider";
+import Link from 'next/link';
+import { useState, type FormEvent } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/Button';
+import { Footer } from '@/components/layout/Footer';
+import { Logo } from '@/components/ui/Logo';
+import { ErrorNotice } from '@/components/ui/Notice';
+import { Block, PageShell } from '@/components/layout/PageShell';
+import { TextField } from '@/components/ui/TextField';
+import { TopBar } from '@/components/layout/TopBar';
+import { ApiError } from '@/lib/api/client';
+import { ErrorCode } from '@/lib/api/error-codes';
+import { homePathOf, useAuth } from '@/lib/auth/AuthProvider';
 
 // L-01 로그인 (Figma 203:240 기본 · 203:433 실패 · 203:635 비활성 계정)
 export default function LoginPage() {
   const router = useRouter();
   const { login } = useAuth();
-  const [loginId, setLoginId] = useState("");
-  const [password, setPassword] = useState("");
+  const [loginId, setLoginId] = useState('');
+  const [password, setPassword] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
@@ -31,15 +31,15 @@ export default function LoginPage() {
     setPasswordError(undefined);
     try {
       const result = await login(loginId.trim(), password);
-      router.replace(result.mustChangePassword ? "/password/change" : homePathOf(result.role));
+      router.replace(result.mustChangePassword ? '/password/change' : homePathOf(result.role));
     } catch (error) {
       if (error instanceof ApiError && error.code === ErrorCode.ACCOUNT_DEACTIVATED) {
         setNotice(error.message);
       } else if (error instanceof ApiError && error.code === ErrorCode.LOGIN_FAILED) {
-        setNotice("아이디 또는 비밀번호가 맞지 않아요");
-        setPasswordError("비밀번호를 다시 확인해 주세요");
+        setNotice('아이디 또는 비밀번호가 맞지 않아요');
+        setPasswordError('비밀번호를 다시 확인해 주세요');
       } else {
-        setNotice(error instanceof Error ? error.message : "잠시 후 다시 시도해 주세요");
+        setNotice(error instanceof Error ? error.message : '잠시 후 다시 시도해 주세요');
       }
     } finally {
       setSubmitting(false);
@@ -85,7 +85,10 @@ export default function LoginPage() {
           <span aria-hidden className="typo-caption text-(--color-text-disabled)">
             |
           </span>
-          <Link href="/password/reset" className="typo-caption-strong text-(--color-text-secondary)">
+          <Link
+            href="/password/reset"
+            className="typo-caption-strong text-(--color-text-secondary)"
+          >
             비밀번호를 잊었어요
           </Link>
         </div>

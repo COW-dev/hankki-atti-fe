@@ -1,4 +1,4 @@
-import { Icon } from "@/components/ui/Icon";
+import { Icon } from '@/components/ui/Icon';
 
 /**
  * Figma Notice · Error (70:77). 화면 상단 오류 안내 — 스크린리더가 바로 읽도록 role="alert".
