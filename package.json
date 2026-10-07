@@ -14,7 +14,9 @@
     "test:watch": "vitest",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test"
+    "check": "pnpm lint && pnpm format:check && pnpm typecheck && pnpm test",
+    "test:unit": "vitest run --project unit",
+    "test:storybook": "vitest run --project storybook"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "latest",
