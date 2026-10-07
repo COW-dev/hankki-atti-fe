@@ -1,7 +1,8 @@
 import type { StorybookConfig } from '@storybook/nextjs-vite';
+import { fileURLToPath } from 'node:url';
 
 const config: StorybookConfig = {
-  stories: ['../components/**/*.mdx', '../components/**/*.stories.@(js|jsx|mjs|ts|tsx)'],
+  stories: ['../packages/**/*.stories.tsx', '../apps/web/components/**/*.stories.tsx'],
   addons: [
     '@chromatic-com/storybook',
     '@storybook/addon-vitest',
@@ -9,7 +10,19 @@ const config: StorybookConfig = {
     '@storybook/addon-docs',
     '@storybook/addon-mcp',
   ],
-  framework: '@storybook/nextjs-vite',
-  staticDirs: ['../public'],
+  framework: {
+    name: '@storybook/nextjs-vite',
+    options: {
+      nextConfigPath: fileURLToPath(new URL('../apps/web/next.config.ts', import.meta.url)),
+    },
+  },
+  staticDirs: ['../apps/web/public'],
+  async viteFinal(config) {
+    const { mergeConfig } = await import('vite');
+    return mergeConfig(config, {
+      resolve: { alias: { '@': fileURLToPath(new URL('../apps/web', import.meta.url)) } },
+      css: { postcss: { plugins: [(await import('@tailwindcss/postcss')).default()] } },
+    });
+  },
 };
 export default config;

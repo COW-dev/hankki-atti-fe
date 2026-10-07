@@ -20,5 +20,11 @@ package-lock.json
 
 # misc
 .env
-
+next-env.d.ts
+packages/icons/svg/
+.ai-workspace/
+# 문서는 표·줄바꿈을 손으로 맞춘다
 *.md
+
+storybook-static/
+.pnpm-store/

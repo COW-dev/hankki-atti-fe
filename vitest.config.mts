@@ -6,7 +6,7 @@ import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   // tsconfig의 "@/*" 경로 별칭과 같게 맞춘다
-  resolve: { alias: { '@': fileURLToPath(new URL('.', import.meta.url)) } },
+  resolve: { alias: { '@': fileURLToPath(new URL('./apps/web', import.meta.url)) } },
   test: {
     projects: [
       {
@@ -17,7 +17,7 @@ export default defineConfig({
           environment: 'jsdom',
           setupFiles: ['./vitest.setup.ts'],
           include: ['**/*.test.{ts,tsx}'],
-          exclude: ['node_modules/**', '.next/**'],
+          exclude: ['**/node_modules/**', '**/.next/**', 'storybook-static/**'],
         },
       },
       {
