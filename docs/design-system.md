@@ -100,6 +100,8 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 | `--space-2xl` | 32 | | `--stroke-default` | 1 | |
 | `--space-3xl` | 40 | | `--stroke-strong` | 2 | 입력칸 포커스·오류 |
 
+그림자는 모달·알림 패널에만 쓴다: `--shadow-modal` (Figma Shadow/Modal, 0 8 32 rgba(26,28,36,0.16)).
+
 ## 포커스
 
 키보드 포커스는 2px 간격 + 3px `--color-border-focus` 링이다(2026-10-01 개정, 흰 배경 대비 3.98:1). 전역 `:focus-visible`이 그리므로 컴포넌트에서 따로 만들지 않는다. 입력칸은 Figma State=Focus대로 안쪽 2px 테두리로 대신 표시한다.
@@ -109,21 +111,21 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 | 컴포넌트 | Figma | 변형 | 코드 | 상태 |
 |---|---|---|---|---|
 | Button | 68:73 | Primary · Secondary · Tertiary · Danger × Large · Small | `@hankki/ui` (`Button` / `ButtonLink`) (화면 이동은 `ButtonLink`) | ✅ |
-| TextField | 70:62 | Default · Focus · Error · Disabled | `@hankki/ui` (`TextField`) | ✅ (Disabled 미구현) |
-| Notice | 70:77 | Info · Success · Error · Warning | `@hankki/ui` (`ErrorNotice`) | 🟡 Error만 |
+| TextField | 70:62 | Default · Focus · Error · Disabled | `@hankki/ui` (`TextField`) — `helper`, `multiline`(textarea), `count`(글자 수·초과 오류) | ✅ (Disabled 미구현) |
+| Notice | 70:77 | Info · Success · Error · Warning | `@hankki/ui` (`Notice tone=…`, `ErrorNotice`) — error만 `alert`, `live`면 `status` | ✅ |
 | A11yToggle | 70:86 | Pressed true · false | `apps/web/components/ui/A11yToggle` | ✅ (음성 읽기 미구현) |
 | Icon | 68:48 | 15종 | `@hankki/icons` (`Icon`) | 🟡 쓴 것만 `packages/icons/svg`에 있음 |
 | TopBar | 70:87 · 목업 201:3 | 뒤로 / 로고, 알림, 접근성 토글 | `apps/web/components/layout/TopBar` | ✅ (알림 개수 미구현) |
 | TabBar | 70:141 | 장애학생 · 도우미 × Active 1~4 | `apps/web/components/layout/TabBar` | 🟡 장애학생만 |
 | Footer | 목업 201:68 | copyright 유무 | `apps/web/components/layout/Footer` | ✅ |
 | Logo | 목업 187:51 | large · topbar · footer | `apps/web/components/ui/Logo` | ✅ Figma에서 한 장의 SVG로 내보냄. 포크 손잡이 레이어(187:47, 이미지 추적)는 내보내기에서 빠져 디자이너 확인 필요 |
-| StatusTag | 68:92 | 성공 · 진행 · 종료 · 경고 · 오류 · 정보 · 중립 | — | ⬜ |
-| Chip | 68:99 | Default · Selected · Pressed · Disabled · Focus | — | ⬜ |
-| OptionTile | 228:180 | Checkbox · Radio × 5상태 (Checkbox 68:108 대체) | — | ⬜ |
+| StatusTag | 68:92 | 성공 · 진행 · 종료 · 경고 · 오류 · 정보 · 중립 | `@hankki/ui` (`StatusTag tone=…`) | ✅ |
+| Chip | 68:99 | Default · Selected · Pressed · Disabled · Focus | `@hankki/ui` (`ChipGroup` radiogroup + `Chip`) — 화살표 이동 = 선택, `columns`로 균등 폭 | ✅ |
+| OptionTile | 228:180 | Checkbox · Radio × 5상태 (Checkbox 68:108 대체) | `@hankki/ui` (`OptionGroup` fieldset + `OptionTile`) — 진짜 input을 숨기고 label을 타일로. 높이는 `--control-height`(M에서 Figma 44) | ✅ |
 | Toggle | 228:193 | Off · On · Disabled · Focus | — | ⬜ |
 | InputCompact | 228:206 | Text · Select (관리자 검색·드롭다운) | — | ⬜ |
 | RequestCard | 70:142 | 신청 카드 | — | ⬜ |
-| Modal | 70:152 | 확인·선택 모달 | — | ⬜ |
+| Modal | 70:152 | 확인·선택 모달 | `@hankki/ui` (`Modal`) — 네이티브 `dialog.showModal()`, 열리면 제목 포커스, Esc·배경 클릭(`dismissOnBackdrop`) | ✅ |
 | SidebarItem | 70:172 | 관리자 사이드바 | — | ⬜ |
 
 Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만들기 전에 `get_design_context`로 꼭 읽는다.

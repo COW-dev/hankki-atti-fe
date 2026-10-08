@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { TextField } from '@hankki/ui';
 
@@ -34,5 +35,40 @@ describe('TextField', () => {
     render(<TextField label="아이디" />);
 
     expect(screen.getByRole('textbox', { name: '아이디' })).not.toHaveAttribute('aria-invalid');
+  });
+
+  it('helper를 주면 설명으로 읽히고, 오류가 생기면 오류 문구가 대신한다', () => {
+    const { rerender } = render(<TextField label="학번" helper="로그인 아이디로 써요" />);
+    expect(screen.getByRole('textbox', { name: '학번' })).toHaveAccessibleDescription(
+      '로그인 아이디로 써요',
+    );
+
+    rerender(<TextField label="학번" helper="로그인 아이디로 써요" error="학번을 입력해 주세요" />);
+    expect(screen.getByRole('textbox', { name: '학번' })).toHaveAccessibleDescription(
+      '학번을 입력해 주세요',
+    );
+  });
+
+  it('multiline이면 여러 줄 입력칸이 되고 글자 수가 설명에 들어간다', async () => {
+    render(<TextField multiline label="메모 (선택)" count={200} />);
+    const textarea = screen.getByRole('textbox', { name: '메모 (선택)' });
+
+    expect(textarea.tagName).toBe('TEXTAREA');
+    expect(textarea).toHaveAccessibleDescription('0 / 200자');
+
+    await userEvent.type(textarea, '출입구에서 기다릴게요');
+    expect(textarea).toHaveAccessibleDescription('11 / 200자');
+    expect(textarea).not.toHaveAttribute('aria-invalid');
+  });
+
+  it('최대 글자 수를 넘으면 오류로 표시하되 입력은 막지 않는다', async () => {
+    render(<TextField multiline label="메모" count={5} />);
+    const textarea = screen.getByRole('textbox', { name: '메모' });
+
+    await userEvent.type(textarea, '여섯글자예요');
+
+    expect(textarea).toHaveValue('여섯글자예요');
+    expect(textarea).toHaveAttribute('aria-invalid', 'true');
+    expect(textarea).toHaveAccessibleDescription('5자까지 쓸 수 있어요 6 / 5자');
   });
 });
