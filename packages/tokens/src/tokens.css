@@ -1,0 +1,157 @@
+/*
+ * 디자인 토큰 — Figma "06 디자인 시스템"(68:2) 변수와 같은 이름을 쓴다.
+ * 컴포넌트는 원시값(--brand-*, --gray-*)을 쓰지 않고 용도(Color) 토큰만 쓴다.
+ * 사용법과 규칙은 docs/design-system.md 참고.
+ */
+
+:root {
+  /* ── 원시값 (컴포넌트에서 직접 쓰지 않는다) ── */
+  --brand-50: #eefcfb;
+  --brand-100: #d8f9f6;
+  --brand-200: #a7f3ed;
+  --brand-300: #6cdad1;
+  --brand-400: #37beb2;
+  --brand-500: #0c8f84;
+  --brand-600: #0f857b;
+  --brand-700: #096d64;
+  --brand-800: #07504a;
+  --brand-900: #043430;
+
+  --gray-0: #ffffff;
+  --gray-50: #f8f9fa;
+  --gray-100: #f1f3f5;
+  --gray-200: #e4e7eb;
+  --gray-300: #cfd4da;
+  --gray-400: #adb4bd;
+  --gray-500: #868e99;
+  --gray-600: #5f6773;
+  --gray-700: #454c57;
+  --gray-800: #2d333b;
+  --gray-900: #191d23;
+
+  /* ── 배경 ── */
+  --color-bg-default: var(--gray-0);
+  --color-bg-subtle: var(--gray-50);
+  --color-bg-muted: var(--gray-100);
+  --color-bg-disabled: var(--gray-200);
+  --color-bg-brand: var(--brand-400);
+  --color-bg-button-primary: var(--brand-200);
+  --color-bg-brand-pressed: var(--brand-300);
+  --color-bg-brand-subtle: var(--brand-200);
+  --color-bg-brand-accent: var(--brand-200);
+  --color-bg-brand-selected: var(--brand-50);
+  --color-bg-brand-strong: var(--brand-500);
+  --color-bg-danger: #e5383b;
+  --color-bg-danger-subtle: #fff1f1;
+  --color-bg-success-subtle: #edfaf2;
+  --color-bg-warning-subtle: #fff5e8;
+  --color-bg-overlay: #000000;
+
+  /* ── 글자 ── */
+  --color-text-primary: var(--gray-900);
+  --color-text-secondary: var(--gray-600);
+  --color-text-disabled: var(--gray-400);
+  --color-text-brand: var(--brand-700);
+  --color-text-on-brand: var(--gray-900);
+  --color-text-danger: #b01e24;
+  --color-text-success: #0e6b39;
+  --color-text-warning: #a34e00;
+
+  /* ── 테두리 ── */
+  --color-border-default: var(--gray-200);
+  --color-border-strong: var(--gray-500);
+  --color-border-brand: var(--brand-600);
+  --color-border-focus: var(--brand-500);
+  --color-border-danger: #e5383b;
+
+  /* ── 아이콘 ── */
+  --color-icon-primary: var(--gray-900);
+  --color-icon-secondary: var(--gray-600);
+  --color-icon-brand: var(--brand-700);
+  --color-icon-danger: #e5383b;
+  --color-icon-success: #0e6b39;
+  --color-icon-warning: #a34e00;
+  --color-icon-inverse: var(--gray-0);
+
+  /* ── 간격 (4 단위) ── */
+  --space-2xs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
+  --space-md: 16px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-2xl: 32px;
+  --space-3xl: 40px;
+
+  /* ── 모서리 · 선 ── */
+  --radius-sm: 8px;
+  --radius-control: 10px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-full: 999px;
+  --stroke-default: 1px;
+  --stroke-strong: 2px;
+}
+
+/*
+ * 크기 모드 (Figma Size 변수 모드). 화면 틀(PageShell)의 data-size로 고른다.
+ *   L     — 장애학생 · 비로그인 (기본)
+ *   M     — 도우미
+ *   admin — 관리자 (데스크톱)
+ *   큰 글씨 — 접근성 모드. <html data-text-size="large">이면 L·M 대신 이 값을 쓴다
+ * display는 L(M-01 소개 화면)·관리자만 목업 변수로 확인했다. M·큰 글씨는 디자인 시스템 표 값이다.
+ */
+:root,
+[data-size='L'] {
+  --font-display: 24px;
+  --font-title: 18px;
+  --font-body: 16px;
+  --font-label: 16px;
+  --font-caption: 14px;
+  --control-height: 48px;
+  --control-height-sm: 40px;
+  --control-padding-x: 20px;
+  --tabbar-height: 64px;
+  --icon-size: 24px;
+}
+
+[data-size='M'] {
+  --font-display: 22px;
+  --font-title: 17px;
+  --font-body: 15px;
+  --font-label: 16px;
+  --font-caption: 13px;
+  --control-height: 44px;
+  --control-height-sm: 36px;
+  --control-padding-x: 16px;
+  --tabbar-height: 62px;
+  --icon-size: 20px;
+}
+
+[data-size='admin'] {
+  --font-display: 24px;
+  --font-title: 18px;
+  --font-body: 14px;
+  --font-label: 14px;
+  --font-caption: 12px;
+  --control-height: 40px;
+  --control-height-sm: 32px;
+  --control-padding-x: 12px;
+  --icon-size: 18px;
+}
+
+:root[data-text-size='large'],
+:root[data-text-size='large'] [data-size='L'],
+:root[data-text-size='large'] [data-size='M'] {
+  --font-display: 34px;
+  --font-title: 26px;
+  --font-body: 24px;
+  --font-label: 24px;
+  --font-caption: 20px;
+  --control-height: 56px;
+  --control-height-sm: 48px;
+  --control-padding-x: 24px;
+  --tabbar-height: 84px;
+  --icon-size: 28px;
+}

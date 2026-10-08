@@ -18,7 +18,7 @@ $ARGUMENTS - 구현할 기능·화면 설명 (화면 ID나 Figma 노드 ID가 �
   - 상태별 프레임(기본·실패·빈 상태 등)이 따로 있으면 모두 확인한다
   - 대표 화면이면 "05 접근성 주석"의 포커스·읽기 순서도 확인한다
 - API: 백엔드 Swagger에서 요청·응답 필드와 오류 `code` 확인 (아직 없는 API면 "백엔드 대기"로 표시)
-- $ARGUMENTS와 관련된 기존 코드 (`app/`, `components/`, `lib/`)
+- $ARGUMENTS와 관련된 기존 코드 (`apps/web/app/`, `apps/web/components/`, `apps/web/lib/`, `packages/`)
 
 ### 2. 계획 수립
 
@@ -27,12 +27,12 @@ $ARGUMENTS - 구현할 기능·화면 설명 (화면 ID나 Figma 노드 ID가 �
 
 **변경/생성 파일 목록**
 - 파일 경로, 변경 유형(신규/수정), 변경 이유
-- 새로 만들 `components/ui` 컴포넌트와 Figma 노드 ID
+- 새로 만들 `packages/ui/src` 컴포넌트와 Figma 노드 ID
 - 새로 받을 에셋(아이콘·이미지)
 
 **작업 순서**
 ```
-에셋 → 디자인 시스템 컴포넌트(components/ui) → lib(API 호출·로직) → 화면(app/) → 테스트
+에셋 → 디자인 시스템 컴포넌트(packages/ui/src) → lib(API 호출·로직) → 화면(app/) → 테스트
 ```
 
 **접근성 계획**
@@ -44,11 +44,11 @@ $ARGUMENTS - 구현할 기능·화면 설명 (화면 ID나 Figma 노드 ID가 �
 - 시간 경계(30분 단위, 식사 시작·종료), 블라인드(매칭 전 개인정보 미표시)
 
 **테스트 전략**
-- `lib/` 단위 테스트 대상, `components/ui` 접근성·키보드 테스트 대상
+- `apps/web/lib/` 단위 테스트 대상, `packages/ui/src` 접근성·키보드 테스트 대상
 
 **리스크**
 - 디자인과 명세가 다른 부분 → "확인 필요"로 표시
-- 인증 관련 변경 포함 여부 — `lib/auth/`, `lib/api/client.ts` 수정 시 사람 리뷰 필수 명시
+- 인증 관련 변경 포함 여부 — `apps/web/lib/auth/`, `apps/web/lib/api/client.ts` 수정 시 사람 리뷰 필수 명시
 
 > 컨벤션 상세 → **AGENTS.md 참고**
 

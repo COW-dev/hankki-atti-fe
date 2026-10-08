@@ -3,9 +3,9 @@ name: CI
 # push는 main에만 건다. 작업 브랜치까지 걸면 PR마다 push CI와 PR CI가 중복 실행된다.
 on:
   push:
-    branches: ["main"]
+    branches: ['main']
   pull_request:
-    branches: ["main"]
+    branches: ['main']
 
 permissions:
   contents: read
@@ -42,11 +42,17 @@ jobs:
       - name: Typecheck
         run: pnpm typecheck
 
+      - name: Install Chromium
+        run: pnpm exec playwright install --with-deps chromium
+
       - name: Test
         run: pnpm test
 
       - name: Build
         run: pnpm build
+
+      - name: Build Storybook
+        run: pnpm build-storybook
 
   secret-scan:
     runs-on: ubuntu-latest

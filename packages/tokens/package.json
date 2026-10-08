@@ -1,0 +1,9 @@
+{
+  "name": "@hankki/tokens",
+  "version": "0.1.0",
+  "private": true,
+  "exports": {
+    "./tokens.css": "./src/tokens.css",
+    "./styles.css": "./src/styles.css"
+  }
+}
