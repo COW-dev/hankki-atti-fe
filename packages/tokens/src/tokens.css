@@ -92,6 +92,9 @@
   --radius-full: 999px;
   --stroke-default: 1px;
   --stroke-strong: 2px;
+
+  /* ── 그림자 (모달·알림 패널에만, Figma Shadow/Modal) ── */
+  --shadow-modal: 0 8px 32px rgba(26, 28, 36, 0.16);
 }
 
 /*

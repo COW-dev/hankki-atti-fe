@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect } from 'storybook/test';
-import { TextField } from './TextField';
+import { TextField, type SingleLineTextFieldProps } from './TextField';
 
 const meta = {
   title: '공용 UI/TextField',
@@ -13,7 +13,7 @@ const meta = {
       </div>
     ),
   ],
-} satisfies Meta<typeof TextField>;
+} satisfies Meta<SingleLineTextFieldProps>;
 export default meta;
 type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
@@ -62,6 +62,14 @@ export const Password: Story = {
 export const LongError: Story = {
   args: {
     error: '입력한 아이디를 찾을 수 없어요. 센터에서 발급받은 아이디가 맞는지 다시 확인해 주세요.',
+  },
+};
+export const Helper: Story = {
+  args: { label: '학번', placeholder: '예: 60221234', helper: '로그인 아이디로 써요' },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('textbox', { name: '학번' })).toHaveAccessibleDescription(
+      '로그인 아이디로 써요',
+    );
   },
 };
 export const LargeText: Story = { globals: { textSize: 'large' } };
