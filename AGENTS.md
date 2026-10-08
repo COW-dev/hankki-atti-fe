@@ -88,7 +88,8 @@ bash scripts/setup-hooks.sh   # Git 훅 활성화 (main 직접 커밋 차단·�
 apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
 ├── app/                # 라우트·화면 조립
 ├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
-├── lib/                # API·인증·도메인 로직
+├── features/           # 도메인별 화면 조각·훅 (requests/ = 내 신청·도우미 신청)
+├── lib/                # API·인증·도메인 로직 (labels/ = 상태 enum 표시 문구, format/ = 날짜·시각)
 └── public/             # 앱 이미지, icons는 packages/icons/svg 심링크
 packages/
 ├── ui/src/             # 공용 UI: 컴포넌트별 구현·스토리·테스트·index
@@ -160,8 +161,8 @@ Figma A11Y 공통 규칙(31:2)을 코드 기준으로 옮겼다. 위반은 기�
 
 - **블라인드는 서버 책임** — 매칭 전 도우미 화면에는 서버가 준 필드만 그린다. 받은 개인정보를 화면에서 숨기는 방식으로 해결하지 않는다 (그런 응답을 받으면 백엔드에 알린다)
 - **장애 정보는 민감정보** — 장애 유형·특이사항을 `console`·에러 리포트에 남기지 않는다
-- **상태 표시** — API는 enum 코드만 준다. 표시 문구는 프론트가 매핑하고, 매핑 표는 한곳(`apps/web/lib/labels/` 등, 처음 만들 때 이 섹션에 추가)에 둔다
-- **시간** — 신청 시각은 30분 단위, 이용 시간 1시간, 모든 시각은 Asia/Seoul 기준으로 표시한다
+- **상태 표시** — API는 enum 코드만 준다. 표시 문구는 프론트가 매핑하고, 매핑 표는 `apps/web/lib/labels/`에 둔다 (`help-request.ts`: 신청 상태 → StatusTag 톤·문구, 도움 유형 문구)
+- **시간** — 신청 시각은 30분 단위, 이용 시간 1시간, 모든 시각은 Asia/Seoul 기준으로 표시한다. 서버의 `LocalDateTime` 문자열은 `apps/web/lib/format/datetime.ts`의 `parseLocalDateTime`으로만 읽는다 (`new Date(문자열)`은 브라우저 시간대를 탄다)
 
 ---
 

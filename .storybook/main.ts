@@ -2,7 +2,11 @@ import type { StorybookConfig } from '@storybook/nextjs-vite';
 import { fileURLToPath } from 'node:url';
 
 const config: StorybookConfig = {
-  stories: ['../packages/**/*.stories.tsx', '../apps/web/components/**/*.stories.tsx'],
+  stories: [
+    '../packages/**/*.stories.tsx',
+    '../apps/web/components/**/*.stories.tsx',
+    '../apps/web/features/**/*.stories.tsx',
+  ],
   addons: [
     '@chromatic-com/storybook',
     '@storybook/addon-vitest',
