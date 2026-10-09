@@ -22,3 +22,26 @@ export type MyHelpRequests = {
   // 매칭 실패·취소 완료·이용 완료·노쇼, 최근 순
   past: MyHelpRequest[];
 };
+
+// GET /api/help-requests/time-options 항목 — 오늘부터 7일, 주말·공휴일·지난 시각 제외. 날짜·시각 순
+export type TimeOption = { startAt: string; endAt: string; meal: 'LUNCH' | 'DINNER' };
+export type TimeOptionDate = { date: string; startTimes: TimeOption[] };
+
+// POST /api/help-requests 본문
+export type CreateHelpRequestBody = {
+  startAt: string;
+  helpTypes: HelpType[];
+  otherHelpText?: string;
+  memo?: string;
+};
+
+// POST /api/help-requests 응답 (백엔드 HelpRequestCreateResponseDto)
+export type CreatedHelpRequest = {
+  id: number;
+  startAt: string;
+  endAt: string;
+  helpTypes: HelpType[];
+  otherHelpText: string | null;
+  memo: string | null;
+  status: HelpRequestStatus;
+};

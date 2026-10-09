@@ -9,16 +9,21 @@ export function OptionGroup({
   describedBy,
   children,
   className,
+  legendClassName,
 }: {
   legend: string;
   columns?: 1 | 2;
   describedBy?: string;
   children: ReactNode;
   className?: string;
+  // 화면 필드 제목(typo-label 등)에 맞출 때
+  legendClassName?: string;
 }) {
   return (
     <fieldset aria-describedby={describedBy} className={`w-full min-w-0 ${className ?? ''}`}>
-      <legend className="typo-body-strong mb-(--space-xs) w-full text-(--color-text-primary)">
+      <legend
+        className={`mb-(--space-xs) w-full text-(--color-text-primary) ${legendClassName ?? 'typo-body-strong'}`}
+      >
         {legend}
       </legend>
       <div className={`grid gap-(--space-xs) ${columns === 2 ? 'grid-cols-2' : 'grid-cols-1'}`}>

@@ -3,7 +3,13 @@
 import { useRef, type KeyboardEvent } from 'react';
 import { Chip } from './Chip';
 
-export type ChipOption<T extends string> = { value: T; label: string; disabled?: boolean };
+export type ChipOption<T extends string> = {
+  value: T;
+  label: string;
+  disabled?: boolean;
+  // disabled인 이유 (스크린리더용)
+  disabledReason?: string;
+};
 
 const COLUMNS_CLASS = {
   1: 'grid-cols-1',
@@ -26,7 +32,8 @@ type ChipGroupProps<T extends string> = {
 
 /**
  * Chip 단일 선택 묶음 (radiogroup). Tab은 그룹에 한 번만 들어오고(선택된 칩, 없으면 첫 칩),
- * 화살표로 이동하면 바로 선택된다 (표준 라디오 동작). Home/End로 처음·끝. disabled 칩은 건너뛴다.
+ * 화살표로 이동하면 바로 선택된다 (표준 라디오 동작). Home/End로 처음·끝.
+ * disabled 칩도 화살표로 들어가진다 — 그 시각이 있다는 것과 이유를 읽어 주려고. 선택만 안 된다.
  */
 export function ChipGroup<T extends string>({
   options,
@@ -38,43 +45,39 @@ export function ChipGroup<T extends string>({
   className,
 }: ChipGroupProps<T>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
-  const enabledIndexes = options.flatMap((option, index) => (option.disabled ? [] : [index]));
   const selectedIndex = options.findIndex((option) => option.value === value);
-  const tabbableIndex =
-    selectedIndex >= 0 && !options[selectedIndex].disabled
-      ? selectedIndex
-      : (enabledIndexes[0] ?? -1);
+  const firstEnabled = options.findIndex((option) => !option.disabled);
+  const tabbableIndex = selectedIndex >= 0 ? selectedIndex : firstEnabled >= 0 ? firstEnabled : 0;
 
-  const select = (index: number) => {
-    onChange(options[index].value);
+  // 포커스를 옮기고, 고를 수 있는 칩이면 선택까지 한다
+  const moveTo = (index: number) => {
     refs.current[index]?.focus();
+    if (!options[index].disabled) onChange(options[index].value);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
-    const position = enabledIndexes.indexOf(index);
-    if (position < 0) return;
-    const last = enabledIndexes.length - 1;
+    const last = options.length - 1;
     let next: number;
     switch (event.key) {
       case 'ArrowRight':
       case 'ArrowDown':
-        next = enabledIndexes[position === last ? 0 : position + 1];
+        next = index === last ? 0 : index + 1;
         break;
       case 'ArrowLeft':
       case 'ArrowUp':
-        next = enabledIndexes[position === 0 ? last : position - 1];
+        next = index === 0 ? last : index - 1;
         break;
       case 'Home':
-        next = enabledIndexes[0];
+        next = 0;
         break;
       case 'End':
-        next = enabledIndexes[last];
+        next = last;
         break;
       default:
         return;
     }
     event.preventDefault();
-    select(next);
+    moveTo(next);
   };
 
   return (
@@ -92,10 +95,9 @@ export function ChipGroup<T extends string>({
           }}
           selected={option.value === value}
           disabled={option.disabled}
+          disabledReason={option.disabledReason}
           tabIndex={index === tabbableIndex ? 0 : -1}
-          onClick={() => {
-            if (!option.disabled) select(index);
-          }}
+          onClick={() => moveTo(index)}
           onKeyDown={(event) => handleKeyDown(event, index)}
         >
           {option.label}

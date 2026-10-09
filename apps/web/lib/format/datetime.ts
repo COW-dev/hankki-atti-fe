@@ -61,6 +61,25 @@ export function relativeMealLabel(startAt: Date, now: Date): string {
   return `${formatDate(startAt)} ${meal}`;
 }
 
+// "10월 9일" (요약 "10월 9일 12:00 ~ 13:00 · 1시간"용)
+export function formatDateShort(date: Date): string {
+  return `${date.getMonth() + 1}월 ${date.getDate()}일`;
+}
+
+// 서버 날짜 "2026-10-09" → 그날 0시
+export function parseLocalDate(value: string): Date {
+  return parseLocalDateTime(`${value}T00:00`);
+}
+
+// F-01 날짜 칩: 오늘 "오늘 10/9", 내일 "내일 10/10", 그 밖 "10/13 (월)" (Figma 206:1504)
+export function dateChipLabel(date: Date, now: Date): string {
+  const days = daysBetween(startOfDay(now), startOfDay(date));
+  const short = `${date.getMonth() + 1}/${date.getDate()}`;
+  if (days === 0) return `오늘 ${short}`;
+  if (days === 1) return `내일 ${short}`;
+  return `${short} (${WEEKDAYS[date.getDay()]})`;
+}
+
 export function isSameDay(a: Date, b: Date): boolean {
   return daysBetween(startOfDay(a), startOfDay(b)) === 0;
 }

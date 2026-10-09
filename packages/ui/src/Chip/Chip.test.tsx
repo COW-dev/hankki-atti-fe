@@ -6,7 +6,12 @@ import { ChipGroup } from '@hankki/ui';
 
 const OPTIONS = [
   { value: 'today', label: '오늘 10/6' },
-  { value: 'tomorrow', label: '내일 10/7', disabled: true },
+  {
+    value: 'tomorrow',
+    label: '내일 10/7',
+    disabled: true,
+    disabledReason: '이미 신청한 시간과 겹쳐요',
+  },
   { value: 'wed', label: '10/8 (수)' },
 ];
 
@@ -60,7 +65,7 @@ describe('ChipGroup', () => {
     expect(screen.getByRole('radio', { name: '오늘 10/6' })).toHaveAttribute('tabindex', '-1');
   });
 
-  it('선택이 없으면 첫 칩으로 들어오고, 화살표로 옮기면 바로 선택되며 disabled는 건너뛴다', async () => {
+  it('선택이 없으면 첫 칩으로 들어오고, 화살표로 옮기면 바로 선택된다', async () => {
     // given
     const onChange = vi.fn();
     render(<Harness onChange={onChange} />);
@@ -68,8 +73,8 @@ describe('ChipGroup', () => {
     await userEvent.tab();
     expect(screen.getByRole('radio', { name: '오늘 10/6' })).toHaveFocus();
 
-    // when — → 는 내일(disabled)을 건너뛰어 10/8, 한 번 더 → 는 처음으로 돌아온다
-    await userEvent.keyboard('{ArrowRight}');
+    // when — → 두 번이면 10/8, 한 번 더 → 는 처음으로 돌아온다
+    await userEvent.keyboard('{ArrowRight}{ArrowRight}');
     expect(screen.getByRole('radio', { name: '10/8 (수)' })).toHaveFocus();
     expect(screen.getByRole('radio', { name: '10/8 (수)' })).toHaveAttribute(
       'aria-checked',
@@ -81,6 +86,24 @@ describe('ChipGroup', () => {
     expect(screen.getByRole('radio', { name: '오늘 10/6' })).toHaveFocus();
     expect(onChange).toHaveBeenNthCalledWith(1, 'wed');
     expect(onChange).toHaveBeenNthCalledWith(2, 'today');
+  });
+
+  it('disabled 칩에도 화살표로 들어가 이유를 읽어 주지만 선택되지는 않는다 (색만으로 알리지 않는다)', async () => {
+    // given
+    const onChange = vi.fn();
+    render(<Harness initial="today" onChange={onChange} />);
+    await userEvent.tab();
+    await userEvent.tab();
+
+    // when
+    await userEvent.keyboard('{ArrowRight}');
+
+    // then
+    const blocked = screen.getByRole('radio', { name: /내일 10\/7.*겹쳐요/ });
+    expect(blocked).toHaveFocus();
+    expect(blocked).toHaveAttribute('aria-disabled', 'true');
+    expect(blocked).toHaveAttribute('aria-checked', 'false');
+    expect(onChange).not.toHaveBeenCalled();
   });
 
   it('Home·End는 처음·끝 칩을 고른다', async () => {
@@ -105,11 +128,11 @@ describe('ChipGroup', () => {
     render(<Harness initial="today" onChange={onChange} />);
 
     await userEvent.click(screen.getByRole('radio', { name: '10/8 (수)' }));
-    await userEvent.click(screen.getByRole('radio', { name: '내일 10/7' }));
+    await userEvent.click(screen.getByRole('radio', { name: /내일 10\/7/ }));
 
     expect(onChange).toHaveBeenCalledTimes(1);
     expect(onChange).toHaveBeenCalledWith('wed');
-    expect(screen.getByRole('radio', { name: '내일 10/7' })).toHaveAttribute(
+    expect(screen.getByRole('radio', { name: /내일 10\/7/ })).toHaveAttribute(
       'aria-disabled',
       'true',
     );

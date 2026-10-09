@@ -1,10 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
+  dateChipLabel,
   formatDate,
+  formatDateShort,
   formatDateTime,
   formatDateTimeRange,
   formatTimeRange,
   mealOf,
+  parseLocalDate,
   parseLocalDateTime,
   relativeMealLabel,
 } from '@/lib/format/datetime';
@@ -60,5 +63,19 @@ describe('relativeMealLabel', () => {
         parseLocalDateTime('2026-10-06T23:50:00'),
       ),
     ).toBe('내일 점심');
+  });
+});
+
+describe('dateChipLabel', () => {
+  const now = parseLocalDateTime('2026-10-09T09:00:00');
+
+  it('오늘·내일은 "오늘 10/9"·"내일 10/10", 그 밖은 "10/13 (화)"다', () => {
+    expect(dateChipLabel(parseLocalDate('2026-10-09'), now)).toBe('오늘 10/9');
+    expect(dateChipLabel(parseLocalDate('2026-10-10'), now)).toBe('내일 10/10');
+    expect(dateChipLabel(parseLocalDate('2026-10-13'), now)).toBe('10/13 (화)');
+  });
+
+  it('formatDateShort는 "10월 9일"', () => {
+    expect(formatDateShort(parseLocalDate('2026-10-09'))).toBe('10월 9일');
   });
 });
