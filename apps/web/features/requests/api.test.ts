@@ -1,5 +1,11 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fetchMyRequests, reportNoShow, withdrawRequest } from '@/features/requests/api';
+import {
+  createRequest,
+  fetchMyRequests,
+  fetchTimeOptions,
+  reportNoShow,
+  withdrawRequest,
+} from '@/features/requests/api';
 
 describe('requests api', () => {
   it('내 신청은 GET /api/help-requests/me', async () => {
@@ -23,5 +29,23 @@ describe('requests api', () => {
     expect(authRequest).toHaveBeenNthCalledWith(2, '/api/help-requests/8/no-show', {
       method: 'POST',
     });
+  });
+
+  it('시작 시각 선택지는 GET /api/help-requests/time-options', async () => {
+    const authRequest = vi.fn().mockResolvedValue([]);
+
+    await fetchTimeOptions(authRequest);
+
+    expect(authRequest).toHaveBeenCalledWith('/api/help-requests/time-options');
+  });
+
+  it('신청은 POST /api/help-requests에 본문을 보내고 만들어진 신청을 돌려준다', async () => {
+    const authRequest = vi.fn().mockResolvedValue({ id: 9, status: 'RECRUITING' });
+    const body = { startAt: '2026-10-12T12:00:00', helpTypes: ['SERVING' as const] };
+
+    const result = await createRequest(authRequest, body);
+
+    expect(authRequest).toHaveBeenCalledWith('/api/help-requests', { method: 'POST', body });
+    expect(result.status).toBe('RECRUITING');
   });
 });

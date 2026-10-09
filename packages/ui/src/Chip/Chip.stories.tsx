@@ -50,7 +50,14 @@ export const Dates: Story = {};
 export const Times: Story = { args: { options: TIMES, columns: 4, initial: '12:00' } };
 export const NoneSelected: Story = { args: { initial: null } };
 export const WithDisabled: Story = {
-  args: { options: [...TIMES.slice(0, 2), { ...TIMES[2], disabled: true }, TIMES[3]], columns: 4 },
+  args: {
+    options: [
+      ...TIMES.slice(0, 2),
+      { ...TIMES[2], disabled: true, disabledReason: '이미 신청한 시간과 겹쳐요' },
+      TIMES[3],
+    ],
+    columns: 4,
+  },
 };
 export const Keyboard: Story = {
   args: { options: TIMES, columns: 4, initial: '12:00' },
