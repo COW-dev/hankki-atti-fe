@@ -1,6 +1,6 @@
 # 디자인 시스템
 
-Figma "06 디자인 시스템"(파일 `xc4O5yRWg6RXjpPGEUcbrE`, 페이지 68:2)을 코드 기준으로 정리한 문서다. 값이 다르면 Figma가 기준이고, 이 문서와 `packages/tokens/src/tokens.css`를 함께 고친다.
+현재 작업 기준은 Figma [hankki-atti 페이지](https://www.figma.com/design/Tnl5oLY7yDBs2Suy8hg7WC?node-id=87-4604)(파일 `Tnl5oLY7yDBs2Suy8hg7WC`, 페이지 `87:4604`)다. 아래 기존 토큰·목업 값은 이전 파일 `xc4O5yRWg6RXjpPGEUcbrE`의 "06 디자인 시스템"(68:2)에서 확인한 값이며, 새 파일의 상세 조회로 확인한 항목부터 갱신한다. 값이 다르면 Figma가 기준이고, 이 문서와 `packages/tokens/src/tokens.css`를 함께 고친다.
 
 - 토큰: `packages/tokens/src/tokens.css`
 - 텍스트 스타일·포커스 링: `packages/tokens/src/styles.css`
@@ -117,8 +117,8 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 | TabBar | 70:141 | 장애학생 · 도우미 × Active 1~4 | `apps/web/components/layout/TabBar` | 🟡 장애학생만 |
 | Footer | 목업 201:68 | copyright 유무 | `apps/web/components/layout/Footer` | ✅ |
 | Logo | 목업 187:51 | large · topbar · footer | `apps/web/components/ui/Logo` | ✅ Figma에서 한 장의 SVG로 내보냄. 포크 손잡이 레이어(187:47, 이미지 추적)는 내보내기에서 빠져 디자이너 확인 필요 |
-| StatusTag | 68:92 | 성공 · 진행 · 종료 · 경고 · 오류 · 정보 · 중립 | — | ⬜ |
-| Chip | 68:99 | Default · Selected · Pressed · Disabled · Focus | — | ⬜ |
+| StatusTag | 87:4810 | 성공 · 진행 · 종료 · 경고 · 오류 · 정보 · 중립 | `@hankki/ui` (`StatusTag`) | ✅ 구현, 원본 아이콘은 사용자 삽입 |
+| Chip | 87:4832 | Default · Selected · Pressed · Disabled · Focus | `@hankki/ui` (`Chip` / `ChipGroup`) | ✅ 구현 |
 | OptionTile | 228:180 | Checkbox · Radio × 5상태 (Checkbox 68:108 대체) | — | ⬜ |
 | Toggle | 228:193 | Off · On · Disabled · Focus | — | ⬜ |
 | InputCompact | 228:206 | Text · Select (관리자 검색·드롭다운) | — | ⬜ |
@@ -127,6 +127,19 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 | SidebarItem | 70:172 | 관리자 사이드바 | — | ⬜ |
 
 Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만들기 전에 `get_design_context`로 꼭 읽는다.
+
+### Chip · StatusTag 사용 규칙
+
+- Chip은 단일 선택 radio다. 날짜·시간·필터 묶음은 `ChipGroup`에 이름(`label`), 선택값(`value`), 변경 함수(`onChange`), 선택지(`options`)를 전달한다. 선택값은 호출부에서 관리한다.
+- `ChipGroup`은 선택한 항목만 Tab으로 진입하며 방향키는 순환, Home·End는 첫·끝 항목으로 이동하고 선택한다. 비활성 항목은 방향키 선택에서 건너뛴다. 단독 `Chip`을 조립하면 호출부가 radiogroup과 키보드 이동을 제공해야 한다.
+- `inactive`는 선택을 차단하는 `aria-disabled`다. 비활성 이유는 선택지의 `describedBy`로 설명 요소에 연결한다.
+- **접근성 우선 예외**: Figma Chip 설명은 `control/height-sm`이지만 저장소의 최소 조작 영역 규칙을 적용하여 `--control-height`(L 48 · M 44 · 큰 글씨 56)로 구현한다. 별도 작은 조작 영역 예외가 승인되기 전까지 이 기준을 유지한다.
+- Chip 모서리는 `--radius-control`(10), StatusTag는 `--radius-sm`(8)이다. 이전 일반 설명의 칩·태그 `radius/full`을 적용하지 않는다.
+- StatusTag는 `type="success | progress | ended | error | warning | info | neutral"`와 상태 문구를 받는다. API enum과 표시 문구 매핑은 호출부의 도메인 로직에 둔다.
+- 원본 아이콘은 사용자가 삽입한다. StatusTag의 `icon` 슬롯에 아이콘을 전달하며 성공·진행·종료·오류·경고에 사용한다. 정보·중립은 Figma대로 글자만 표시한다. 슬롯은 장식으로 숨기고 크기는 `--font-caption`에 맞춘다(기본 L 14). `Icon` 사용 시 같은 크기를 명시한다.
+- 정적 태그마다 `role="status"`를 붙이지 않는다. 동적으로 바뀐 상태의 알림은 화면의 polite 영역에서 처리한다.
+
+2026-10-08 현재 새 파일의 Chip·StatusTag 상세 디자인과 스크린샷만 확보했다. Figma Starter 호출 한도로 나머지 상세 조회 및 기존 컴포넌트 대조는 미완료다. 위 ✅는 구현 상태이며 브라우저 시각 대조 완료를 의미하지 않는다.
 
 ## 새 컴포넌트 추가 절차
 
