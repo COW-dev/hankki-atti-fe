@@ -1,1 +1,1 @@
-export * from './Notice';
+export { ErrorNotice, Notice, type NoticeTone } from './Notice';

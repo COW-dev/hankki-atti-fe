@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { Chip, ChipGroup } from './Chip';
+import { Chip } from './Chip';
+import { ChipGroup } from './ChipGroup';
 
 describe('Chip', () => {
   it('비활성 칩은 포커스를 받고 선택은 막는다', async () => {
@@ -80,5 +81,55 @@ describe('Chip', () => {
     await userEvent.keyboard('{ArrowLeft}');
     expect(screen.getByRole('radio', { name: '12:00' })).toHaveFocus();
     expect(onChange).toHaveBeenCalledWith('a');
+  });
+});
+
+describe('ChipGroup 신청 화면 호환', () => {
+  it('빈 선택값이면 첫 활성 칩으로 진입하고 외부 제목으로 그룹을 읽는다', async () => {
+    render(
+      <>
+        <p id="date-label">날짜</p>
+        <ChipGroup
+          labelledBy="date-label"
+          value={null}
+          onChange={() => undefined}
+          columns={4}
+          options={[
+            { value: 'a', label: '오늘', disabled: true },
+            { value: 'b', label: '내일' },
+          ]}
+        />
+      </>,
+    );
+    await userEvent.tab();
+    expect(screen.getByRole('radiogroup', { name: '날짜' })).toBeInTheDocument();
+    expect(screen.getByRole('radio', { name: '내일' })).toHaveFocus();
+  });
+  it('선택된 비활성 칩은 이유를 읽고 클릭은 막으며 방향키는 활성 칩으로 이동한다', async () => {
+    const onChange = vi.fn();
+    render(
+      <ChipGroup
+        label="시각"
+        value="a"
+        onChange={onChange}
+        options={[
+          {
+            value: 'a',
+            label: '12:00',
+            disabled: true,
+            disabledReason: '이미 신청한 시간과 겹쳐요',
+          },
+          { value: 'b', label: '13:00' },
+        ]}
+      />,
+    );
+    await userEvent.tab();
+    const blocked = screen.getByRole('radio', { name: /12:00.*겹쳐요/ });
+    expect(blocked).toHaveFocus();
+    await userEvent.keyboard(' ');
+    expect(onChange).not.toHaveBeenCalled();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(screen.getByRole('radio', { name: '13:00' })).toHaveFocus();
+    expect(onChange).toHaveBeenCalledWith('b');
   });
 });

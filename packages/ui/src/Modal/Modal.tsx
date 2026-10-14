@@ -6,10 +6,14 @@ import { Button } from '../Button';
 type ModalProps = {
   open: boolean;
   title: string;
-  children: ReactNode;
+  children?: ReactNode;
+  description?: ReactNode;
+  actions?: ReactNode;
+  dismissOnBackdrop?: boolean;
+  className?: string;
   onClose: () => void;
-  confirmLabel: string;
-  onConfirm: () => void;
+  confirmLabel?: string;
+  onConfirm?: () => void;
   confirmInactive?: boolean;
   confirmDescribedBy?: string;
   destructive?: boolean;
@@ -20,6 +24,10 @@ export function Modal({
   open,
   title,
   children,
+  description,
+  actions,
+  dismissOnBackdrop = true,
+  className,
   onClose,
   confirmLabel,
   onConfirm,
@@ -31,6 +39,7 @@ export function Modal({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const titleId = useId();
   const bodyId = useId();
+  const descriptionId = useId();
   useEffect(() => {
     const dialog = dialogRef.current;
     if (!open || !dialog) return;
@@ -50,7 +59,7 @@ export function Modal({
       ref={dialogRef}
       aria-modal="true"
       aria-labelledby={titleId}
-      aria-describedby={bodyId}
+      aria-describedby={description ? descriptionId : children ? bodyId : undefined}
       onKeyDown={(event) => {
         if (event.key === 'Escape') {
           event.preventDefault();
@@ -82,33 +91,47 @@ export function Modal({
           }
         }
       }}
+      onClick={(event) => {
+        if (dismissOnBackdrop && event.target === event.currentTarget) onClose();
+      }}
       onCancel={(event) => {
         event.preventDefault();
         onClose();
       }}
-      className="m-auto max-h-[calc(100dvh-var(--space-xl)*2)] w-[calc(100%-var(--space-md)*2)] max-w-[342px] overflow-y-auto rounded-(--radius-xl) border-0 bg-(--color-bg-default) p-(--space-xl) text-(--color-text-primary) shadow-(--shadow-modal) backdrop:bg-(--color-bg-overlay)/50"
+      className={`m-auto max-h-[calc(100dvh-var(--space-xl)*2)] w-[calc(100%-var(--space-md)*2)] max-w-[342px] overflow-y-auto rounded-(--radius-xl) border-0 bg-(--color-bg-default) p-(--space-xl) text-(--color-text-primary) shadow-(--shadow-modal) backdrop:bg-(--color-bg-overlay)/50 ${className ?? ''}`}
     >
       <div className="flex flex-col items-start gap-(--space-md)">
         <h2 ref={titleRef} id={titleId} tabIndex={-1} className="typo-title w-full">
           {title}
         </h2>
+        {description && (
+          <p id={descriptionId} className="typo-body text-(--color-text-secondary)">
+            {description}
+          </p>
+        )}
         <div id={bodyId} className="typo-body w-full text-(--color-text-secondary)">
           {children}
         </div>
-        <div className="flex w-full gap-(--space-xs)">
-          <Button variant="secondary" className="min-w-0 flex-1" onClick={onClose}>
-            닫기
-          </Button>
-          <Button
-            variant={destructive ? 'danger' : 'primary'}
-            className="min-w-0 flex-1"
-            onClick={onConfirm}
-            inactive={confirmInactive}
-            aria-describedby={confirmDescribedBy}
-          >
-            {confirmLabel}
-          </Button>
-        </div>
+        {(actions || confirmLabel) && (
+          <div className="flex w-full gap-(--space-xs) *:flex-1">
+            {actions ?? (
+              <>
+                <Button variant="secondary" className="min-w-0 flex-1" onClick={onClose}>
+                  닫기
+                </Button>
+                <Button
+                  variant={destructive ? 'danger' : 'primary'}
+                  className="min-w-0 flex-1"
+                  onClick={onConfirm}
+                  inactive={confirmInactive}
+                  aria-describedby={confirmDescribedBy}
+                >
+                  {confirmLabel}
+                </Button>
+              </>
+            )}
+          </div>
+        )}
       </div>
     </dialog>
   );

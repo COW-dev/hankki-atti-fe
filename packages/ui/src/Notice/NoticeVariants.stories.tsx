@@ -10,7 +10,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 export const Info: Story = {
   play: async ({ canvas, args }) => {
-    await expect(canvas.getByRole('status')).toHaveTextContent(args.message);
+    await expect(canvas.getByRole('status')).toHaveTextContent(args.message ?? '');
   },
 };
 export const Success: Story = { args: { type: 'success' } };

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
-import { ChipGroup } from './Chip';
+import { ChipGroup } from './ChipGroup';
 
 const meta = {
   title: '공용 UI/Chip',

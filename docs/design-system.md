@@ -100,6 +100,8 @@ Figma 디자인 시스템 머리말(1:1359)과 2026-10-01 개정(1:1794)을 요�
 | `--space-2xl` | 32 | | `--stroke-default` | 1 | |
 | `--space-3xl` | 40 | | `--stroke-strong` | 2 | 입력칸 포커스·오류 |
 
+그림자는 모달·알림 패널에만 쓴다: `--shadow-modal` (Figma Shadow/Modal, 0 8 32 rgba(26,28,36,0.16)).
+
 ## 포커스
 
 키보드 포커스는 2px 간격 + 3px `--color-border-focus` 링이다(2026-10-01 개정, 흰 배경 대비 3.98:1). 전역 `:focus-visible`이 그리므로 컴포넌트에서 따로 만들지 않는다. 입력칸은 Figma State=Focus대로 안쪽 2px 테두리로 대신 표시한다.
@@ -109,7 +111,7 @@ Figma 디자인 시스템 머리말(1:1359)과 2026-10-01 개정(1:1794)을 요�
 | 컴포넌트 | Figma | 변형 | 코드 | 상태 |
 |---|---|---|---|---|
 | Button | 1:1074 | Primary · Secondary · Tertiary · Danger × Large · Small | `@hankki/ui` (`Button` / `ButtonLink`) (화면 이동은 `ButtonLink`) | ✅ |
-| TextField | 1:1181 | Default · Focus · Error · Disabled | `@hankki/ui` (`TextField`) | ✅ 안내·오류·비활성 상태 구현 |
+| TextField | 1:1181 | Default · Focus · Error · Disabled | `@hankki/ui` (`TextField`) — `multiline`, `count` 지원 | ✅ 안내·오류·비활성 상태 구현 |
 | Notice | 1:1207 | Info · Success · Error · Warning | `@hankki/ui` (`Notice` / `ErrorNotice`) | ✅ Info · Success · Error · Warning |
 | A11yToggle | 1:1220 | Pressed true · false | `apps/web/components/ui/A11yToggle` | ✅ (음성 읽기 미구현) |
 | Icon | 1:1034 | 15종 | `@hankki/icons` (`Icon`) | ✅ 기본 15종·상태·탭 원본 SVG 확보 |
@@ -150,6 +152,10 @@ Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만
 
 ### 새 공용 컴포넌트 사용 규칙
 
+- 신청 화면과의 호환을 위해 Notice·StatusTag는 `tone`도 지원하고, Notice는 `children`과 `live`로 정적 안내와 완료 알림을 구분한다. Modal은 `description`, `actions`, `dismissOnBackdrop`도 지원한다.
+- OptionGroup은 fieldset/legend로 복수 선택 묶음 이름과 열 수를 지정한다. 신청 폼은 OptionTile의 `selected`, `onClick`을 사용한다.
+- ChipGroup은 `columns`, `labelledBy`, 빈 선택값과 `disabledReason`을 지원한다. 비활성 항목은 방향키 선택에서 건너뛴다.
+- TextField는 `multiline`으로 여러 줄 입력을, `count`로 글자 수와 초과 오류를 표시한다. 초과 입력은 막지 않는다.
 - Notice는 `type="info | success | error | warning"`와 `message`를 받는다. 오류는 `alert`, 나머지는 `status`로 알린다. 기존 `ErrorNotice` 호출도 유지한다.
 - OptionTile은 `type="checkbox | radio"`, `selected`, `inactive`를 받는다. 단일 선택에는 `OptionTileGroup`을 쓰고, 복수 선택 묶음은 호출부가 이름 있는 fieldset/legend로 감싼다.
 - Toggle은 `label`, `checked`, `onChange`가 필수다. `role="switch"`와 `aria-checked`로 상태를 전달하며 `inactive`여도 포커스는 받는다.

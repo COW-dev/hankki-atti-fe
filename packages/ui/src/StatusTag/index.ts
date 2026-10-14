@@ -1,1 +1,1 @@
-export { StatusTag } from './StatusTag';
+export { StatusTag, type StatusTone } from './StatusTag';
