@@ -21,7 +21,7 @@ const textSizeStore = {
 };
 
 /**
- * 접근성 모드 토글 (Figma A11yToggle 70:86). 지금은 큰 글씨만 바꾼다 — 음성 읽기와 계정 저장은 백엔드 설정 API(BE-13) 후 붙인다.
+ * 접근성 모드 토글 (Figma A11yToggle 1:1220). 지금은 큰 글씨만 바꾼다 — 음성 읽기와 계정 저장은 백엔드 설정 API(BE-13) 후 붙인다.
  */
 export function A11yToggle() {
   const pressed = useSyncExternalStore(
@@ -41,7 +41,7 @@ export function A11yToggle() {
       aria-pressed={pressed}
       aria-label="큰 글씨와 음성 읽기"
       onClick={() => textSizeStore.set(!pressed)}
-      className={`flex min-h-(--control-height-sm) shrink-0 cursor-pointer items-center justify-center gap-(--space-2xs) rounded-(--radius-control) px-(--space-sm) ${pressed ? 'bg-(--color-bg-brand-selected)' : 'bg-(--color-bg-muted)'}`}
+      className={`flex min-h-(--control-height) shrink-0 cursor-pointer items-center justify-center gap-(--space-2xs) rounded-(--radius-control) px-(--space-sm) ${pressed ? 'bg-(--color-bg-brand-selected)' : 'bg-(--color-bg-muted)'}`}
     >
       <Icon name={pressed ? 'text-size-on' : 'text-size'} />
       <span

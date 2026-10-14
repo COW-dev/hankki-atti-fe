@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect } from 'storybook/test';
-import { StudentTabBar } from './TabBar';
+import { HelperTabBar, StudentTabBar } from './TabBar';
 
 const meta = {
   title: '앱/StudentTabBar',
@@ -26,3 +26,18 @@ export const Apply: Story = { args: { active: '/requests/new' } };
 export const Notices: Story = { args: { active: '/notices' } };
 export const MyPage: Story = { args: { active: '/mypage' } };
 export const LargeText: Story = { globals: { textSize: 'large' } };
+
+export const Helper: Story = {
+  globals: { sizeMode: 'M' },
+  render: () => <HelperTabBar active="/matches" />,
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('link', { name: '요청 목록' })).toHaveAttribute(
+      'href',
+      '/requests',
+    );
+    await expect(canvas.getByRole('link', { name: '매칭 현황' })).toHaveAttribute(
+      'aria-current',
+      'page',
+    );
+  },
+};
