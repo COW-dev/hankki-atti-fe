@@ -10,7 +10,7 @@ type ChipProps = Omit<
   inactive?: boolean;
 };
 
-/** Figma Chip (87:4832). 단일 선택은 ChipGroup으로 묶어 키보드 이동을 제공한다. */
+/** Figma Chip (1:1161). 단일 선택은 ChipGroup으로 묶어 키보드 이동을 제공한다. */
 export function Chip({
   selected = false,
   inactive = false,
@@ -73,18 +73,26 @@ export function ChipGroup({
         );
         const available = radios.filter((radio) => radio.getAttribute('aria-disabled') !== 'true');
         if (!available.length) return;
-        const index = available.findIndex((radio) => radio === document.activeElement);
-        const next =
+        let next =
           event.key === 'Home'
-            ? 0
+            ? available[0]
             : event.key === 'End'
-              ? available.length - 1
-              : (index +
-                  (['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1) +
-                  available.length) %
-                available.length;
-        available[next].focus();
-        available[next].click();
+              ? available[available.length - 1]
+              : undefined;
+        if (!next) {
+          const direction = ['ArrowLeft', 'ArrowUp'].includes(event.key) ? -1 : 1;
+          let index = radios.findIndex((radio) => radio === document.activeElement);
+          if (index < 0) index = direction > 0 ? -1 : 0;
+          for (let step = 0; step < radios.length; step++) {
+            index = (index + direction + radios.length) % radios.length;
+            if (radios[index].getAttribute('aria-disabled') !== 'true') {
+              next = radios[index];
+              break;
+            }
+          }
+        }
+        next?.focus();
+        next?.click();
       }}
     >
       {options.map((option) => (

@@ -31,6 +31,8 @@ export const Inactive: Story = {
     await expect(args.onClick).not.toHaveBeenCalled();
   },
 };
+export const InactiveTertiary: Story = { args: { variant: 'tertiary', inactive: true } };
+export const SmallLargeText: Story = { args: { size: 'small' }, globals: { textSize: 'large' } };
 export const KeyboardFocus: Story = {
   play: async ({ canvas, userEvent, args }) => {
     const button = canvas.getByRole('button', { name: '도우미 신청하기' });

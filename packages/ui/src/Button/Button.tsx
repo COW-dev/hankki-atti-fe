@@ -29,14 +29,14 @@ const VARIANT_CLASS: Record<ButtonVariant, string> = {
 
 const SIZE_CLASS: Record<ButtonSize, string> = {
   large: 'min-h-(--control-height) min-w-(--control-height) px-(--control-padding-x)',
-  small: 'min-h-(--control-height-sm) min-w-(--control-height-sm) px-(--space-md)',
+  small: 'min-h-(--control-height) min-w-(--control-height) px-(--space-md)',
 };
 
 const BASE_CLASS =
   'typo-body-strong flex items-center justify-center gap-(--space-xs) rounded-(--radius-control) py-(--space-xs)';
 
 /**
- * Figma Button (68:73): Style 4종 × Size 2종. 높이는 크기 모드(control/height)를 따른다.
+ * Figma Button (1:1074): Style 4종 × Size 2종. 높이는 크기 모드(control/height)를 따른다.
  * 비활성은 disabled 대신 inactive를 쓴다 — disabled는 포커스를 못 받아 스크린리더가 이유를 읽어 줄 수 없다.
  */
 export function Button({
@@ -50,7 +50,7 @@ export function Button({
   ...props
 }: ButtonProps) {
   const look = inactive
-    ? 'cursor-not-allowed bg-(--color-bg-disabled) text-(--color-text-disabled)'
+    ? `cursor-not-allowed text-(--color-text-disabled) ${variant === 'tertiary' ? 'bg-transparent' : 'bg-(--color-bg-disabled)'}`
     : `cursor-pointer ${VARIANT_CLASS[variant]}`;
 
   return (

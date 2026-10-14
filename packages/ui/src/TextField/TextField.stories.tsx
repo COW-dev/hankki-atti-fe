@@ -16,7 +16,9 @@ const meta = {
 } satisfies Meta<typeof TextField>;
 export default meta;
 type Story = StoryObj<typeof meta>;
-export const Default: Story = {};
+export const Default: Story = { args: { helper: '로그인 아이디로 써요' } };
+export const Disabled: Story = { args: { disabled: true, helper: '로그인 아이디로 써요' } };
+export const HelperSize: Story = { globals: { sizeMode: 'M' } };
 export const Filled: Story = { args: { defaultValue: 'atti' } };
 export const KeyboardFocus: Story = {
   play: async ({ canvas, userEvent }) => {

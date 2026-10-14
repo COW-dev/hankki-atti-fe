@@ -62,4 +62,23 @@ describe('Chip', () => {
     await userEvent.keyboard('{ArrowRight}');
     expect(onChange).not.toHaveBeenCalled();
   });
+  it('선택 항목이 비활성이면 그 위치에서 이전 활성 항목으로 이동한다', async () => {
+    const onChange = vi.fn();
+    render(
+      <ChipGroup
+        label="시간"
+        value="b"
+        onChange={onChange}
+        options={[
+          { value: 'a', label: '12:00' },
+          { value: 'b', label: '12:30', inactive: true },
+          { value: 'c', label: '13:00' },
+        ]}
+      />,
+    );
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(screen.getByRole('radio', { name: '12:00' })).toHaveFocus();
+    expect(onChange).toHaveBeenCalledWith('a');
+  });
 });
