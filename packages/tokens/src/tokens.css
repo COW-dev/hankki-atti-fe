@@ -1,5 +1,5 @@
 /*
- * 디자인 토큰 — Figma "06 디자인 시스템"(68:2) 변수와 같은 이름을 쓴다.
+ * 디자인 토큰 — Figma "hankki-atti-DS"(1:1965) 변수와 같은 이름을 쓴다.
  * 컴포넌트는 원시값(--brand-*, --gray-*)을 쓰지 않고 용도(Color) 토큰만 쓴다.
  * 사용법과 규칙은 docs/design-system.md 참고.
  */
@@ -92,6 +92,13 @@
   --radius-full: 999px;
   --stroke-default: 1px;
   --stroke-strong: 2px;
+  /* OptionTile 표시와 Modal 그림자 — Figma 1:1737, 1:1346 */
+  --stroke-mark: 1.5px;
+  --radius-mark: 6px;
+  --selection-mark-size: 20px;
+  --selection-check-size: 14px;
+  --sidebar-item-height: 56px;
+  --shadow-modal: 0 8px 32px #1a1c2429;
 }
 
 /*
