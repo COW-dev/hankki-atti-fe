@@ -7,3 +7,6 @@ export * from './StatusTag';
 export * from './OptionTile';
 export * from './Toggle';
 export * from './InputCompact';
+export * from './RequestCard';
+export * from './SidebarItem';
+export * from './Modal';
