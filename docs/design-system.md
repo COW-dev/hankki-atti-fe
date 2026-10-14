@@ -1,6 +1,6 @@
 # 디자인 시스템
 
-Figma "06 디자인 시스템"(파일 `xc4O5yRWg6RXjpPGEUcbrE`, 페이지 68:2)을 코드 기준으로 정리한 문서다. 값이 다르면 Figma가 기준이고, 이 문서와 `packages/tokens/src/tokens.css`를 함께 고친다.
+현재 디자인 시스템 기준은 Figma [hankki-atti-DS](https://www.figma.com/design/14Pknotxq8Yi4F2eddqqGg?node-id=1-1965)(파일 `14Pknotxq8Yi4F2eddqqGg`, 노드 `1:1965`)다. 2026-10-13 MCP로 구조와 변수 정의 조회를 확인했다. 아래 컴포넌트 표의 디자인 시스템 노드는 새 파일 기준이다. 목업 노드는 이전 파일 `xc4O5yRWg6RXjpPGEUcbrE` 기준이며, 기존 Chip·StatusTag 구현은 파일 `Tnl5oLY7yDBs2Suy8hg7WC`의 상세 디자인을 확인해 작성했다. 2026-10-13 기존 Button·TextField·ErrorNotice·Chip·StatusTag·A11yToggle·TopBar·장애학생 TabBar의 상세 디자인과 스크린샷을 조회해 대조했다. Footer·Logo·PageShell·Block은 새 디자인 시스템 프레임에 대응 노드가 없어 기존 목업 기준을 유지한다. 값이 다르면 Figma가 기준이고, 이 문서와 `packages/tokens/src/tokens.css`를 함께 고친다.
 
 - 토큰: `packages/tokens/src/tokens.css`
 - 텍스트 스타일·포커스 링: `packages/tokens/src/styles.css`
@@ -8,7 +8,7 @@ Figma "06 디자인 시스템"(파일 `xc4O5yRWg6RXjpPGEUcbrE`, 페이지 68:2)�
 
 ## 원칙
 
-Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요약했다.
+Figma 디자인 시스템 머리말(1:1359)과 2026-10-01 개정(1:1794)을 요약했다.
 
 - 무채색 + 강조색 하나, 넉넉한 여백, 큰 제목
 - 배경은 bg/subtle(회색), 내용은 흰 블록(bg/default). 모바일은 블록을 좌우 끝까지 붙이고 블록 사이 회색 띠 10px
@@ -83,7 +83,7 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 | `--tabbar-height` | 64 | 62 | 84 | — |
 | `--icon-size` | 24 | 20 | 28 | 18 |
 
-\* 목업 화면 변수로 확인하지 못해 디자인 시스템 설명(72:205 표, 239:150 개정 메모)의 값을 쓴 것. 해당 크기를 처음 쓰는 화면에서 Figma로 확인한다. 72:205 표는 개정 전 값이라 L·M 글자 크기가 목업과 다르다 — **목업 화면의 변수 값이 기준**이다.
+\* 목업 화면 변수로 확인하지 못해 디자인 시스템 설명(이전 파일의 72:205 표, 239:150 개정 메모)의 값을 쓴 것. 해당 크기를 처음 쓰는 화면에서 Figma로 확인한다. 72:205 표는 개정 전 값이라 L·M 글자 크기가 목업과 다르다 — **목업 화면의 변수 값이 기준**이다.
 
 ## 간격 · 모서리 · 선
 
@@ -110,25 +110,60 @@ Figma 디자인 시스템 머리말(72:50)과 2026-10-01 개정(239:150)을 요�
 
 | 컴포넌트 | Figma | 변형 | 코드 | 상태 |
 |---|---|---|---|---|
-| Button | 68:73 | Primary · Secondary · Tertiary · Danger × Large · Small | `@hankki/ui` (`Button` / `ButtonLink`) (화면 이동은 `ButtonLink`) | ✅ |
-| TextField | 70:62 | Default · Focus · Error · Disabled | `@hankki/ui` (`TextField`) — `helper`, `multiline`(textarea), `count`(글자 수·초과 오류) | ✅ (Disabled 미구현) |
-| Notice | 70:77 | Info · Success · Error · Warning | `@hankki/ui` (`Notice tone=…`, `ErrorNotice`) — error만 `alert`, `live`면 `status` | ✅ |
-| A11yToggle | 70:86 | Pressed true · false | `apps/web/components/ui/A11yToggle` | ✅ (음성 읽기 미구현) |
-| Icon | 68:48 | 15종 | `@hankki/icons` (`Icon`) | 🟡 쓴 것만 `packages/icons/svg`에 있음 |
-| TopBar | 70:87 · 목업 201:3 | 뒤로 / 로고, 알림, 접근성 토글 | `apps/web/components/layout/TopBar` | ✅ (알림 개수 미구현) |
-| TabBar | 70:141 | 장애학생 · 도우미 × Active 1~4 | `apps/web/components/layout/TabBar` | 🟡 장애학생만 |
+| Button | 1:1074 | Primary · Secondary · Tertiary · Danger × Large · Small | `@hankki/ui` (`Button` / `ButtonLink`) (화면 이동은 `ButtonLink`) | ✅ |
+| TextField | 1:1181 | Default · Focus · Error · Disabled | `@hankki/ui` (`TextField`) — `multiline`, `count` 지원 | ✅ 안내·오류·비활성 상태 구현 |
+| Notice | 1:1207 | Info · Success · Error · Warning | `@hankki/ui` (`Notice` / `ErrorNotice`) | ✅ Info · Success · Error · Warning |
+| A11yToggle | 1:1220 | Pressed true · false | `apps/web/components/ui/A11yToggle` | ✅ (음성 읽기 미구현) |
+| Icon | 1:1034 | 15종 | `@hankki/icons` (`Icon`) | ✅ 기본 15종·상태·탭 원본 SVG 확보 |
+| TopBar | 1:1227 · 이전 목업 201:3 | 뒤로 / 로고, 알림, 접근성 토글 | `apps/web/components/layout/TopBar` | ✅ 알림 개수·패널 상태 props 지원 |
+| TabBar | 1:1235 | 장애학생 · 도우미 × Active 1~4 | `apps/web/components/layout/TabBar` | ✅ `StudentTabBar` · `HelperTabBar` |
 | Footer | 목업 201:68 | copyright 유무 | `apps/web/components/layout/Footer` | ✅ |
 | Logo | 목업 187:51 | large · topbar · footer | `apps/web/components/ui/Logo` | ✅ Figma에서 한 장의 SVG로 내보냄. 포크 손잡이 레이어(187:47, 이미지 추적)는 내보내기에서 빠져 디자이너 확인 필요 |
-| StatusTag | 68:92 | 성공 · 진행 · 종료 · 경고 · 오류 · 정보 · 중립 | `@hankki/ui` (`StatusTag tone=…`) | ✅ |
-| Chip | 68:99 | Default · Selected · Pressed · Disabled · Focus | `@hankki/ui` (`ChipGroup` radiogroup + `Chip`) — 화살표 이동 = 선택, `columns`로 균등 폭. disabled 칩도 포커스는 받고 `disabledReason`을 읽어 준다 | ✅ |
-| OptionTile | 228:180 | Checkbox · Radio × 5상태 (Checkbox 68:108 대체) | `@hankki/ui` (`OptionGroup` fieldset + `OptionTile`) — 진짜 input을 숨기고 label을 타일로. 높이는 `--control-height`(M에서 Figma 44) | ✅ |
-| Toggle | 228:193 | Off · On · Disabled · Focus | — | ⬜ |
-| InputCompact | 228:206 | Text · Select (관리자 검색·드롭다운) | — | ⬜ |
-| RequestCard | 70:142 | 신청 카드 | — | ⬜ |
-| Modal | 70:152 | 확인·선택 모달 | `@hankki/ui` (`Modal`) — 네이티브 `dialog.showModal()`, 열리면 제목 포커스, Esc·배경 클릭(`dismissOnBackdrop`) | ✅ |
-| SidebarItem | 70:172 | 관리자 사이드바 | — | ⬜ |
+| StatusTag | 1:1139 | 성공 · 진행 · 종료 · 경고 · 오류 · 정보 · 중립 | `@hankki/ui` (`StatusTag`) | ✅ 원본 상태 아이콘 포함 |
+| Chip | 1:1161 | Default · Selected · Pressed · Disabled · Focus | `@hankki/ui` (`Chip` / `ChipGroup`) | ✅ 구현 |
+| OptionTile | 1:1737 | Checkbox · Radio × 5상태 (Checkbox 1:1173 대체) | `@hankki/ui` (`OptionTile`) | ✅ |
+| Toggle | 1:1770 | Off · On · Disabled · Focus | `@hankki/ui` (`Toggle`) | ✅ |
+| InputCompact | 1:1783 | Text · Select (관리자 검색·드롭다운) | `@hankki/ui` (`InputCompact`) | ✅ |
+| RequestCard | 1:1340 | 신청 카드 | `@hankki/ui` (`RequestCard`) | ✅ |
+| Modal | 1:1346 | 확인·선택 모달 | `@hankki/ui` (`Modal`) | ✅ |
+| SidebarItem | 1:1352 | 관리자 사이드바 | `@hankki/ui` (`SidebarItem`) | ✅ |
 
 Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만들기 전에 `get_design_context`로 꼭 읽는다.
+
+### 입력·버튼·탭 사용 규칙
+
+- TextField의 `helper`는 입력 아래 안내이며 `aria-describedby`로 연결한다. 오류가 있으면 안내 대신 `error`를 표시하고 `role="alert"`로 즉시 알린다. `describedBy`와 표준 `aria-describedby`로 전달한 외부 설명도 함께 연결한다.
+- TextField의 `disabled`는 비활성 입력 스타일을 적용한다. 버튼의 비활성 동작은 계속 `inactive`를 쓴다.
+- 비활성 Tertiary 버튼은 Figma처럼 배경 없이 비활성 글자색만 적용한다.
+- StudentTabBar는 현재 탭에만 브랜드색 원본 아이콘을 쓰고 나머지는 보조색 원본 아이콘을 쓴다.
+
+### Chip · StatusTag 사용 규칙
+
+- Chip은 단일 선택 radio다. 날짜·시간·필터 묶음은 `ChipGroup`에 이름(`label`), 선택값(`value`), 변경 함수(`onChange`), 선택지(`options`)를 전달한다. 선택값은 호출부에서 관리한다.
+- `ChipGroup`은 선택한 항목만 Tab으로 진입하며 방향키는 순환, Home·End는 첫·끝 항목으로 이동하고 선택한다. 비활성 항목은 방향키 선택에서 건너뛴다. 단독 `Chip`을 조립하면 호출부가 radiogroup과 키보드 이동을 제공해야 한다.
+- `inactive`는 선택을 차단하는 `aria-disabled`다. 비활성 이유는 선택지의 `describedBy`로 설명 요소에 연결한다.
+- **접근성 우선 예외**: 작은 Button·ButtonLink, A11yToggle, Chip, OptionTile, Toggle은 Figma의 `control/height-sm` 대신 최소 조작 영역 `--control-height`를 적용한다. Figma Chip 설명은 `control/height-sm`이지만 저장소의 최소 조작 영역 규칙을 적용하여 `--control-height`(L 48 · M 44 · 큰 글씨 56)로 구현한다. 별도 작은 조작 영역 예외가 승인되기 전까지 이 기준을 유지한다.
+- Chip 모서리는 `--radius-control`(10), StatusTag는 `--radius-sm`(8)이다. 이전 일반 설명의 칩·태그 `radius/full`을 적용하지 않는다.
+- StatusTag는 `type="success | progress | ended | error | warning | info | neutral"`와 상태 문구를 받는다. API enum과 표시 문구 매핑은 호출부의 도메인 로직에 둔다.
+- StatusTag는 새 Figma에서 내려받은 성공·진행·종료·오류·경고 원본 아이콘을 기본 표시한다. `icon` 슬롯으로 호출부에서 교체할 수 있다. 정보·중립은 Figma대로 글자만 표시한다. 슬롯은 장식으로 숨기고 크기는 `--font-caption`에 맞춘다(기본 L 14). `Icon` 사용 시 같은 크기를 명시한다.
+- 정적 태그마다 `role="status"`를 붙이지 않는다. 동적으로 바뀐 상태의 알림은 화면의 polite 영역에서 처리한다.
+
+2026-10-08에는 이전 작업 파일 `Tnl5oLY7yDBs2Suy8hg7WC`의 Chip·StatusTag 상세 디자인과 스크린샷만 확보했다. 당시에는 Figma Starter 호출 한도로 나머지 상세 조회 및 기존 컴포넌트 대조가 미완료였다. 현재 대조 범위는 문서 상단에 기록한다. 새 공용 컴포넌트에는 상태별 스토리와 단위·브라우저 접근성 테스트를 작성했다. 기존 목업에만 있는 Footer·Logo·PageShell·Block은 이번 새 파일 대조 대상에 포함하지 않았다.
+
+### 새 공용 컴포넌트 사용 규칙
+
+- 신청 화면과의 호환을 위해 Notice·StatusTag는 `tone`도 지원하고, Notice는 `children`과 `live`로 정적 안내와 완료 알림을 구분한다. Modal은 `description`, `actions`, `dismissOnBackdrop`도 지원한다.
+- OptionGroup은 fieldset/legend로 복수 선택 묶음 이름과 열 수를 지정한다. 신청 폼은 OptionTile의 `selected`, `onClick`을 사용한다.
+- ChipGroup은 `columns`, `labelledBy`, 빈 선택값과 `disabledReason`을 지원한다. 비활성 항목은 방향키 선택에서 건너뛴다.
+- TextField는 `multiline`으로 여러 줄 입력을, `count`로 글자 수와 초과 오류를 표시한다. 초과 입력은 막지 않는다.
+- Notice는 `type="info | success | error | warning"`와 `message`를 받는다. 오류는 `alert`, 나머지는 `status`로 알린다. 기존 `ErrorNotice` 호출도 유지한다.
+- OptionTile은 `type="checkbox | radio"`, `selected`, `inactive`를 받는다. 단일 선택에는 `OptionTileGroup`을 쓰고, 복수 선택 묶음은 호출부가 이름 있는 fieldset/legend로 감싼다.
+- Toggle은 `label`, `checked`, `onChange`가 필수다. `role="switch"`와 `aria-checked`로 상태를 전달하며 `inactive`여도 포커스는 받는다.
+- InputCompact는 보이지 않는 `label`이 필수다. 기본은 텍스트 입력, `kind="select"`에는 `options`를 전달한다. 표준 입력 속성과 이벤트를 지원한다.
+- RequestCard는 `title`, `meta`, `status`, `statusLabel`을 받는다. `partner`와 `action`은 선택이며 도메인·개인정보 판단은 호출부와 서버의 책임이다. `action` 이름에는 일시가 포함된다. 목록은 ul/li로 감싼다.
+- Modal은 `open`을 호출부가 관리한다. 제목 포커스, Tab/Shift+Tab 순환, Esc/닫기, 열었던 요소로 복귀와 배경 접근 차단을 제공한다. `onConfirm` 후 닫기 여부도 호출부가 정한다.
+- SidebarItem은 `href`, 표시 문구, `active`를 받으며 `icon`으로 항목별 원본 아이콘 이름을 지정할 수 있다. 관리자 화면 자체는 구현하지 않는다.
+- 새 용도 토큰은 OptionTile의 표시 크기·외곽선·모서리, SidebarItem 높이, Modal 그림자다. 원본은 각각 Figma `1:1737`, `1:1352`, `1:1346`이다.
 
 ## 새 컴포넌트 추가 절차
 

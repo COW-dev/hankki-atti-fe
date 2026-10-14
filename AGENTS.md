@@ -48,9 +48,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 |---|---|
 | 기능 명세 | Notion "장애학생지원센터 서비스 > 문서" (PRD, 기능명세서, 유저플로우). 명세와 코드가 다르면 기능명세서가 기준 |
 | 화면 디자인 | Figma 파일 `xc4O5yRWg6RXjpPGEUcbrE` — **"10 목업"(201:2)이 최신**. 이전 페이지(와이어프레임 등)는 참고만 |
-| 디자인 시스템 | Figma "06 디자인 시스템"(68:2) → 코드 정리본은 [docs/design-system.md](docs/design-system.md) |
+| 디자인 시스템 | Figma [hankki-atti-DS](https://www.figma.com/design/14Pknotxq8Yi4F2eddqqGg?node-id=1-1965) — 파일 `14Pknotxq8Yi4F2eddqqGg`, 노드 `1:1965` → 코드 정리본은 [docs/design-system.md](docs/design-system.md) |
 | 접근성 규칙 | Figma "00 가이드"의 A11Y 공통 규칙(31:2), "05 접근성 주석"(대표 화면 포커스·읽기 순서) |
 | API | 백엔드 Swagger UI. 응답 형식은 `ApiResult` (`resultType`, `httpStatusCode`, `code`, `message`, `data`) |
+
+디자인 시스템은 위 새 파일을 기준으로 조회한다. 화면 목업·접근성 가이드의 파일과 노드는 기존 참조이며, 새 파일에서 대응 노드를 확인하기 전까지 유지한다. 파일 간 노드 ID는 서로 바꿔 쓰지 않는다.
 
 판단이 애매하면 추측하지 말고 사용자에게 확인한다.
 
@@ -58,9 +60,11 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ## 빌드 / 테스트 / 실행 명령어
 
+아래 명령은 저장소 루트(`hankki-atti-fe/`)에서 실행한다. 다른 디렉토리에서 시작했다면 먼저 `cd /Users/yehoon/Desktop/hankki-atti-fe`로 이동한다(다른 환경에서는 clone한 경로 사용). 루트의 `pnpm dev`는 `pnpm --filter @hankki/web dev`로 `apps/web`에서 Next.js를 실행한다. Next.js를 직접 실행할 때는 `cd apps/web` 후 `pnpm dev`를 사용하고, 공용 검사·Storybook 명령은 저장소 루트에서 실행한다.
+
 ```bash
 pnpm install          # 의존성 설치
-pnpm dev              # 로컬 실행 (http://localhost:3000) — 백엔드는 .env.local의 NEXT_PUBLIC_API_BASE_URL (기본 http://localhost:8080)
+pnpm dev              # 로컬 실행 (http://localhost:3000) — 백엔드는 apps/web/.env.local의 NEXT_PUBLIC_API_BASE_URL (기본 http://localhost:8080)
 pnpm lint             # ESLint
 pnpm format           # Prettier 적용 (pnpm format:check는 검사만)
 pnpm typecheck        # 라우트 타입 생성 후 tsc

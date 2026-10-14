@@ -7,6 +7,8 @@ export type ChipOption<T extends string> = {
   value: T;
   label: string;
   disabled?: boolean;
+  inactive?: boolean;
+  describedBy?: string;
   // disabled인 이유 (스크린리더용)
   disabledReason?: string;
 };
@@ -19,7 +21,7 @@ const COLUMNS_CLASS = {
 } as const;
 
 type ChipGroupProps<T extends string> = {
-  options: ChipOption<T>[];
+  options: readonly ChipOption<T>[];
   value: T | null;
   onChange: (value: T) => void;
   // 그룹 이름. 보이는 제목이 있으면 labelledBy로 그 id를 준다
@@ -33,7 +35,7 @@ type ChipGroupProps<T extends string> = {
 /**
  * Chip 단일 선택 묶음 (radiogroup). Tab은 그룹에 한 번만 들어오고(선택된 칩, 없으면 첫 칩),
  * 화살표로 이동하면 바로 선택된다 (표준 라디오 동작). Home/End로 처음·끝.
- * disabled 칩도 화살표로 들어가진다 — 그 시각이 있다는 것과 이유를 읽어 주려고. 선택만 안 된다.
+ * 비활성 칩은 방향키 선택에서 건너뛰고, 선택된 비활성 칩은 Tab으로 이유를 읽을 수 있다.
  */
 export function ChipGroup<T extends string>({
   options,
@@ -46,13 +48,13 @@ export function ChipGroup<T extends string>({
 }: ChipGroupProps<T>) {
   const refs = useRef<(HTMLButtonElement | null)[]>([]);
   const selectedIndex = options.findIndex((option) => option.value === value);
-  const firstEnabled = options.findIndex((option) => !option.disabled);
+  const firstEnabled = options.findIndex((option) => !option.disabled && !option.inactive);
   const tabbableIndex = selectedIndex >= 0 ? selectedIndex : firstEnabled >= 0 ? firstEnabled : 0;
 
   // 포커스를 옮기고, 고를 수 있는 칩이면 선택까지 한다
   const moveTo = (index: number) => {
     refs.current[index]?.focus();
-    if (!options[index].disabled) onChange(options[index].value);
+    if (!options[index].disabled && !options[index].inactive) onChange(options[index].value);
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
@@ -77,6 +79,11 @@ export function ChipGroup<T extends string>({
         return;
     }
     event.preventDefault();
+    if (options.every((option) => option.disabled || option.inactive)) return;
+    const direction = ['ArrowLeft', 'ArrowUp', 'End'].includes(event.key) ? -1 : 1;
+    while (options[next].disabled || options[next].inactive) {
+      next = (next + direction + options.length) % options.length;
+    }
     moveTo(next);
   };
 
@@ -94,13 +101,16 @@ export function ChipGroup<T extends string>({
             refs.current[index] = element;
           }}
           selected={option.value === value}
-          disabled={option.disabled}
-          disabledReason={option.disabledReason}
+          inactive={option.disabled || option.inactive}
+          aria-describedby={option.describedBy}
           tabIndex={index === tabbableIndex ? 0 : -1}
           onClick={() => moveTo(index)}
           onKeyDown={(event) => handleKeyDown(event, index)}
         >
           {option.label}
+          {option.disabled && option.disabledReason && (
+            <span className="sr-only">, {option.disabledReason}</span>
+          )}
         </Chip>
       ))}
     </div>

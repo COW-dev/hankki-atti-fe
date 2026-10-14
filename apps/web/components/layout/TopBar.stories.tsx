@@ -21,7 +21,15 @@ export const Back: Story = {
   },
 };
 export const Logo: Story = { args: { logo: true, title: '내 신청' } };
-export const Notification: Story = { args: { logo: true, bell: true, title: '내 신청' } };
+export const Notification: Story = {
+  args: { bell: true, title: '내 신청', unreadCount: 2, notificationExpanded: false },
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('button', { name: '알림, 안 읽은 알림 2개' })).toHaveAttribute(
+      'aria-expanded',
+      'false',
+    );
+  },
+};
 export const LargeText: Story = {
   args: { back: true, title: '비밀번호 변경' },
   globals: { textSize: 'large' },

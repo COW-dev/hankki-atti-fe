@@ -1,81 +1,59 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
-import { Button, Modal } from '@hankki/ui';
-
-function renderModal({
-  open = true,
-  onClose = vi.fn(),
-  dismissOnBackdrop,
-}: {
-  open?: boolean;
-  onClose?: () => void;
-  dismissOnBackdrop?: boolean;
-} = {}) {
-  render(
-    <Modal
-      open={open}
-      onClose={onClose}
-      title="도우미가 오지 않았나요?"
-      description="10월 2일 (목) 12:30 · 도우미 김도움"
-      dismissOnBackdrop={dismissOnBackdrop}
-      actions={
-        <>
-          <Button variant="secondary" onClick={onClose}>
-            돌아가기
-          </Button>
-          <Button variant="danger">신고하기</Button>
-        </>
-      }
-    >
-      <p>이용 후 24시간까지 신고할 수 있어요</p>
-    </Modal>,
-  );
-  return { onClose };
-}
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import { Modal } from './Modal';
 
 describe('Modal', () => {
-  it('열리면 제목이 이름, 설명이 설명인 dialog가 되고 제목에 포커스한다', () => {
-    renderModal();
-
-    const dialog = screen.getByRole('dialog', { name: '도우미가 오지 않았나요?' });
-    expect(dialog).toHaveAccessibleDescription('10월 2일 (목) 12:30 · 도우미 김도움');
-    expect(screen.getByRole('heading', { name: '도우미가 오지 않았나요?' })).toHaveFocus();
-    expect(screen.getByRole('button', { name: '신고하기' })).not.toHaveFocus();
+  afterEach(() => {
+    Reflect.deleteProperty(HTMLDialogElement.prototype, 'showModal');
+    Reflect.deleteProperty(HTMLDialogElement.prototype, 'close');
   });
-
-  it('닫혀 있으면 열리지 않는다', () => {
-    const { container } = render(
-      <Modal open={false} onClose={() => undefined} title="이 요청에 지원할까요?" />,
+  it('제목과 설명을 연결하고 파괴적 동작 대신 제목에 포커스를 둔다', async () => {
+    // jsdom에는 native dialog가 없어 열기·닫기만 대체한다. 포커스 가두기와 Esc는 브라우저 스토리에서 검증한다.
+    Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+      configurable: true,
+      value: function (this: HTMLDialogElement) {
+        this.setAttribute('open', '');
+      },
+    });
+    Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+      configurable: true,
+      value: function (this: HTMLDialogElement) {
+        this.removeAttribute('open');
+      },
+    });
+    const onClose = vi.fn();
+    const onConfirm = vi.fn();
+    const { rerender } = render(
+      <Modal
+        open
+        title="신청을 취소할까요?"
+        confirmLabel="취소하기"
+        onClose={onClose}
+        onConfirm={onConfirm}
+        destructive
+      >
+        취소하면 다시 신청해야 해요.
+      </Modal>,
     );
-
-    expect(container.querySelector('dialog')).not.toHaveAttribute('open');
-  });
-
-  it('Esc를 누르면 onClose를 부른다', async () => {
-    const { onClose } = renderModal();
-
-    await userEvent.keyboard('{Escape}');
-
+    const dialog = screen.getByRole('dialog', { name: '신청을 취소할까요?' });
+    expect(dialog).toHaveAccessibleDescription('취소하면 다시 신청해야 해요.');
+    expect(screen.getByRole('heading', { name: '신청을 취소할까요?' })).toHaveFocus();
+    await userEvent.click(screen.getByRole('button', { name: '취소하기' }));
+    expect(onConfirm).toHaveBeenCalledOnce();
+    await userEvent.click(screen.getByRole('button', { name: '닫기' }));
     expect(onClose).toHaveBeenCalledOnce();
-  });
-
-  it('배경을 누르면 닫히고, dismissOnBackdrop이 false면 닫히지 않는다', async () => {
-    const { onClose } = renderModal();
-    await userEvent.click(screen.getByRole('dialog'));
-    expect(onClose).toHaveBeenCalledOnce();
-
-    const kept = renderModal({ dismissOnBackdrop: false });
-    const dialogs = screen.getAllByRole('dialog');
-    await userEvent.click(dialogs[dialogs.length - 1]);
-    expect(kept.onClose).not.toHaveBeenCalled();
-  });
-
-  it('안쪽 내용을 눌러도 닫히지 않는다', async () => {
-    const { onClose } = renderModal();
-
-    await userEvent.click(screen.getByText('이용 후 24시간까지 신고할 수 있어요'));
-
-    expect(onClose).not.toHaveBeenCalled();
+    rerender(
+      <Modal
+        open={false}
+        title="신청을 취소할까요?"
+        confirmLabel="취소하기"
+        onClose={onClose}
+        onConfirm={onConfirm}
+      >
+        취소하면 다시 신청해야 해요.
+      </Modal>,
+    );
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 });

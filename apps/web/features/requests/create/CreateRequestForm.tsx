@@ -161,8 +161,8 @@ export function CreateRequestForm({
               type="checkbox"
               name="helpTypes"
               value={type}
-              checked={state.helpTypes.includes(type)}
-              onChange={() => onToggleHelpType(type)}
+              selected={state.helpTypes.includes(type)}
+              onClick={() => onToggleHelpType(type)}
             >
               {HELP_TYPE_LABEL[type]}
             </OptionTile>

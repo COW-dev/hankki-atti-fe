@@ -33,14 +33,18 @@ export type MultilineTextFieldProps = CommonProps & { multiline: true } & Omit<
 export type TextFieldProps = SingleLineTextFieldProps | MultilineTextFieldProps;
 
 const FIELD_CLASS =
-  'typo-body w-full min-w-px flex-1 bg-transparent text-(--color-text-primary) outline-none placeholder:text-(--color-text-secondary) focus-visible:outline-none';
+  'typo-body w-full min-w-px flex-1 bg-transparent outline-none focus-visible:outline-none';
 
 /**
- * Figma TextField (70:62): 테두리 없음 + bg/muted, 포커스는 border/focus, 오류는 border/danger + 아래 안내.
+ * Figma TextField (1:1181): 테두리 없음 + bg/muted, 포커스는 border/focus, 오류는 border/danger + 아래 안내.
  * multiline이면 같은 모양의 textarea (F-01 메모).
  */
 export function TextField(props: TextFieldProps) {
   const { label, error, helper, describedBy, count, className } = props;
+  const text = props.disabled ? 'text-(--color-text-disabled)' : 'text-(--color-text-primary)';
+  const placeholder = props.disabled
+    ? 'placeholder:text-(--color-text-disabled)'
+    : 'placeholder:text-(--color-text-secondary)';
   const id = useId();
   const errorId = `${id}-error`;
   const helperId = `${id}-helper`;
@@ -60,6 +64,7 @@ export function TextField(props: TextFieldProps) {
       showHelper ? helperId : null,
       count !== undefined ? countId : null,
       describedBy,
+      props['aria-describedby'],
     ]
       .filter(Boolean)
       .join(' ') || undefined;
@@ -73,16 +78,16 @@ export function TextField(props: TextFieldProps) {
     void multiline;
     field = (
       <textarea
+        {...textareaProps}
         id={id}
         rows={rows}
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedBy}
-        className={`${FIELD_CLASS} resize-none`}
+        className={`${FIELD_CLASS} ${text} ${placeholder} resize-none`}
         onChange={(event: ChangeEvent<HTMLTextAreaElement>) => {
           setTypedLength(event.target.value.length);
           onChange?.(event);
         }}
-        {...textareaProps}
       />
     );
   } else {
@@ -90,27 +95,27 @@ export function TextField(props: TextFieldProps) {
     void multiline;
     field = (
       <input
+        {...inputProps}
         id={id}
         aria-invalid={ariaInvalid}
         aria-describedby={ariaDescribedBy}
-        className={FIELD_CLASS}
+        className={`${FIELD_CLASS} ${text} ${placeholder}`}
         onChange={(event: ChangeEvent<HTMLInputElement>) => {
           setTypedLength(event.target.value.length);
           onChange?.(event);
         }}
-        {...inputProps}
       />
     );
   }
 
   return (
     <div className={`flex w-full flex-col items-start gap-(--space-xs) ${className ?? ''}`}>
-      <label htmlFor={id} className="typo-body-strong w-full text-(--color-text-primary)">
+      <label htmlFor={id} className={`typo-body-strong w-full ${text}`}>
         {label}
       </label>
       {/* 입력칸 자체의 포커스 표시는 이 테두리가 대신한다 (Figma State=Focus) */}
       <div
-        className={`flex w-full rounded-(--radius-control) bg-(--color-bg-muted) px-(--space-md) ${
+        className={`flex w-full rounded-(--radius-control) ${props.disabled ? 'bg-(--color-bg-disabled)' : 'bg-(--color-bg-muted)'} px-(--space-md) ${
           props.multiline
             ? 'items-start py-(--space-sm)'
             : 'min-h-(--control-height) items-center py-(--space-xs)'
@@ -123,6 +128,7 @@ export function TextField(props: TextFieldProps) {
           {errorText ? (
             <p
               id={errorId}
+              role="alert"
               className="typo-caption flex min-w-px flex-1 items-center gap-(--space-2xs) text-(--color-text-danger)"
             >
               <Icon name="error" />

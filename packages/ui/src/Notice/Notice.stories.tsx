@@ -3,7 +3,7 @@ import { expect } from 'storybook/test';
 import { Notice } from './Notice';
 
 const meta = {
-  title: '공용 UI/Notice',
+  title: '공용 UI/Notice/신청 화면',
   component: Notice,
   args: { tone: 'info', children: '10월 7일 12:00 ~ 13:00 · 1시간' },
   argTypes: { tone: { control: 'select', options: ['info', 'success', 'error', 'warning'] } },

@@ -2,23 +2,26 @@ import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { Icon } from './Icon';
 
 const names = [
+  'icon-check',
   'back',
-  'check',
-  'dash',
-  'error',
-  'list',
-  'notification',
-  'tab-apply',
-  'tab-my-requests-active',
-  'tab-mypage',
-  'tab-notice',
-  'text-size',
-  'text-size-on',
+  'chevron-right',
+  'bell',
+  'close',
+  'info',
+  'alert',
+  'clock',
+  'minus',
+  'icon-text-size',
+  'plus',
+  'icon-list',
+  'megaphone',
+  'user',
+  'users',
 ];
 const meta = {
   title: '공용 UI/Icon',
   component: Icon,
-  args: { name: 'check' },
+  args: { name: 'icon-check' },
   argTypes: { name: { control: 'select', options: names } },
 } satisfies Meta<typeof Icon>;
 export default meta;
