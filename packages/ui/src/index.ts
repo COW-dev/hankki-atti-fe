@@ -4,3 +4,6 @@ export * from './Notice';
 export * from './Block';
 export * from './Chip';
 export * from './StatusTag';
+export * from './OptionTile';
+export * from './Toggle';
+export * from './InputCompact';
