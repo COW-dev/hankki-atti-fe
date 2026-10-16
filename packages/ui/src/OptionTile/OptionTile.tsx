@@ -60,24 +60,29 @@ export function OptionTile({
 
 type Option = { value: string; label: ReactNode; inactive?: boolean; describedBy?: string };
 
-/** 단일 선택 묶음에 방향키 이동과 한 개의 Tab 진입점을 제공한다. */
+/**
+ * 단일 선택 묶음에 방향키 이동과 한 개의 Tab 진입점을 제공한다.
+ * 기본은 Figma 설명대로 2열이고, 문구가 긴 목록(취소 사유 209:3672)은 columns=1로 전폭에 놓는다.
+ */
 export function OptionTileGroup({
   label,
   options,
   value,
   onChange,
+  columns = 2,
 }: {
   label: string;
   options: readonly Option[];
   value: string;
   onChange: (value: string) => void;
+  columns?: 1 | 2;
 }) {
   const tabValue = options.find((option) => option.value === value)?.value ?? options[0]?.value;
   return (
     <div
       role="radiogroup"
       aria-label={label}
-      className="grid grid-cols-2 gap-(--space-xs)"
+      className={`grid gap-(--space-xs) ${columns === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}
       onKeyDown={(event) => {
         if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key))
           return;

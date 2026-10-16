@@ -157,7 +157,7 @@ Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만
 - ChipGroup은 `columns`, `labelledBy`, 빈 선택값과 `disabledReason`을 지원한다. 비활성 항목은 방향키 선택에서 건너뛴다.
 - TextField는 `multiline`으로 여러 줄 입력을, `count`로 글자 수와 초과 오류를 표시한다. 초과 입력은 막지 않는다.
 - Notice는 `type="info | success | error | warning"`와 `message`를 받는다. 오류는 `alert`, 나머지는 `status`로 알린다. 기존 `ErrorNotice` 호출도 유지한다.
-- OptionTile은 `type="checkbox | radio"`, `selected`, `inactive`를 받는다. 단일 선택에는 `OptionTileGroup`을 쓰고, 복수 선택 묶음은 호출부가 이름 있는 fieldset/legend로 감싼다.
+- OptionTile은 `type="checkbox | radio"`, `selected`, `inactive`를 받는다. 단일 선택에는 `OptionTileGroup`을 쓰고, 복수 선택 묶음은 호출부가 이름 있는 fieldset/legend로 감싼다. `OptionTileGroup`은 기본 2열이고 문구가 긴 목록(매칭 취소 사유 209:3672)은 `columns={1}`로 전폭에 놓는다.
 - Toggle은 `label`, `checked`, `onChange`가 필수다. `role="switch"`와 `aria-checked`로 상태를 전달하며 `inactive`여도 포커스는 받는다.
 - InputCompact는 보이지 않는 `label`이 필수다. 기본은 텍스트 입력, `kind="select"`에는 `options`를 전달한다. 표준 입력 속성과 이벤트를 지원한다.
 - RequestCard는 `title`, `meta`, `status`, `statusLabel`을 받는다. `partner`와 `action`은 선택이며 도메인·개인정보 판단은 호출부와 서버의 책임이다. `action` 이름에는 일시가 포함된다. 목록은 ul/li로 감싼다.
