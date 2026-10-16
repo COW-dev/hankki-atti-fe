@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Block, Button, ButtonLink, Notice } from '@hankki/ui';
 import { PastRequestRow } from './PastRequestRow';
 import { UpcomingRequestCard } from './UpcomingRequestCard';
@@ -18,7 +18,10 @@ export function MyRequestsView({
   notice,
   error,
   withdrawingId,
+  cancelingId,
+  focusKey = 0,
   onWithdraw,
+  onCancel,
   onReportNoShow,
 }: {
   data: MyHelpRequests;
@@ -28,11 +31,21 @@ export function MyRequestsView({
   // 철회 실패 등 블록 안 오류 안내
   error: string | null;
   withdrawingId: number | null;
+  cancelingId: number | null;
+  // 취소로 카드가 지난 신청으로 옮겨지면 연 버튼이 사라져 포커스가 돌아갈 곳이 없다 — 값이 바뀔 때 첫 섹션 제목으로 보낸다
+  focusKey?: number;
   onWithdraw: (request: MyHelpRequest) => void;
+  onCancel: (request: MyHelpRequest) => void;
   onReportNoShow: (request: MyHelpRequest) => void;
 }) {
   const [pastExpanded, setPastExpanded] = useState(false);
   const pastListId = useId();
+  const headingRef = useRef<HTMLHeadingElement>(null);
+  const firstSection = data.upcoming.length > 0 ? 'upcoming' : 'past';
+
+  useEffect(() => {
+    if (focusKey > 0) headingRef.current?.focus();
+  }, [focusKey]);
   const visiblePast = pastExpanded ? data.past : data.past.slice(0, PAST_PREVIEW_COUNT);
   const canExpandPast = data.past.length > PAST_PREVIEW_COUNT;
 
@@ -60,7 +73,13 @@ export function MyRequestsView({
       {data.upcoming.length > 0 && (
         <Block gap="md">
           <div className="flex w-full items-center justify-between pb-1">
-            <h2 className="typo-label text-(--color-text-primary)">다가오는 신청</h2>
+            <h2
+              ref={firstSection === 'upcoming' ? headingRef : undefined}
+              tabIndex={-1}
+              className="typo-label text-(--color-text-primary)"
+            >
+              다가오는 신청
+            </h2>
             <p className="typo-caption text-(--color-text-secondary)">{data.upcoming.length}건</p>
           </div>
           <ul className="flex w-full flex-col">
@@ -71,7 +90,9 @@ export function MyRequestsView({
                 isNext={index === 0}
                 now={now}
                 withdrawing={withdrawingId === request.id}
+                canceling={cancelingId === request.id}
                 onWithdraw={onWithdraw}
+                onCancel={onCancel}
               />
             ))}
           </ul>
@@ -81,7 +102,13 @@ export function MyRequestsView({
       {data.past.length > 0 && (
         <Block gap="md">
           <div className="flex w-full items-center justify-between pb-1">
-            <h2 className="typo-label text-(--color-text-primary)">지난 신청</h2>
+            <h2
+              ref={firstSection === 'past' ? headingRef : undefined}
+              tabIndex={-1}
+              className="typo-label text-(--color-text-primary)"
+            >
+              지난 신청
+            </h2>
             {canExpandPast && (
               <Button
                 variant="tertiary"

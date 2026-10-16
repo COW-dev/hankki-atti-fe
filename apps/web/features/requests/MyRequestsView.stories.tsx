@@ -28,7 +28,9 @@ const meta = {
     notice: null,
     error: null,
     withdrawingId: null,
+    cancelingId: null,
     onWithdraw: fn(),
+    onCancel: fn(),
     onReportNoShow: fn(),
     data: {
       upcoming: [
@@ -96,6 +98,9 @@ export const List: Story = {
     await expect(canvas.getByText('오늘 저녁 · 다음 식사')).toBeInTheDocument();
     await userEvent.click(canvas.getByRole('button', { name: '10월 12일 (월) 신청 철회' }));
     await expect(args.onWithdraw).toHaveBeenCalledOnce();
+    // 매칭 완료 카드의 취소하기 — 이름에 날짜를 넣어 카드마다 구분한다
+    await userEvent.click(canvas.getByRole('button', { name: '10월 13일 (화) 매칭 취소하기' }));
+    await expect(args.onCancel).toHaveBeenCalledWith(args.data.upcoming[1]);
     // 지난 신청 3건 + 전체 보기
     await expect(canvas.getAllByRole('listitem')).toHaveLength(5);
     await userEvent.click(canvas.getByRole('button', { name: '전체 보기' }));
@@ -107,6 +112,14 @@ export const List: Story = {
   },
 };
 export const WithNotice: Story = { args: { notice: '신청을 철회했어요', withdrawingId: 1 } };
+export const Canceling: Story = {
+  args: { notice: null, cancelingId: 2 },
+  play: async ({ canvas }) => {
+    await expect(
+      canvas.getByRole('button', { name: '10월 13일 (화) 매칭 취소하기' }),
+    ).toHaveAttribute('aria-disabled', 'true');
+  },
+};
 export const WithError: Story = {
   args: { error: '이미 상태가 바뀐 신청이에요. 목록을 다시 불러올게요' },
 };

@@ -23,6 +23,11 @@ export function withdrawRequest(authRequest: AuthRequest, id: number): Promise<M
   return authRequest<MyHelpRequest>(`/api/help-requests/${id}/withdraw`, { method: 'POST' });
 }
 
+// 매칭 완료 신청 취소 (명세 "매칭 취소 (학생)": 사유·패널티 없음, 도우미에게 바로 알림). 응답은 취소 완료가 된 신청
+export function cancelRequest(authRequest: AuthRequest, id: number): Promise<MyHelpRequest> {
+  return authRequest<MyHelpRequest>(`/api/help-requests/${id}/cancel`, { method: 'POST' });
+}
+
 // 이용 완료 후 24시간 안에 노쇼 신고. 응답은 노쇼가 된 신청
 export function reportNoShow(authRequest: AuthRequest, id: number): Promise<MyHelpRequest> {
   return authRequest<MyHelpRequest>(`/api/help-requests/${id}/no-show`, { method: 'POST' });
