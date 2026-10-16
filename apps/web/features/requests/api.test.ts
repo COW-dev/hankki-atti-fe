@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   applyToRequest,
+  cancelRequest,
   createRequest,
   fetchMyRequests,
   fetchOpenRequests,
@@ -19,11 +20,12 @@ describe('requests api', () => {
     expect(result).toEqual({ upcoming: [], past: [] });
   });
 
-  it('철회·노쇼 신고는 신청 ID 경로에 POST하고 바뀐 신청을 돌려준다', async () => {
+  it('철회·노쇼 신고·매칭 취소는 신청 ID 경로에 본문 없이 POST하고 바뀐 신청을 돌려준다', async () => {
     const authRequest = vi.fn().mockResolvedValue({ id: 7, status: 'CANCELED' });
 
     await withdrawRequest(authRequest, 7);
     await reportNoShow(authRequest, 8);
+    const canceled = await cancelRequest(authRequest, 9);
 
     expect(authRequest).toHaveBeenNthCalledWith(1, '/api/help-requests/7/withdraw', {
       method: 'POST',
@@ -31,6 +33,10 @@ describe('requests api', () => {
     expect(authRequest).toHaveBeenNthCalledWith(2, '/api/help-requests/8/no-show', {
       method: 'POST',
     });
+    expect(authRequest).toHaveBeenNthCalledWith(3, '/api/help-requests/9/cancel', {
+      method: 'POST',
+    });
+    expect(canceled.status).toBe('CANCELED');
   });
 
   it('시작 시각 선택지는 GET /api/help-requests/time-options', async () => {

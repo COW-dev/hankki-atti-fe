@@ -34,6 +34,21 @@ describe('applyUpdate', () => {
     ]);
   });
 
+  it('매칭 완료 신청이 취소되면 다가오는 목록에서 빠지고 지난 목록 맨 앞으로 간다', () => {
+    const current = {
+      upcoming: [request(1, 'RECRUITING'), request(2, 'MATCHED')],
+      past: [request(3, 'COMPLETED')],
+    };
+
+    const result = applyUpdate(current, request(2, 'CANCELED'));
+
+    expect(result.upcoming.map((r) => r.id)).toEqual([1]);
+    expect(result.past.map((r) => [r.id, r.status])).toEqual([
+      [2, 'CANCELED'],
+      [3, 'COMPLETED'],
+    ]);
+  });
+
   it('노쇼 신고는 지난 목록의 그 자리에서 상태만 바뀐다', () => {
     const current = {
       upcoming: [],
