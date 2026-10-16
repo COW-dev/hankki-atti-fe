@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  applyToRequest,
   createRequest,
   fetchMyRequests,
+  fetchOpenRequests,
   fetchTimeOptions,
   reportNoShow,
   withdrawRequest,
@@ -47,5 +49,26 @@ describe('requests api', () => {
 
     expect(authRequest).toHaveBeenCalledWith('/api/help-requests', { method: 'POST', body });
     expect(result.status).toBe('RECRUITING');
+  });
+
+  it('모집 중 신청은 GET /api/help-requests/open에 from·to 날짜를 붙인다', async () => {
+    const authRequest = vi.fn().mockResolvedValue([]);
+
+    await fetchOpenRequests(authRequest, '2026-10-16', '2026-10-23');
+
+    expect(authRequest).toHaveBeenCalledWith(
+      '/api/help-requests/open?from=2026-10-16&to=2026-10-23',
+    );
+  });
+
+  it('지원은 신청 ID 경로의 applications에 본문 없이 POST하고 지원 결과를 돌려준다', async () => {
+    const authRequest = vi.fn().mockResolvedValue({ applicationId: 1, status: 'WAITING' });
+
+    const result = await applyToRequest(authRequest, 7);
+
+    expect(authRequest).toHaveBeenCalledWith('/api/help-requests/7/applications', {
+      method: 'POST',
+    });
+    expect(result.status).toBe('WAITING');
   });
 });

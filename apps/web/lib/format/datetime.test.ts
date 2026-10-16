@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  addDays,
   dateChipLabel,
   formatDate,
   formatDateShort,
   formatDateTime,
   formatDateTimeRange,
+  formatIsoDate,
   formatTimeRange,
   mealOf,
+  openDateChipLabel,
   parseLocalDate,
   parseLocalDateTime,
   relativeMealLabel,
@@ -77,5 +80,25 @@ describe('dateChipLabel', () => {
 
   it('formatDateShort는 "10월 9일"', () => {
     expect(formatDateShort(parseLocalDate('2026-10-09'))).toBe('10월 9일');
+  });
+});
+
+describe('openDateChipLabel', () => {
+  const now = parseLocalDateTime('2026-10-16T09:00:00');
+
+  it('오늘은 "오늘", 내일은 "내일 10/17", 그 밖은 "10/18"이다', () => {
+    expect(openDateChipLabel(parseLocalDate('2026-10-16'), now)).toBe('오늘');
+    expect(openDateChipLabel(parseLocalDate('2026-10-17'), now)).toBe('내일 10/17');
+    expect(openDateChipLabel(parseLocalDate('2026-10-18'), now)).toBe('10/18');
+  });
+});
+
+describe('formatIsoDate · addDays', () => {
+  it('서버 날짜 쿼리 형식 "2026-10-06"으로 쓰고 한 자리는 0을 채운다', () => {
+    expect(formatIsoDate(parseLocalDate('2026-10-06'))).toBe('2026-10-06');
+  });
+
+  it('addDays는 달을 넘겨도 날짜만 더한다', () => {
+    expect(formatIsoDate(addDays(parseLocalDate('2026-10-28'), 7))).toBe('2026-11-04');
   });
 });
