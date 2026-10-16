@@ -92,7 +92,7 @@ bash scripts/setup-hooks.sh   # Git 훅 활성화 (main 직접 커밋 차단·�
 apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
 ├── app/                # 라우트·화면 조립
 ├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
-├── features/           # 도메인별 화면 조각·훅 (requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원)
+├── features/           # 도메인별 화면 조각·훅 (requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격)
 ├── lib/                # API·인증·도메인 로직 (labels/ = 상태 enum 표시 문구, format/ = 날짜·시각)
 └── public/             # 앱 이미지, icons는 packages/icons/svg 심링크
 packages/
