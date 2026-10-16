@@ -41,11 +41,15 @@ export function useOpenRequests(enabled: boolean, now: Date) {
   // 목록 블록 오류 (서버 상태가 바뀌어 목록을 다시 받은 경우)
   const [listError, setListError] = useState<string | null>(null);
   const [result, setResult] = useState<HelpRequestApplication | null>(null);
+  // 지원 뒤 목록을 다시 받을 때마다 올라간다 — 화면이 포커스를 목록 제목으로 보내는 신호
+  // (눌렀던 버튼이 "지원 불가"로 바뀌어 사라질 수 있어서)
+  const [refreshKey, setRefreshKey] = useState(0);
 
   const load = useCallback(
     () => settle(fetchOpenRequests(authRequest, range.from, range.to)).then(setList),
     [authRequest, range],
   );
+  const refresh = useCallback(() => load().then(() => setRefreshKey((key) => key + 1)), [load]);
 
   useEffect(() => {
     if (!enabled) return;
@@ -83,20 +87,20 @@ export function useOpenRequests(enabled: boolean, now: Date) {
       if (shouldReload) {
         setApplyTarget(null);
         setListError(message);
-        void load();
+        void refresh();
       } else {
         setApplyError(message);
       }
     } finally {
       setSubmitting(false);
     }
-  }, [applyTarget, submitting, authRequest, load]);
+  }, [applyTarget, submitting, authRequest, refresh]);
 
   // 결과 모달을 닫으면 목록을 다시 받는다 — 지원한 카드가 "지원 불가 · 이미 지원한 요청이에요"로 바뀐다
   const closeResult = useCallback(() => {
     setResult(null);
-    return load();
-  }, [load]);
+    return refresh();
+  }, [refresh]);
 
   return {
     list,
@@ -109,6 +113,7 @@ export function useOpenRequests(enabled: boolean, now: Date) {
     applyError,
     listError,
     result,
+    refreshKey,
     openApply,
     closeApply,
     submitApply,

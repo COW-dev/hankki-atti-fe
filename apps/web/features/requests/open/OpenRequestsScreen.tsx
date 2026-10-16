@@ -29,22 +29,17 @@ export function OpenRequestsScreen() {
     applyError,
     listError,
     result,
+    refreshKey,
     openApply,
     closeApply,
     submitApply,
     closeResult,
   } = useOpenRequests(true, now);
-  // 목록을 다시 받은 뒤 포커스를 보낼 때마다 올린다
-  const [focusKey, setFocusKey] = useState(0);
   const filterOptions = useMemo(() => dateFilterOptions(now), [now]);
   const visibleDates = useMemo(
     () => (list.status === 'ready' ? filterDates(list.dates, filter, now) : []),
     [list, filter, now],
   );
-
-  const handleCloseResult = () => {
-    void closeResult().then(() => setFocusKey((key) => key + 1));
-  };
 
   return (
     <PageShell
@@ -71,7 +66,7 @@ export function OpenRequestsScreen() {
           error={listError}
           applyingId={submitting && applyTarget ? applyTarget.id : null}
           onApply={openApply}
-          focusKey={focusKey}
+          focusKey={refreshKey}
         />
       )}
 
@@ -82,7 +77,7 @@ export function OpenRequestsScreen() {
         onClose={closeApply}
         onSubmit={() => void submitApply()}
       />
-      <ApplyResultModal result={result} onClose={handleCloseResult} />
+      <ApplyResultModal result={result} onClose={() => void closeResult()} />
     </PageShell>
   );
 }

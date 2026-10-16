@@ -18,7 +18,7 @@ export function ApplyResultModal({
   result: HelpRequestApplication | null;
   onClose: () => void;
 }) {
-  if (!result) return <Modal open={false} title="" onClose={onClose} />;
+  if (!result) return null;
 
   const summary = `${formatDateTimeRange(
     parseLocalDateTime(result.startAt),

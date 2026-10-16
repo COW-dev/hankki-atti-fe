@@ -64,6 +64,8 @@ describe('useOpenRequests', () => {
     expect(result.current.result).toBeNull();
     expect(authRequest).toHaveBeenCalledTimes(3);
     expect(result.current.list).toEqual({ status: 'ready', dates: [] });
+    // 다시 받은 뒤 포커스를 옮기라는 신호
+    expect(result.current.refreshKey).toBe(1);
   });
 
   it('409면 모달을 닫고 목록 블록에 사유를 보여 주며 목록을 다시 받는다', async () => {
@@ -79,6 +81,7 @@ describe('useOpenRequests', () => {
     expect(result.current.result).toBeNull();
     expect(result.current.listError).toBe('예비 인원이 다 찼어요. 목록을 다시 불러올게요');
     await waitFor(() => expect(result.current.list).toEqual({ status: 'ready', dates: [] }));
+    await waitFor(() => expect(result.current.refreshKey).toBe(1));
   });
 
   it('네트워크 오류면 모달을 열어 둔 채 오류를 보여 줘 다시 누를 수 있다', async () => {
