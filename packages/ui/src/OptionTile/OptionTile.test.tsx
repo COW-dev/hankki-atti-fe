@@ -58,6 +58,28 @@ describe('OptionTile', () => {
     await userEvent.keyboard('{End}');
     expect(screen.getByRole('radio', { name: '저녁' })).toBeChecked();
   });
+  it('1열 묶음도 같은 radiogroup이고 아래 방향키로 다음 항목을 고른다', async () => {
+    function Example() {
+      const [value, setValue] = useState('a');
+      return (
+        <OptionTileGroup
+          label="취소 사유"
+          columns={1}
+          value={value}
+          onChange={setValue}
+          options={[
+            { value: 'a', label: '질병·부상' },
+            { value: 'b', label: '가족 경조사' },
+          ]}
+        />
+      );
+    }
+    render(<Example />);
+    expect(screen.getByRole('radiogroup', { name: '취소 사유' })).toBeInTheDocument();
+    await userEvent.tab();
+    await userEvent.keyboard('{ArrowDown}');
+    expect(screen.getByRole('radio', { name: '가족 경조사' })).toBeChecked();
+  });
   it('선택 항목이 비활성으로 바뀌어도 그 위치에서 이전 활성 항목으로 이동한다', async () => {
     const onChange = vi.fn();
     render(
