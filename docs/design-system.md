@@ -161,7 +161,7 @@ Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만
 - Toggle은 `label`, `checked`, `onChange`가 필수다. `role="switch"`와 `aria-checked`로 상태를 전달하며 `inactive`여도 포커스는 받는다.
 - InputCompact는 보이지 않는 `label`이 필수다. 기본은 텍스트 입력, `kind="select"`에는 `options`를 전달한다. 표준 입력 속성과 이벤트를 지원한다.
 - RequestCard는 `title`, `meta`, `status`, `statusLabel`을 받는다. `partner`와 `action`은 선택이며 도메인·개인정보 판단은 호출부와 서버의 책임이다. `action` 이름에는 일시가 포함된다. 목록은 ul/li로 감싼다.
-- Modal은 `open`을 호출부가 관리한다. 제목 포커스, Tab/Shift+Tab 순환, Esc/닫기, 열었던 요소로 복귀와 배경 접근 차단을 제공한다. `onConfirm` 후 닫기 여부도 호출부가 정한다.
+- Modal은 `open`을 호출부가 관리한다. 제목 포커스, Tab/Shift+Tab 순환, Esc/닫기, 열었던 요소로 복귀와 배경 접근 차단을 제공한다. `onConfirm` 후 닫기 여부도 호출부가 정한다. 결과 모달처럼 제목 위에 아이콘 원이 오면 `icon`(목업 209:3514)을 준다. 장식이라 숨기고 의미는 제목이 전달한다.
 - SidebarItem은 `href`, 표시 문구, `active`를 받으며 `icon`으로 항목별 원본 아이콘 이름을 지정할 수 있다. 관리자 화면 자체는 구현하지 않는다.
 - 새 용도 토큰은 OptionTile의 표시 크기·외곽선·모서리, SidebarItem 높이, Modal 그림자다. 원본은 각각 Figma `1:1737`, `1:1352`, `1:1346`이다.
 

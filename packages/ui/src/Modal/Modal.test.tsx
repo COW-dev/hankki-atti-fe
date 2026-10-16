@@ -56,4 +56,30 @@ describe('Modal', () => {
     );
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
+
+  it('아이콘을 주면 장식으로 숨기고 제목이 이름이 된다', () => {
+    Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+      configurable: true,
+      value: function (this: HTMLDialogElement) {
+        this.setAttribute('open', '');
+      },
+    });
+    Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+      configurable: true,
+      value: function (this: HTMLDialogElement) {
+        this.removeAttribute('open');
+      },
+    });
+    // afterEach가 dialog 대체 구현을 지우기 전에 내린다
+    const { unmount } = render(
+      <Modal open title="매칭됐어요!" icon={<span>✓</span>} onClose={() => {}}>
+        못 가게 되면 매칭 현황에서 취소해 주세요
+      </Modal>,
+    );
+    const dialog = screen.getByRole('dialog', { name: '매칭됐어요!' });
+    expect(dialog).toHaveAccessibleName('매칭됐어요!');
+    expect(screen.queryByText('✓')).not.toBeNull();
+    expect(screen.getByText('✓').closest('[aria-hidden]')).not.toBeNull();
+    unmount();
+  });
 });
