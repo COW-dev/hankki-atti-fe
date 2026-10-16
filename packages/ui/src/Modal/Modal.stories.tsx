@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs-vite';
 import { expect, within } from 'storybook/test';
+import { Icon } from '@hankki/icons';
 import { Button } from '../Button';
 import { Modal } from './Modal';
 const meta = {
@@ -61,6 +62,22 @@ export const Destructive: Story = {
     title: '신청을 취소할까요?',
     confirmLabel: '취소하기',
     children: '취소하면 다시 신청해야 해요.',
+  },
+};
+// 결과 모달 (목업 209:3514): 제목 위 아이콘 원. 의미는 제목이 전달하고 아이콘은 장식이다
+export const WithIcon: Story = {
+  args: {
+    open: true,
+    icon: <Icon name="check" />,
+    title: '매칭됐어요!',
+    description: '10월 7일 (화) 12:00 ~ 13:00 · 배식 보조',
+    children: '못 가게 되면 매칭 현황에서 취소해 주세요',
+    confirmLabel: '확인',
+  },
+  play: async ({ canvas }) => {
+    const dialog = canvas.getByRole('dialog', { name: '매칭됐어요!' });
+    await expect(within(dialog).getByRole('heading', { name: '매칭됐어요!' })).toHaveFocus();
+    await expect(within(dialog).queryByRole('img')).not.toBeInTheDocument();
   },
 };
 export const LargeText: Story = { args: { open: true }, globals: { textSize: 'large' } };

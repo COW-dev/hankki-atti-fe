@@ -80,6 +80,24 @@ export function dateChipLabel(date: Date, now: Date): string {
   return `${short} (${WEEKDAYS[date.getDay()]})`;
 }
 
+// F-06 날짜 필터 칩 (Figma 208:3532): 오늘 "오늘", 내일 "내일 10/7", 그 밖 "10/8" — F-01 칩보다 짧다 (한 줄 4개)
+export function openDateChipLabel(date: Date, now: Date): string {
+  const days = daysBetween(startOfDay(now), startOfDay(date));
+  const short = `${date.getMonth() + 1}/${date.getDate()}`;
+  if (days === 0) return '오늘';
+  if (days === 1) return `내일 ${short}`;
+  return short;
+}
+
+// 서버 날짜 쿼리 "2026-10-16" (시간대 변환 없이 로컬 날짜 그대로)
+export function formatIsoDate(date: Date): string {
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+}
+
+export function addDays(date: Date, days: number): Date {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
+}
+
 export function isSameDay(a: Date, b: Date): boolean {
   return daysBetween(startOfDay(a), startOfDay(b)) === 0;
 }

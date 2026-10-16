@@ -6,6 +6,8 @@ import { Button } from '../Button';
 type ModalProps = {
   open: boolean;
   title: string;
+  // 제목 위 장식 아이콘 (결과 모달 — 목업 209:3514 아이콘 원). 의미는 제목이 전달한다
+  icon?: ReactNode;
   children?: ReactNode;
   description?: ReactNode;
   actions?: ReactNode;
@@ -23,6 +25,7 @@ type ModalProps = {
 export function Modal({
   open,
   title,
+  icon,
   children,
   description,
   actions,
@@ -101,6 +104,14 @@ export function Modal({
       className={`m-auto max-h-[calc(100dvh-var(--space-xl)*2)] w-[calc(100%-var(--space-md)*2)] max-w-[342px] overflow-y-auto rounded-(--radius-xl) border-0 bg-(--color-bg-default) p-(--space-xl) text-(--color-text-primary) shadow-(--shadow-modal) backdrop:bg-(--color-bg-overlay)/50 ${className ?? ''}`}
     >
       <div className="flex flex-col items-start gap-(--space-md)">
+        {icon && (
+          <div
+            aria-hidden
+            className="flex size-12 items-center justify-center rounded-(--radius-full) bg-(--color-bg-muted)"
+          >
+            {icon}
+          </div>
+        )}
         <h2 ref={titleRef} id={titleId} tabIndex={-1} className="typo-title w-full">
           {title}
         </h2>

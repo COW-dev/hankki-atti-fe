@@ -1,8 +1,10 @@
 import type {
   CreateHelpRequestBody,
   CreatedHelpRequest,
+  HelpRequestApplication,
   MyHelpRequest,
   MyHelpRequests,
+  OpenHelpRequestDate,
   TimeOptionDate,
 } from './types';
 
@@ -37,4 +39,23 @@ export function createRequest(
   body: CreateHelpRequestBody,
 ): Promise<CreatedHelpRequest> {
   return authRequest<CreatedHelpRequest>('/api/help-requests', { method: 'POST', body });
+}
+
+// 도우미가 지원할 수 있는 모집 중 신청, 날짜별 (from·to는 "YYYY-MM-DD", to 포함, 최대 31일)
+export function fetchOpenRequests(
+  authRequest: AuthRequest,
+  from: string,
+  to: string,
+): Promise<OpenHelpRequestDate[]> {
+  return authRequest<OpenHelpRequestDate[]>(`/api/help-requests/open?from=${from}&to=${to}`);
+}
+
+// 도우미 지원 (본문 없음). 첫 지원자면 MATCHED + student, 아니면 WAITING + waitingOrder
+export function applyToRequest(
+  authRequest: AuthRequest,
+  id: number,
+): Promise<HelpRequestApplication> {
+  return authRequest<HelpRequestApplication>(`/api/help-requests/${id}/applications`, {
+    method: 'POST',
+  });
 }
