@@ -28,7 +28,9 @@ const preview: Preview = {
       },
     },
   },
-  beforeEach({ globals }) {
+  beforeEach({ globals, viewMode }) {
+    // Docs는 여러 스토리를 한 화면에 그리므로 html이 아니라 데코레이터의 감싼 요소로 고른다
+    if (viewMode === 'docs') return;
     const previous = localStorage.getItem('hankki.textSize');
     const textSize = document.documentElement.dataset.textSize;
     const lang = document.documentElement.lang;
@@ -44,13 +46,19 @@ const preview: Preview = {
     };
   },
   decorators: [
-    function DesignSystem(Story, { globals }) {
+    function DesignSystem(Story, { globals, storyGlobals, viewMode }) {
+      // Docs에서는 스토리에 적은 globals(예: LargeText)가 globals에 합쳐지지 않아 storyGlobals를 먼저 본다
+      const textSize =
+        (storyGlobals.textSize ?? globals.textSize) === 'large' ? 'large' : 'default';
       useEffect(() => {
-        document.documentElement.dataset.textSize =
-          globals.textSize === 'large' ? 'large' : 'default';
-      }, [globals.textSize]);
+        if (viewMode !== 'docs') document.documentElement.dataset.textSize = textSize;
+      }, [textSize, viewMode]);
       return (
-        <div data-size={globals.sizeMode} className="font-sans antialiased">
+        <div
+          data-text-size={textSize}
+          data-size={storyGlobals.sizeMode ?? globals.sizeMode}
+          className="font-sans antialiased"
+        >
           <Story />
         </div>
       );
