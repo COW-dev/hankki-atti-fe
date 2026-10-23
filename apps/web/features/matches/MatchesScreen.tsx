@@ -42,7 +42,7 @@ export function MatchesScreen() {
     <PageShell
       size="M"
       topBar={<TopBar title="매칭 현황" logo bell />}
-      footer={<Footer />}
+      footer={<Footer withTabBar />}
       tabBar={<HelperTabBar active="/matches" />}
     >
       {list.status === 'error' && (
