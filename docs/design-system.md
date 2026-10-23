@@ -37,11 +37,13 @@ Figma 디자인 시스템 머리말(1:1359)과 2026-10-01 개정(1:1794)을 요�
 | `--color-bg-success-subtle` | #edfaf2 | 성공 안내·태그 |
 | `--color-bg-warning-subtle` | #fff5e8 | 경고 안내·태그 |
 | `--color-bg-overlay` | #000000 | 모달 뒤 (투명도는 컴포넌트에서) |
+| `--color-bg-inverse` | #191d23 | 토스트 |
 | `--color-text-primary` | #191d23 | 본문 |
 | `--color-text-secondary` | #5f6773 | 보조 글자 (5.7:1) |
 | `--color-text-disabled` | #adb4bd | 비활성 글자 |
 | `--color-text-brand` | #096d64 | 선택·강조 글자 |
 | `--color-text-on-brand` | #191d23 | 민트 위 글자 |
+| `--color-text-inverse` | #ffffff | 어두운 면 위 글자 (토스트) |
 | `--color-text-danger` / `-success` / `-warning` | #b01e24 / #0e6b39 / #a34e00 | 상태 글자 |
 | `--color-border-default` | #e4e7eb | 구분선 |
 | `--color-border-strong` | #868e99 | 강한 테두리 |
@@ -127,6 +129,7 @@ Figma 디자인 시스템 머리말(1:1359)과 2026-10-01 개정(1:1794)을 요�
 | RequestCard | 1:1340 | 신청 카드 | `@hankki/ui` (`RequestCard`) | ✅ |
 | Modal | 1:1346 | 확인·선택 모달 | `@hankki/ui` (`Modal`) | ✅ |
 | SidebarItem | 1:1352 | 관리자 사이드바 | `@hankki/ui` (`SidebarItem`) | ✅ |
+| Toast | real_page 14:2862 외 8종 | 완료·안내 한 줄 (2초 뒤 닫힘) | `@hankki/ui` (`Toast`) | ✅ |
 
 Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만들기 전에 `get_design_context`로 꼭 읽는다.
 
@@ -162,6 +165,7 @@ Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만
 - InputCompact는 보이지 않는 `label`이 필수다. 기본은 텍스트 입력, `kind="select"`에는 `options`를 전달한다. 표준 입력 속성과 이벤트를 지원한다.
 - RequestCard는 `title`, `meta`, `status`, `statusLabel`을 받는다. `partner`와 `action`은 선택이며 도메인·개인정보 판단은 호출부와 서버의 책임이다. `action` 이름에는 일시가 포함된다. 목록은 ul/li로 감싼다.
 - Modal은 `open`을 호출부가 관리한다. 제목 포커스, Tab/Shift+Tab 순환, Esc/닫기, 열었던 요소로 복귀와 배경 접근 차단을 제공한다. `onConfirm` 후 닫기 여부도 호출부가 정한다. 결과 모달처럼 제목 위에 아이콘 원이 오면 `icon`(목업 209:3514)을 준다. 장식이라 숨기고 의미는 제목이 전달한다.
+- Toast는 `message`(없으면 `null`)와 `onClose`를 받고, 문구가 생기면 2초 뒤 `onClose`를 부른다. live 영역(`status`)이 처음부터 있어야 문구가 읽히므로 조건부로 렌더링하지 말고 항상 둔다. 포커스는 옮기지 않는다. 탭바가 있는 화면은 `withTabBar`로 탭바 위 20, 없으면 바닥에서 40 띄운다(14:2862·14:2865).
 - SidebarItem은 `href`, 표시 문구, `active`를 받으며 `icon`으로 항목별 원본 아이콘 이름을 지정할 수 있다. 관리자 화면 자체는 구현하지 않는다.
 - 새 용도 토큰은 OptionTile의 표시 크기·외곽선·모서리, SidebarItem 높이, Modal 그림자다. 원본은 각각 Figma `1:1737`, `1:1352`, `1:1346`이다.
 

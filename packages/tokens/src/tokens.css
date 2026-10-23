@@ -46,6 +46,7 @@
   --color-bg-success-subtle: #edfaf2;
   --color-bg-warning-subtle: #fff5e8;
   --color-bg-overlay: #000000;
+  --color-bg-inverse: var(--gray-900);
 
   /* ── 글자 ── */
   --color-text-primary: var(--gray-900);
@@ -56,6 +57,7 @@
   --color-text-danger: #b01e24;
   --color-text-success: #0e6b39;
   --color-text-warning: #a34e00;
+  --color-text-inverse: var(--gray-0);
 
   /* ── 테두리 ── */
   --color-border-default: var(--gray-200);
