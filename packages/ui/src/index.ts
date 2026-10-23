@@ -10,3 +10,4 @@ export * from './InputCompact';
 export * from './RequestCard';
 export * from './SidebarItem';
 export * from './Modal';
+export * from './Toast';
