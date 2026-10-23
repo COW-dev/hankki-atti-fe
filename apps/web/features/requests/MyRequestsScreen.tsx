@@ -11,13 +11,14 @@ import { TopBar } from '@/components/layout/TopBar';
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { reportNoShow, withdrawRequest } from './api';
+import { cancelRequest, reportNoShow, withdrawRequest } from './api';
+import { CancelRequestModal } from './CancelRequestModal';
 import { MyRequestsView } from './MyRequestsView';
 import { NoShowReportModal } from './NoShowReportModal';
 import type { MyHelpRequest } from './types';
 import { useMyRequests } from './useMyRequests';
 
-// 이미 상태가 바뀐 신청에 철회·신고하면 목록을 다시 받는다
+// 이미 상태가 바뀐 신청에 철회·취소·신고하면 목록을 다시 받는다 (매칭 취소는 식사 시작도 INVALID_STATUS로 온다)
 function actionErrorMessage(error: unknown): { message: string; reload: boolean } {
   if (error instanceof ApiError) {
     if (error.code === ErrorCode.HELP_REQUEST_NOT_FOUND) {
@@ -35,7 +36,7 @@ function actionErrorMessage(error: unknown): { message: string; reload: boolean 
 }
 
 /**
- * F-02 내 신청 — 빈 상태 206:1281 · 목록 204:2804 · 노쇼 신고 모달 207:1921.
+ * F-02 내 신청 — 빈 상태 206:1281 · 목록 204:2804 · 취소 확인 모달 207:1856 · 노쇼 신고 모달 207:1921.
  * 역할 확인은 /requests 라우트가 하고, 여기는 장애학생으로 확인된 뒤에만 그린다.
  */
 export function MyRequestsScreen() {
@@ -45,6 +46,11 @@ export function MyRequestsScreen() {
   const [notice, setNotice] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [withdrawingId, setWithdrawingId] = useState<number | null>(null);
+  const [cancelTarget, setCancelTarget] = useState<MyHelpRequest | null>(null);
+  const [cancelSubmitting, setCancelSubmitting] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
+  // 취소로 카드가 사라진 뒤 포커스를 섹션 제목으로 보낼 때마다 올린다
+  const [focusKey, setFocusKey] = useState(0);
   const [noShowTarget, setNoShowTarget] = useState<MyHelpRequest | null>(null);
   const [noShowSubmitting, setNoShowSubmitting] = useState(false);
   const [noShowError, setNoShowError] = useState<string | null>(null);
@@ -63,6 +69,36 @@ export function MyRequestsScreen() {
       if (shouldReload) void reload();
     } finally {
       setWithdrawingId(null);
+    }
+  };
+
+  const openCancel = (request: MyHelpRequest) => {
+    setCancelError(null);
+    setCancelTarget(request);
+  };
+
+  // 명세 "매칭 취소 (학생)": 확인 모달 뒤 바로 취소, 사유·패널티 없음. 404·409면 모달을 닫고 목록을 다시 받는다
+  const handleCancel = async (request: MyHelpRequest) => {
+    setCancelSubmitting(true);
+    setCancelError(null);
+    setNotice(null);
+    setError(null);
+    try {
+      replace(await cancelRequest(authRequest, request.id));
+      setCancelTarget(null);
+      setNotice('취소됐어요. 도우미에게 알렸어요');
+      setFocusKey((key) => key + 1);
+    } catch (caught) {
+      const { message, reload: shouldReload } = actionErrorMessage(caught);
+      if (shouldReload) {
+        setCancelTarget(null);
+        setError(message);
+        void reload();
+      } else {
+        setCancelError(message);
+      }
+    } finally {
+      setCancelSubmitting(false);
     }
   };
 
@@ -135,10 +171,21 @@ export function MyRequestsScreen() {
           notice={notice}
           error={error}
           withdrawingId={withdrawingId}
+          cancelingId={cancelTarget && cancelSubmitting ? cancelTarget.id : null}
+          focusKey={focusKey}
           onWithdraw={handleWithdraw}
+          onCancel={openCancel}
           onReportNoShow={openNoShow}
         />
       )}
+
+      <CancelRequestModal
+        request={cancelTarget}
+        submitting={cancelSubmitting}
+        error={cancelError}
+        onClose={() => setCancelTarget(null)}
+        onSubmit={handleCancel}
+      />
 
       <NoShowReportModal
         request={noShowTarget}
