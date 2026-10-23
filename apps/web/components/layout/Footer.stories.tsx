@@ -7,3 +7,4 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 export const Copyright: Story = { args: { copyright: true } };
 export const LargeText: Story = { globals: { textSize: 'large' } };
+export const WithTabBar: Story = { args: { withTabBar: true } };

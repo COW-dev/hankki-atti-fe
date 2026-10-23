@@ -36,7 +36,7 @@ export default function CreateRequestPage() {
     <PageShell
       size="L"
       topBar={<TopBar title="도우미 신청" logo bell />}
-      footer={<Footer />}
+      footer={<Footer withTabBar />}
       tabBar={<StudentTabBar active="/requests/new" />}
     >
       {created ? (
