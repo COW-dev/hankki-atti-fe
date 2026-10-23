@@ -8,6 +8,14 @@ const meta = {
   title: '공용 UI/Toast',
   component: Toast,
   args: { message: '신청을 철회했어요', onClose: () => {} },
+  decorators: [
+    // Toast는 fixed라 문서 페이지에서 칸 밖으로 빠져나간다. transform으로 휴대폰 틀(390, real_page 프레임 폭) 안에 가둔다.
+    (Story) => (
+      <div className="relative h-80 w-full max-w-[390px] bg-(--color-bg-subtle) [transform:translateZ(0)]">
+        <Story />
+      </div>
+    ),
+  ],
 } satisfies Meta<typeof Toast>;
 export default meta;
 type Story = StoryObj<typeof meta>;
