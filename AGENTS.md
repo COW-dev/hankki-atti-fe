@@ -35,12 +35,17 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 **사용자와 화면**
 
-| 사용자 | 화면 | 크기 모드 |
-|---|---|---|
-| 비로그인 | 소개, 로그인, 회원가입, 비밀번호 재설정 | L |
-| 장애학생 | 도우미 신청, 내 신청, 공지사항, 마이페이지 (모바일 웹, 계정은 센터가 발급) | L |
-| 도우미 | 요청 목록, 매칭 현황, 공지사항, 마이페이지 (모바일 웹, 직접 회원가입) | M |
-| 관리자 | 데스크톱 별도 도메인 — **이 레포에 둘지 미정**, 정해지면 이 섹션을 갱신한다 | admin |
+| 사용자 | 도메인 (`app/` 폴더) | 화면 | 크기 모드 |
+|---|---|---|---|
+| 비로그인 | 메인 (`app/`) | 소개, 로그인, 회원가입, 비밀번호 재설정 | L |
+| 장애학생 | 메인 (`app/`) | 도우미 신청, 내 신청, 공지사항, 마이페이지 (모바일 웹, 계정은 센터가 발급) | L |
+| 도우미 | `helper.` (`app/helper/`) | 요청 목록, 매칭 현황, 공지사항, 마이페이지, 로그인·회원가입 (모바일 웹, 직접 회원가입) | M |
+| 관리자 | `admin.` (`app/admin/`) | 데스크톱 — 지금은 권한 가드·로그인 뼈대만, 목업이 정해지면 채운다 | admin |
+
+**서브도메인** — `apps/web/proxy.ts`가 host를 보고 `helper.x/matches` → `/helper/matches`로 rewrite한다 (판단은 `lib/site.ts`, 배경은 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md)).
+- 도메인마다 한 역할만 받는다 (`SITE_ROLE`). refresh 쿠키는 서브도메인끼리 공유하지 않으므로 로그인도 도메인별로 하고, 다른 역할 계정은 로그아웃시킨다
+- 서브도메인 화면 안의 링크·`router` 경로에는 `/helper`·`/admin` 접두사를 붙이지 않는다 (`<Link href="/matches">`). 다른 도메인으로 가는 링크만 `siteUrl('helper', 경로)`
+- 메인 도메인에서 `/helper`·`/admin`으로 직접 들어오면 `/`로 보낸다
 
 **요구사항·디자인 원본**
 
@@ -64,7 +69,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ```bash
 pnpm install          # 의존성 설치
-pnpm dev              # 로컬 실행 (http://localhost:3000) — 백엔드는 apps/web/.env.local의 NEXT_PUBLIC_API_BASE_URL (기본 http://localhost:8080)
+pnpm dev              # 로컬 실행 (http://localhost:3000, 도우미 http://helper.localhost:3000, 관리자 http://admin.localhost:3000) — 백엔드는 apps/web/.env.local의 NEXT_PUBLIC_API_BASE_URL (기본 http://localhost:8080)
 pnpm lint             # ESLint
 pnpm format           # Prettier 적용 (pnpm format:check는 검사만)
 pnpm typecheck        # 라우트 타입 생성 후 tsc
@@ -90,10 +95,11 @@ bash scripts/setup-hooks.sh   # Git 훅 활성화 (main 직접 커밋 차단·�
 
 ```text
 apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
-├── app/                # 라우트·화면 조립
+├── proxy.ts            # 서브도메인 → app 폴더 rewrite
+├── app/                # 라우트·화면 조립 (helper/ = helper. 도메인, admin/ = admin. 도메인)
 ├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
-├── features/           # 도메인별 화면 조각·훅 (requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격)
-├── lib/                # API·인증·도메인 로직 (labels/ = 상태 enum 표시 문구, format/ = 날짜·시각)
+├── features/           # 도메인별 화면 조각·훅 (auth/ = 도메인 공용 로그인 화면, requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격)
+├── lib/                # API·인증·도메인 로직 (site.ts = 서브도메인·역할, labels/ = 상태 enum 표시 문구, format/ = 날짜·시각)
 └── public/             # 앱 이미지, icons는 packages/icons/svg 심링크
 packages/
 ├── ui/src/             # 공용 UI: 컴포넌트별 구현·스토리·테스트·index
