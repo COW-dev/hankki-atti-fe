@@ -150,9 +150,10 @@
   --icon-size: 18px;
 }
 
-:root[data-text-size='large'],
-:root[data-text-size='large'] [data-size='L'],
-:root[data-text-size='large'] [data-size='M'] {
+/* :root로 묶지 않는다 — Storybook Docs는 스토리마다 감싼 요소에 data-text-size를 따로 단다 */
+[data-text-size='large'],
+[data-text-size='large'] [data-size='L'],
+[data-text-size='large'] [data-size='M'] {
   --font-display: 34px;
   --font-title: 26px;
   --font-body: 24px;

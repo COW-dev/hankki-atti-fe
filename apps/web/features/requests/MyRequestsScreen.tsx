@@ -133,7 +133,7 @@ export function MyRequestsScreen() {
     <PageShell
       size="L"
       topBar={<TopBar title="내 신청" logo bell />}
-      footer={<Footer />}
+      footer={<Footer withTabBar />}
       tabBar={<StudentTabBar active="/requests" />}
     >
       {state.status === 'error' && (

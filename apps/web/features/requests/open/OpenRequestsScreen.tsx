@@ -45,7 +45,7 @@ export function OpenRequestsScreen() {
     <PageShell
       size="M"
       topBar={<TopBar title="요청 목록" logo bell />}
-      footer={<Footer />}
+      footer={<Footer withTabBar />}
       tabBar={<HelperTabBar active="/requests" />}
     >
       {list.status === 'error' && (
