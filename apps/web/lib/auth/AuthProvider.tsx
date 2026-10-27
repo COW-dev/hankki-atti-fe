@@ -125,6 +125,9 @@ export function useAuth() {
   return context;
 }
 
+/** 역할의 첫 화면. 역할마다 도메인이 달라서(lib/site.ts) 그 도메인 안의 경로다. */
 export function homePathOf(role: Role) {
-  return role === 'HELPER' ? '/matches' : '/requests';
+  if (role === 'HELPER') return '/matches';
+  if (role === 'ADMIN') return '/';
+  return '/requests';
 }
