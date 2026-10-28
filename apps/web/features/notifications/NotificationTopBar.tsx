@@ -66,8 +66,7 @@ export function NotificationTopBar({
 
   const select = (item: AppNotification) => {
     notifications.markRead(item);
-    const path = notificationPath(item.targetType);
-    if (!path) return;
+    const path = notificationPath(item);
     close();
     // 지금 보고 있는 화면이면 새로 그려 최신 상태를 받는다 (매칭 현황은 들어올 때 승격 모달을 연다)
     if (window.location.pathname === path) window.location.reload();

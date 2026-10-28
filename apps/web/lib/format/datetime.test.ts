@@ -6,6 +6,8 @@ import {
   formatDateShort,
   formatDateTime,
   formatDateTimeRange,
+  formatDotDate,
+  formatDotMonthDay,
   formatIsoDate,
   formatTimeRange,
   mealOf,
@@ -100,5 +102,14 @@ describe('formatIsoDate · addDays', () => {
 
   it('addDays는 달을 넘겨도 날짜만 더한다', () => {
     expect(formatIsoDate(addDays(parseLocalDate('2026-10-28'), 7))).toBe('2026-11-04');
+  });
+});
+
+describe('formatDotDate · formatDotMonthDay', () => {
+  it('공지 게시일은 연.월.일, 수정일은 월.일로 두 자리씩 쓴다', () => {
+    const date = new Date(2026, 8, 5, 9, 0);
+
+    expect(formatDotDate(date)).toBe('2026.09.05');
+    expect(formatDotMonthDay(date)).toBe('09.05');
   });
 });

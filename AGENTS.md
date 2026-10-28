@@ -98,7 +98,7 @@ apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
 ├── proxy.ts            # 서브도메인 → app 폴더 rewrite
 ├── app/                # 라우트·화면 조립 (helper/ = helper. 도메인, admin/ = admin. 도메인)
 ├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
-├── features/           # 도메인별 화면 조각·훅 (auth/ = 도메인 공용 로그인 화면, requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격, notifications/ = 상단 바 알림 개수·알림 패널 — 벨이 있는 TopBar가 연결)
+├── features/           # 도메인별 화면 조각·훅 (auth/ = 도메인 공용 로그인 화면, requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격, notifications/ = 상단 바 알림 개수·알림 패널 — 벨이 있는 TopBar가 연결, notices/ = 장애학생·도우미 공지 목록·상세)
 ├── lib/                # API·인증·도메인 로직 (site.ts = 서브도메인·역할, labels/ = 상태 enum 표시 문구, format/ = 날짜·시각)
 └── public/             # 앱 이미지, icons는 packages/icons/svg 심링크
 packages/
