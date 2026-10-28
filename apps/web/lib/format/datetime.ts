@@ -94,6 +94,16 @@ export function formatIsoDate(date: Date): string {
   return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
 }
 
+// 공지 게시일 "2026.10.01" (Figma 207:2140)
+export function formatDotDate(date: Date): string {
+  return `${date.getFullYear()}.${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
+}
+
+// 공지 수정일 "09.29" — 게시일 옆에 붙어 연도를 생략한다 (Figma 209:4138 "수정됨 09.29")
+export function formatDotMonthDay(date: Date): string {
+  return `${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
+}
+
 export function addDays(date: Date, days: number): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
 }

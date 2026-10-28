@@ -27,4 +27,7 @@ export const ErrorCode = {
   APPLICATION_INVALID_CANCEL_REASON: 'APPLICATION_INVALID_CANCEL_REASON',
   // 알림 읽음 (PATCH /api/notifications/{id}/read) — 없는 알림과 남의 알림을 구분하지 않는다
   NOTIFICATION_NOT_FOUND: 'NOTIFICATION_NOT_FOUND',
+  // 공지 상세 (GET /api/notices/{id}) — 삭제는 "삭제된 공지예요", 없거나 대상이 아니면 찾을 수 없음
+  NOTICE_NOT_FOUND: 'NOTICE_NOT_FOUND',
+  NOTICE_DELETED: 'NOTICE_DELETED',
 } as const;

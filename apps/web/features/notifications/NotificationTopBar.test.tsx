@@ -122,15 +122,12 @@ describe('NotificationTopBar', () => {
     );
   });
 
-  it('공지 알림은 읽음으로만 바꾸고 이동하지 않는다', async () => {
+  it('공지 알림을 누르면 읽음으로 바꾸고 그 공지의 상세로 간다', async () => {
     const { user } = await renderOpened();
 
     await user.click(screen.getByRole('button', { name: /새 공지가 올라왔어요/ }));
 
     expect(authRequest).toHaveBeenCalledWith('/api/notifications/1/read', { method: 'PATCH' });
-    expect(push).not.toHaveBeenCalled();
-    expect(
-      screen.getByRole('button', { name: '새 공지가 올라왔어요, 2시간 전' }),
-    ).toBeInTheDocument();
+    expect(push).toHaveBeenCalledWith('/notices/1');
   });
 });
