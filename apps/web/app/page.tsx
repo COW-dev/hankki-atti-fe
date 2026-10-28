@@ -11,6 +11,7 @@ import { Logo } from '@/components/ui/Logo';
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
 import { homePathOf, useAuth, type Me } from '@/lib/auth/AuthProvider';
+import { siteUrl } from '@/lib/site';
 
 const STEPS = ['도우미를 신청해요', '지원하면 바로 알려드려요', '학식당에서 만나요'];
 
@@ -54,7 +55,7 @@ export default function Home() {
           <ButtonLink href="/login" className="w-full">
             로그인
           </ButtonLink>
-          <ButtonLink href="/signup" variant="secondary" className="w-full">
+          <ButtonLink href={siteUrl('helper', '/signup')} variant="secondary" className="w-full">
             도우미로 회원가입
           </ButtonLink>
         </Block>
