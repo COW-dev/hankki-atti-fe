@@ -89,27 +89,27 @@ export function LoginScreen({ role }: { role: Role }) {
             로그인
           </Button>
         </form>
-        <div className="flex w-full items-center justify-center gap-(--space-sm) whitespace-nowrap">
-          {role !== 'ADMIN' && (
-            <>
-              <Link
-                href={role === 'HELPER' ? '/signup' : siteUrl('helper', '/signup')}
-                className="typo-caption-strong text-(--color-text-secondary)"
-              >
-                도우미 회원가입
-              </Link>
-              <span aria-hidden className="typo-caption text-(--color-text-disabled)">
-                |
-              </span>
-            </>
-          )}
-          <Link
-            href="/password/reset"
-            className="typo-caption-strong text-(--color-text-secondary)"
-          >
-            비밀번호를 잊었어요
-          </Link>
-        </div>
+        {/* 관리자 계정은 백엔드가 비밀번호 재설정을 받지 않아(장애학생·도우미만) 두 링크 모두 숨긴다 */}
+        {role !== 'ADMIN' && (
+          <div className="flex w-full items-center justify-center gap-(--space-sm) whitespace-nowrap">
+            <Link
+              href={role === 'HELPER' ? '/signup' : siteUrl('helper', '/signup')}
+              className="typo-caption-strong text-(--color-text-secondary)"
+            >
+              도우미 회원가입
+            </Link>
+            <span aria-hidden className="typo-caption text-(--color-text-disabled)">
+              |
+            </span>
+            {/* 메일 링크와 같은 경로 (백엔드 PasswordResetService LINK_PATH) */}
+            <Link
+              href="/password-reset"
+              className="typo-caption-strong text-(--color-text-secondary)"
+            >
+              비밀번호를 잊었어요
+            </Link>
+          </div>
+        )}
       </Block>
     </PageShell>
   );
