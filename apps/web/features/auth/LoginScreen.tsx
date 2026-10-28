@@ -13,6 +13,7 @@ import { TextField } from '@hankki/ui';
 import { TopBar } from '@/components/layout/TopBar';
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
+import { loginEvents } from '@/lib/accessibility/login-event';
 import { homePathOf, useAuth, type Role } from '@/lib/auth/AuthProvider';
 import { siteUrl } from '@/lib/site';
 
@@ -36,6 +37,8 @@ export function LoginScreen({ role }: { role: Role }) {
     setPasswordError(undefined);
     try {
       const result = await login(loginId.trim(), password);
+      // 다른 계정으로 바로 로그인해도 그 계정의 접근성 설정으로 다시 맞춘다 (U-06)
+      loginEvents.notify();
       if (result.role !== role) {
         // 이 도메인의 refresh 쿠키를 남기지 않는다. 문구는 목업에 없어 임시로 둔다
         await logout();

@@ -99,7 +99,7 @@ apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
 ├── app/                # 라우트·화면 조립 (helper/ = helper. 도메인, admin/ = admin. 도메인)
 ├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
 ├── features/           # 도메인별 화면 조각·훅 (auth/ = 도메인 공용 로그인 화면, requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격, notifications/ = 상단 바 알림 개수·알림 패널 — 벨이 있는 TopBar가 연결, notices/ = 장애학생·도우미 공지 목록·상세, password-reset/ = 비밀번호 재설정 요청·메일 링크 흐름)
-├── lib/                # API·인증·도메인 로직 (site.ts = 서브도메인·역할, labels/ = 상태 enum 표시 문구, format/ = 날짜·시각)
+├── lib/                # API·인증·도메인 로직 (site.ts = 서브도메인·역할, labels/ = 상태 enum 표시 문구, format/ = 날짜·시각, accessibility/ = 큰 글씨 기기 저장소·계정 동기화)
 └── public/             # 앱 이미지, icons는 packages/icons/svg 심링크
 packages/
 ├── ui/src/             # 공용 UI: 컴포넌트별 구현·스토리·테스트·index
@@ -146,7 +146,7 @@ Figma A11Y 공통 규칙(31:2)을 코드 기준으로 옮겼다. 위반은 기�
 - **폼** — 모든 입력에 label(`TextField`). 규칙·오류는 `aria-describedby`. 못 누르는 버튼은 `disabled` 대신 `Button inactive`(포커스를 받고 이유를 읽어 줌). 비밀번호 붙여넣기 허용
 - **aria-live** — assertive(`role="alert"`): 로그인 실패, 폼 오류. polite: 완료 문구, 필터 결과 "N건 표시", 상태 변화, 새 알림(전역 영역 1개)
 - **모달** — `role="dialog"` + `aria-modal`, 열리면 제목으로 포커스(파괴적 버튼 자동 포커스 금지), 포커스 가두기, Esc 닫기, 닫히면 연 버튼으로 복귀, 배경 inert
-- **접근성 모드** — 토글은 `button` + `aria-pressed`, 이름 "큰 글씨와 음성 읽기". 기기(localStorage)와 계정(서버) 둘 다 저장 — 계정 저장·음성 읽기는 백엔드 설정 API 이후
+- **접근성 모드** — 토글은 `button` + `aria-pressed`, 이름 "큰 글씨와 음성 읽기". 기기(localStorage)와 계정(서버) 둘 다 저장 — 토글은 `textSizeStore.setByUser`로 기기에 저장하고, 루트 레이아웃의 `AccessibilitySync`가 로그인 후 계정 값을 먼저 적용하고 바뀐 값을 계정에 저장한다. 로그인한 채 다른 계정으로 로그인해도 맞추도록 로그인 화면이 `loginEvents.notify()`를 부른다. 음성 읽기는 U-07
 
 ---
 
