@@ -19,9 +19,14 @@ const isUnder = (pathname: string, segment: string) =>
 export type SiteRoute =
   { type: 'rewrite'; pathname: string } | { type: 'redirect'; pathname: string } | { type: 'next' };
 
+/** host의 첫 이름이 서브도메인이면 그 이름, 아니면(메인) null. helper.localhost:3000 → helper */
+export function subdomainOf(host: string): Subdomain | null {
+  return SUBDOMAINS.find((name) => host.split(':')[0].split('.')[0] === name) ?? null;
+}
+
 /** host와 경로로 proxy가 할 일을 정한다. admin.x/users → /admin/users, 메인에서 /admin 직접 접근은 / 로 보낸다. */
 export function resolveSiteRoute(host: string, pathname: string): SiteRoute {
-  const sub = SUBDOMAINS.find((name) => host.split(':')[0].split('.')[0] === name);
+  const sub = subdomainOf(host);
   if (sub) {
     return isUnder(pathname, sub)
       ? { type: 'next' }

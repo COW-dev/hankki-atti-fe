@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { resolveSiteRoute, siteUrl } from './site';
+import { resolveSiteRoute, siteUrl, subdomainOf } from './site';
 
 describe('resolveSiteRoute', () => {
   it('서브도메인 접속이면 폴더 경로로 rewrite한다', () => {
@@ -37,5 +37,14 @@ describe('resolveSiteRoute', () => {
 describe('siteUrl', () => {
   it('메인 주소 앞에 서브도메인을 붙인다', () => {
     expect(siteUrl('helper', '/signup')).toBe('http://helper.localhost:3000/signup');
+  });
+});
+
+describe('subdomainOf', () => {
+  it('host의 첫 이름이 서브도메인이면 그 이름, 메인이면 null', () => {
+    expect(subdomainOf('helper.localhost:3000')).toBe('helper');
+    expect(subdomainOf('admin.atti.bluerack.org')).toBe('admin');
+    expect(subdomainOf('atti.bluerack.org')).toBeNull();
+    expect(subdomainOf('localhost:3000')).toBeNull();
   });
 });

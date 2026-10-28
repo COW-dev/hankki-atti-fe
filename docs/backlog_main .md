@@ -121,6 +121,8 @@
 >
 > 상태 갱신: 2026-10-28 (Asia/Seoul) · 브랜치: `feat/password-reset` · 기준 HEAD: `0916114` — 비밀번호 재설정 작업 코드 대조로 C-03·U-22·U-23만 재평가했다.
 >
+> 상태 갱신: 2026-10-28 (Asia/Seoul) · 브랜치: `feat/accessibility-sync` · 기준 HEAD: `ad988e7` — 접근성 동기화 작업 코드 대조로 C-09·U-06만 재평가했다.
+>
 > 요구사항 원본: [demand.md](../demand.md). 구현 상태는 최초 작성 기준 HEAD(`4ac695d`)의 코드 확인 결과를 유지한다. 이번 수정은 양식 변경이며 구현 상태를 재평가하지 않았다.
 > 요구사항이나 구현이 바뀌면 해당 항목의 상태·근거·의존성을 갱신한다.
 > 모든 항목이 완료되면 상단에 `✅ 완료 (날짜, 최종 병합 PR)` 배너를 붙이고 아카이브한다.
@@ -150,7 +152,7 @@
 | 공용 디자인 시스템 컴포넌트 | Button/ButtonLink, Block, TextField, Notice, StatusTag, Chip/ChipGroup, OptionTile/OptionGroup, Toggle, InputCompact, RequestCard, Modal, SidebarItem, Toast 구현·스토리. 동작 컴포넌트의 인접 테스트. [컴포넌트 현황](design-system.md#컴포넌트) | C-06 | 완료 | 미정 | 우선순위: P0 제안<br>남은 관련 작업: 신규 화면에서 먼저 재사용, Q-02 |
 | 사용자 앱 기본 레이아웃·토큰 | PageShell L/M, TopBar 제목·알림 props, Footer 센터 연락처, `lang="ko"`, 공용 텍스트 스타일·포커스 토큰. [PageShell.tsx](../apps/web/components/layout/PageShell.tsx), [TopBar.tsx](../apps/web/components/layout/TopBar.tsx), [tokens.css](../packages/tokens/src/tokens.css) | C-07 | 완료 | 미정 | 우선순위: P0 제안<br>남은 관련 작업: U-02, U-09, D-11, D-12, Q-02 |
 | 역할별 탭바 컴포넌트 | 장애학생·도우미 메뉴, 아이콘, `aria-current="page"`. 장애학생 화면에 연결. [TabBar.tsx](../apps/web/components/layout/TabBar.tsx) | C-08 | 완료 | 미정 | 우선순위: P0 제안<br>남은 관련 작업: 도우미 화면·경로 연결 U-03 |
-| 기기 큰 글씨 설정 | 토글 `aria-pressed`, 이름 “큰 글씨와 음성 읽기”, localStorage 저장, html `data-text-size` 적용. [A11yToggle.tsx](../apps/web/components/ui/A11yToggle.tsx) | C-09 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: 계정 저장 U-06, 음성 읽기 U-07 |
+| 기기 큰 글씨 설정 | 토글 `aria-pressed`, 이름 “큰 글씨와 음성 읽기”, localStorage 저장, html `data-text-size` 적용. [A11yToggle.tsx](../apps/web/components/ui/A11yToggle.tsx) | C-09 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: 음성 읽기 U-07 (계정 저장은 U-06에서 연결) |
 | M-01 소개 기본 화면 | 제목·이용 3단계·로그인/회원가입 링크·큰 글씨 토글, 로그인 시 역할 홈 이동. [app/page.tsx](../apps/web/app/page.tsx) | C-10 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: 센터 계정 안내 U-01, 스킵 링크 Q-02, 회원가입 U-15 |
 | F-02 내 신청 조회·목록 | 조회 API, 빈 상태·신청하기, 다가오는 건수·다음 식사 강조, 지난 신청 전체 보기, 조회 실패 재시도. [requests/page.tsx](../apps/web/app/requests/page.tsx), [MyRequestsView.tsx](../apps/web/features/requests/MyRequestsView.tsx) | C-11 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: U-10, U-12 |
 | F-02 신청 상태·매칭 상대 표시 | 상태 태그, 일시·도움 유형, 매칭 도우미 이름·카톡 ID, `helperChanged` 보조 태그. [UpcomingRequestCard.tsx](../apps/web/features/requests/UpcomingRequestCard.tsx) | C-12 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: 상태별 안내·article·지난 도우미 표시 U-10, 취소 U-11 |
@@ -171,7 +173,7 @@
 | 역할별 메뉴와 화면 연결 · §1 | 도우미 화면에 HelperTabBar를 연결하고 요청 목록 경로와 장애학생 내 신청 경로가 역할에 맞게 동작한다. 구현되는 공지·마이페이지에도 현재 탭을 적용한다. 링크 생성만으로 대상 화면을 완료 처리하지 않는다. | U-03 | 할 일 | 미정 | 우선순위: P0 제안<br>진행: PR #11·#12에서 도우미 요청 목록·매칭 현황에 HelperTabBar 연결. `chore/#19`에서 도우미 화면을 helper. 서브도메인(`app/helper/`)으로 옮겨 경로를 역할별로 분리<br>남은 작업: 공지·마이페이지 연결 U-24·U-27·U-28 |
 | 인증·라우팅 예외 완성 · §2.1 | 보호 화면 진입 경로를 보존하고 로그인 후 권한 있는 원래 화면으로 복귀한다. `mustChangePassword` 동안 S-PW만 허용하고 탭바·알림을 숨긴다. 서버 403은 본인 홈으로, 재발급 실패 401은 로그인으로 안내한다. 복귀 경로는 앱 내부의 허용 경로만 사용한다. | U-04 | 할 일 | 미정 | 우선순위: P0 제안<br>선행 작업: C-02, C-03, C-05, 인증 API 계약 |
 | 비밀번호 UI·오류 처리 보완 · §3 S-PW/공통 규칙 | 8~64자·영문·숫자·특수문자 조건과 확인 불일치를 일관되게 검증한다. 초기 비밀번호 재사용 거부를 오류 code로 처리한다. 조건 충족 여부·남은 조건을 텍스트로 읽고 오류 요약·첫 오류 포커스를 제공한다. L-02·L-03에서도 같은 규칙을 사용한다. | U-05 | 할 일 | 미정 | 우선순위: P0<br>선행 작업: C-04, 비밀번호 오류 코드; 공통 화면 적용은 U-15·U-23 |
-| 접근성 계정 설정 동기화 · §2.2 | 로그인 전 기기 설정, 로그인 후 계정 설정 우선 적용, 토글 변경 시 기기·계정 저장을 구현한다. 다른 기기와 관리자 등록 기본값이 반영되고 저장 실패를 안내한다. | U-06 | 할 일 | 미정 | 우선순위: P0<br>선행 작업: C-09, 계정 설정 조회·수정 API |
+| 접근성 계정 설정 동기화 · §2.2 | 로그인 전 기기 설정, 로그인 후 계정 설정 우선 적용, 토글 변경 시 기기·계정 저장을 구현한다. 다른 기기와 관리자 등록 기본값이 반영되고 저장 실패를 안내한다. | U-06 | 완료 | 미정 | 우선순위: P0<br>구현: `feat/accessibility-sync` [AccessibilitySync.tsx](../apps/web/lib/accessibility/AccessibilitySync.tsx), [text-size.ts](../apps/web/lib/accessibility/text-size.ts) — 로그인 후 GET /api/me 값 우선 적용(기기에도 저장), 토글 → PATCH /api/me/settings(한 번에 하나, 마지막 값), 실패 토스트, 관리자 도메인 제외. 첫 로그인(S-PW 403)은 비밀번호를 바꾼 뒤 적용·저장, 로그인한 채 다른 계정 로그인도 다시 맞춤<br>남은 관련 작업: 음성 읽기 U-07, 관리자 등록 기본값 선택 — 백엔드가 등록 때 모든 장애학생을 접근성 모드 켬으로 고정 저장하고 등록·수정 API가 값을 받지 않음(AF-01 "처음부터 접근성 모드 켜기" 미지원, COW-dev/hankki-atti-be#61) |
 | 화면 읽어 주기(TTS) · §2.2 | 접근성 모드에서 “읽어 주기 / 정지” 바를 제공한다. 본문 읽기 순서를 따르며 정지·화면 이동 시 이전 읽기를 종료한다. 키보드와 스크린리더로 제어하고 알림·오류 읽기와 중복되지 않는지 검증한다. | U-07 | 할 일 | 미정 | 우선순위: P0<br>선행 작업: U-06, 화면 읽기 범위·기기 지원 확인 |
 | 알림 데이터·새 알림 안내 · §2.3 | 목록·안 읽은 개수·읽음 처리를 연결하고 개수를 주기적/화면 진입 시 갱신한다. 새 알림은 전역 polite 영역 1개에서 안내한다. 매칭·도우미 변경·재모집·실패·예비 변동·학생 취소를 서버 이벤트와 연결한다. | U-08 | 완료 | 미정 | 우선순위: P0<br>구현: `feat/notifications` [useNotifications.ts](../apps/web/features/notifications/useNotifications.ts) — 개수는 화면 진입 시 + 30초마다(탭이 보일 때), 늘면 가장 최근 문장을 polite로 안내. 알림 문장·발생 이벤트는 서버(백엔드 NotificationType 11종)가 만든다<br>남은 관련 작업: U-12, Q-01 |
 | 비모달 알림 패널 · §2.3 | 제목·모두 읽음·안 읽음 점·상대 시각을 표시한다. 버튼 이름에 개수와 `aria-expanded`를 반영하고 Esc 닫기·포커스 복귀를 지원한다. 학생은 F-02, 도우미는 F-07, 공지는 상세로 이동한다. | U-09 | 완료 | 미정 | 우선순위: P0<br>구현: `feat/notifications` [NotificationPanel.tsx](../apps/web/features/notifications/NotificationPanel.tsx), [NotificationTopBar.tsx](../apps/web/features/notifications/NotificationTopBar.tsx) — 이전 목업 207:2111·209:3939 기준(새 Figma 파일은 MCP 권한 없음), 20개씩 + 이전 알림 더 보기, 빈 상태 "새 알림이 없어요"<br>남은 관련 작업: 새 Figma 파일 노드 대조 (공지 알림 이동은 `feat/notices`에서 연결) |
