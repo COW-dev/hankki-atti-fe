@@ -4,19 +4,16 @@ import { useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@hankki/ui';
 import { Footer } from '@/components/layout/Footer';
-import { Icon } from '@hankki/icons';
 import { ErrorNotice } from '@hankki/ui';
 import { Block } from '@hankki/ui';
 import { PageShell } from '@/components/layout/PageShell';
 import { TextField } from '@hankki/ui';
 import { TopBar } from '@/components/layout/TopBar';
+import { PasswordRules } from '@/features/auth/PasswordRules';
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { checkPassword, PASSWORD_MAX_LENGTH } from '@/lib/auth/password-policy';
-
-// 규칙 아이콘은 Figma에서 16px(캡션 14px 기준) — 큰 글씨에서도 글자와 같은 비율로 커지게 한다
-const RULE_ICON_SIZE = 'calc(var(--font-caption) * 8 / 7)';
 
 // S-PW 첫 로그인 비밀번호 변경 (Figma 206:1115)
 export default function PasswordChangePage() {
@@ -87,22 +84,7 @@ export default function PasswordChangePage() {
             value={next}
             onChange={(event) => setNext(event.target.value)}
           />
-          <ul id="password-rules" aria-live="polite" className="flex w-full flex-col gap-1.5">
-            {results.map((rule) => (
-              <li key={rule.label} className="flex items-center gap-1.5">
-                <Icon name={rule.passed ? 'check' : 'dash'} size={RULE_ICON_SIZE} />
-                <span
-                  className={`whitespace-nowrap ${
-                    rule.passed
-                      ? 'typo-caption-strong text-(--color-text-brand)'
-                      : 'typo-caption text-(--color-text-secondary)'
-                  }`}
-                >
-                  {rule.passed ? rule.label : `${rule.label} — 아직 없어요`}
-                </span>
-              </li>
-            ))}
-          </ul>
+          <PasswordRules id="password-rules" value={next} />
           <TextField
             label="새 비밀번호 확인"
             type="password"

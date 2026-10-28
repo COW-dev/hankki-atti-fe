@@ -119,6 +119,8 @@
 >
 > 상태 갱신: 2026-10-28 (Asia/Seoul) · 브랜치: `feat/notices` · 기준 HEAD: `5163402` — 공지 작업 코드 대조로 U-09·U-24·U-25만 재평가했다.
 >
+> 상태 갱신: 2026-10-28 (Asia/Seoul) · 브랜치: `feat/password-reset` · 기준 HEAD: `0916114` — 비밀번호 재설정 작업 코드 대조로 C-03·U-22·U-23만 재평가했다.
+>
 > 요구사항 원본: [demand.md](../demand.md). 구현 상태는 최초 작성 기준 HEAD(`4ac695d`)의 코드 확인 결과를 유지한다. 이번 수정은 양식 변경이며 구현 상태를 재평가하지 않았다.
 > 요구사항이나 구현이 바뀌면 해당 항목의 상태·근거·의존성을 갱신한다.
 > 모든 항목이 완료되면 상단에 `✅ 완료 (날짜, 최종 병합 PR)` 배너를 붙이고 아카이브한다.
@@ -142,7 +144,7 @@
 | --- | --- | --- | --- | --- | --- |
 | 공통 API 클라이언트 | `ApiResult` 처리, `ApiError`, 인증 헤더·쿠키 요청, 연결 실패 처리. [client.ts](../apps/web/lib/api/client.ts), 인접 단위 테스트 | C-01 | 완료 | 미정 | 우선순위: P0 제안<br>남은 관련 작업: 새 API 계약은 각 기능에서 확인 |
 | 인증 세션 기반 | 메모리 access 토큰, `refreshOnce()` 중복 방지, 401 재발급·1회 재시도, 실패 시 비로그인 전환, 로그아웃 함수. [AuthProvider.tsx](../apps/web/lib/auth/AuthProvider.tsx), 인접 단위 테스트 | C-02 | 완료 | 미정 | 우선순위: P0 제안<br>남은 관련 작업: U-04, Q-01 |
-| L-01 로그인 기본 기능 | 아이디·비밀번호 입력, 로그인 API, 역할별 홈 이동, 비밀번호 변경 필요 시 이동, 로그인 실패·비활성 계정 오류 분기, 회원가입·재설정 링크. [login/page.tsx](../apps/web/app/login/page.tsx) | C-03 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: 링크 대상 U-15·U-22, U-04, Q-02 |
+| L-01 로그인 기본 기능 | 아이디·비밀번호 입력, 로그인 API, 역할별 홈 이동, 비밀번호 변경 필요 시 이동, 로그인 실패·비활성 계정 오류 분기, 회원가입·재설정 링크. [login/page.tsx](../apps/web/app/login/page.tsx) | C-03 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: 링크 대상 U-15, U-04, Q-02 (비밀번호 재설정 링크는 `/password-reset`으로 연결, 관리자 로그인에서는 숨김) |
 | S-PW 비밀번호 변경 폼 | 받은·새·확인 비밀번호, 규칙 체크리스트, 조건 미충족 시 이유 연결, 변경 API, 현재 비밀번호 불일치 오류, 변경 후 이동. [change/page.tsx](../apps/web/app/password/change/page.tsx), [password-policy.ts](../apps/web/lib/auth/password-policy.ts)와 테스트 | C-04 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: U-05 |
 | 보호 화면 기본 가드 | 비로그인 → 로그인, 역할 불일치 → 본인 홈, `PASSWORD_CHANGE_REQUIRED` → 변경 화면. [useSessionGuard.ts](../apps/web/lib/auth/useSessionGuard.ts) | C-05 | 완료 | 미정 | 우선순위: P0<br>남은 관련 작업: 원래 화면 복귀·403·강제 변경 전체 제한은 U-04 |
 | 공용 디자인 시스템 컴포넌트 | Button/ButtonLink, Block, TextField, Notice, StatusTag, Chip/ChipGroup, OptionTile/OptionGroup, Toggle, InputCompact, RequestCard, Modal, SidebarItem, Toast 구현·스토리. 동작 컴포넌트의 인접 테스트. [컴포넌트 현황](design-system.md#컴포넌트) | C-06 | 완료 | 미정 | 우선순위: P0 제안<br>남은 관련 작업: 신규 화면에서 먼저 재사용, Q-02 |
@@ -200,8 +202,8 @@
 
 | 할 일 | 내용 | ID | 상태 | 담당자 | 비고 |
 | --- | --- | --- | --- | --- | --- |
-| L-03 재설정 메일 요청·재요청 · §3 | 요청/보냄 상태, 아이디 입력, 30분·1회 링크 안내, 다시 받기를 제공한다. 계정 유무에 관계없이 같은 완료 화면을 표시한다. | U-22 | 할 일 | 미정 | 우선순위: P1<br>선행 작업: 재설정 요청 API |
-| L-03 링크 검증·새 비밀번호·완료/만료 · §3 | 새 비밀번호·확인·조건 UI, 완료 후 다른 기기 로그아웃 안내·로그인 CTA, 30분 경과/사용됨/새 요청 무효 시 다시 요청하기를 제공한다. 원본의 5개 상태가 모두 연결된다. | U-23 | 할 일 | 미정 | 우선순위: P1<br>선행 작업: U-22, C-04, 링크 검증·재설정 API; 다른 기기 세션 검증 U-04·Q-01 |
+| L-03 재설정 메일 요청·재요청 · §3 | 요청/보냄 상태, 아이디 입력, 30분·1회 링크 안내, 다시 받기를 제공한다. 계정 유무에 관계없이 같은 완료 화면을 표시한다. | U-22 | 완료 | 미정 | 우선순위: P1<br>구현: `feat/password-reset` [ResetRequestForm.tsx](../apps/web/features/password-reset/ResetRequestForm.tsx), [ResetSent.tsx](../apps/web/features/password-reset/ResetSent.tsx) — 이전 목업 204:601·204:738, 경로 `/password-reset`(메일 링크와 같음, 메인·helper.)<br>남은 관련 작업: 새 Figma 파일 노드 대조 |
+| L-03 링크 검증·새 비밀번호·완료/만료 · §3 | 새 비밀번호·확인·조건 UI, 완료 후 다른 기기 로그아웃 안내·로그인 CTA, 30분 경과/사용됨/새 요청 무효 시 다시 요청하기를 제공한다. 원본의 5개 상태가 모두 연결된다. | U-23 | 완료 | 미정 | 우선순위: P1<br>구현: `feat/password-reset` [PasswordResetScreen.tsx](../apps/web/features/password-reset/PasswordResetScreen.tsx), [NewPasswordForm.tsx](../apps/web/features/password-reset/NewPasswordForm.tsx), [useResetLink.ts](../apps/web/features/password-reset/useResetLink.ts) — 이전 목업 204:875·204:1033·204:1167, `#token=` 확인 → 새 비밀번호 → 완료/만료. 비밀번호 조건 UI는 S-PW와 공용 [PasswordRules.tsx](../apps/web/features/auth/PasswordRules.tsx)<br>남은 관련 작업: 도우미 메일 링크가 메인 주소로 오는 문제(백엔드 역할별 링크), 다른 기기 세션 검증 Q-01 |
 | F-03 역할별 공지 목록 · §3 | 서버의 역할 필터, 고정 먼저·최신순, 고정 태그, 20개씩 더 보기를 적용한다. 무한 스크롤·읽음 표시는 추가하지 않는다. 조회 실패·빈 결과를 안내한다. | U-24 | 완료 | 미정 | 우선순위: P1<br>구현: `feat/notices` [NoticesView.tsx](../apps/web/features/notices/NoticesView.tsx), [useNotices.ts](../apps/web/features/notices/useNotices.ts) — 이전 목업 207:2140·209:3974 기준, 20개씩 더 보기(새로 붙은 첫 공지로 포커스), 빈 상태 "아직 공지가 없어요"<br>남은 관련 작업: 새 Figma 파일 노드 대조 |
 | F-03 공지 상세·삭제 안내 · §3 | 제목·게시일·수정일·대상·텍스트 본문, URL 자동 링크·“(새 창)”를 제공한다. 삭제된 공지 및 삭제된 공지 알림 진입 시 “삭제된 공지예요”와 목록 CTA를 표시한다. | U-25 | 완료 | 미정 | 우선순위: P1<br>구현: `feat/notices` [NoticeDetailView.tsx](../apps/web/features/notices/NoticeDetailView.tsx), [notice-body.ts](../apps/web/features/notices/notice-body.ts) — 이전 목업 207:2304·209:4138 기준, 본문 URL은 그 자리에서 새 창 링크, 삭제됨 "삭제된 공지예요"·없음 "공지를 찾을 수 없어요" + 목록으로. 공지 알림 → 상세 연결<br>남은 관련 작업: 새 Figma 파일 노드 대조 |
 | 이용 후 피드백 전역 모달 · §2.4 | 완료 후 첫 접속 1회 노출을 서버 플래그로 판단한다. 원본 문구·의견 남기기/나중에를 제공하고 앱에 응답을 저장하지 않는다. 새로고침·다른 기기에서 반복 노출되지 않도록 서버 처리와 연동한다. | U-26 | 할 일 | 미정 | 우선순위: P1<br>선행 작업: C-06, 피드백 표시/처리 API·의견 링크 |
