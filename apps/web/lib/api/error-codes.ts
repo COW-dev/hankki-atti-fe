@@ -32,4 +32,8 @@ export const ErrorCode = {
   // 공지 상세 (GET /api/notices/{id}) — 삭제는 "삭제된 공지예요", 없거나 대상이 아니면 찾을 수 없음
   NOTICE_NOT_FOUND: 'NOTICE_NOT_FOUND',
   NOTICE_DELETED: 'NOTICE_DELETED',
+  // 도우미 회원가입 (POST /api/helpers/signup, 409) — 동시 가입 요청이 겹치면 SIGNUP_CONFLICT
+  HELPER_DUPLICATE_EMAIL: 'HELPER_DUPLICATE_EMAIL',
+  HELPER_DUPLICATE_STUDENT_NO: 'HELPER_DUPLICATE_STUDENT_NO',
+  HELPER_SIGNUP_CONFLICT: 'HELPER_SIGNUP_CONFLICT',
 } as const;
