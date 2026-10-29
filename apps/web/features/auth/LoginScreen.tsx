@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@hankki/ui';
 import { Footer } from '@/components/layout/Footer';
@@ -9,12 +9,13 @@ import { Logo } from '@/components/ui/Logo';
 import { ErrorNotice } from '@hankki/ui';
 import { Block } from '@hankki/ui';
 import { PageShell } from '@/components/layout/PageShell';
-import { TextField } from '@hankki/ui';
+import { TextField, Toast } from '@hankki/ui';
 import { TopBar } from '@/components/layout/TopBar';
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
 import { loginEvents } from '@/lib/accessibility/login-event';
 import { homePathOf, useAuth, type Role } from '@/lib/auth/AuthProvider';
+import { joinedSignup } from '@/features/signup/joined';
 import { siteUrl } from '@/lib/site';
 
 const ROLE_LABEL: Record<Role, string> = { STUDENT: '장애학생', HELPER: '도우미', ADMIN: '관리자' };
@@ -24,7 +25,19 @@ const ROLE_LABEL: Record<Role, string> = { STUDENT: '장애학생', HELPER: '도
 export function LoginScreen({ role }: { role: Role }) {
   const router = useRouter();
   const { login, logout } = useAuth();
-  const [loginId, setLoginId] = useState('');
+  // 도우미 가입 직후면 가입한 이메일을 채우고 토스트로 알린다 (U-15)
+  const [joinedEmail] = useState(joinedSignup.peek);
+  const [loginId, setLoginId] = useState(joinedEmail ?? '');
+  const [toast, setToast] = useState<string | null>(null);
+  const closeToast = useCallback(() => setToast(null), []);
+
+  useEffect(() => {
+    if (!joinedEmail) return;
+    joinedSignup.clear();
+    // live 영역이 먼저 그려진 뒤 문구를 넣어야 스크린리더가 읽는다. 문구는 목업에 없어 임시로 둔다
+    const timer = setTimeout(() => setToast('가입했어요. 로그인해 주세요'));
+    return () => clearTimeout(timer);
+  }, [joinedEmail]);
   const [password, setPassword] = useState('');
   const [notice, setNotice] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | undefined>();
@@ -114,6 +127,7 @@ export function LoginScreen({ role }: { role: Role }) {
           </div>
         )}
       </Block>
+      <Toast message={toast} onClose={closeToast} />
     </PageShell>
   );
 }
