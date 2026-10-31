@@ -2,6 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ApiError, apiRequest } from '@/lib/api/client';
+import { subdomainOf } from '@/lib/site';
 
 export type Role = 'STUDENT' | 'HELPER' | 'ADMIN';
 
@@ -11,6 +12,7 @@ type LoginResponse = {
   role: Role;
   mustChangePassword: boolean;
 };
+type AdminLoginResponse = { accessToken: string; expiresIn: number; name: string; grade: string };
 type TokenResponse = { accessToken: string; expiresIn: number };
 export type Me = { accountId: number; loginId: string; role: Role; accessibilityMode: boolean };
 
@@ -33,9 +35,15 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 // 같은 refresh 토큰을 두 번 쓰면 서버가 탈취로 보고 그 계정의 토큰을 모두 폐기하기 때문이다 (개발 모드 React는 effect를 두 번 실행한다)
 let refreshInFlight: Promise<TokenResponse> | null = null;
 
+// 관리자는 인증 API·refresh 쿠키가 따로다 — 사용자 /api/auth는 관리자 계정을 받지 않는다
+function isAdminSite() {
+  return typeof window !== 'undefined' && subdomainOf(window.location.host) === 'admin';
+}
+const authPath = (action: string) => `${isAdminSite() ? '/api/admin/auth' : '/api/auth'}/${action}`;
+
 function refreshOnce(): Promise<TokenResponse> {
   if (!refreshInFlight) {
-    refreshInFlight = apiRequest<TokenResponse>('/api/auth/refresh', { method: 'POST' }).finally(
+    refreshInFlight = apiRequest<TokenResponse>(authPath('refresh'), { method: 'POST' }).finally(
       () => {
         refreshInFlight = null;
       },
@@ -61,10 +69,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = useCallback(async (loginId: string, password: string) => {
-    const result = await apiRequest<LoginResponse>('/api/auth/login', {
-      method: 'POST',
-      body: { loginId, password },
-    });
+    const body = { loginId, password };
+    // 관리자 로그인 응답에는 role·mustChangePassword가 없다 (관리자 토큰만 발급되고 첫 비밀번호 변경이 없다)
+    const result: LoginResponse = isAdminSite()
+      ? {
+          ...(await apiRequest<AdminLoginResponse>(authPath('login'), { method: 'POST', body })),
+          role: 'ADMIN',
+          mustChangePassword: false,
+        }
+      : await apiRequest<LoginResponse>(authPath('login'), { method: 'POST', body });
     setAccessToken(result.accessToken);
     setStatus('authenticated');
     return result;
@@ -107,7 +120,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   );
 
   const logout = useCallback(async () => {
-    await apiRequest('/api/auth/logout', { method: 'POST' }).catch(() => undefined);
+    await apiRequest(authPath('logout'), { method: 'POST' }).catch(() => undefined);
     setAccessToken(null);
     setStatus('anonymous');
   }, []);

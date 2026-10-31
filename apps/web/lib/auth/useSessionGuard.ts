@@ -23,7 +23,14 @@ export function useSessionGuard(allowedRole: Role): Me | null {
     }
     if (status !== 'authenticated') return;
 
-    authRequest<Me>('/api/me')
+    // 관리자 토큰은 /api/me를 쓸 수 없다. 관리자 토큰이면 역할은 ADMIN으로 정해져 있다
+    const fetchMe =
+      allowedRole === 'ADMIN'
+        ? authRequest<Omit<Me, 'role' | 'accessibilityMode'>>('/api/admin/me').then(
+            (admin): Me => ({ ...admin, role: 'ADMIN', accessibilityMode: false }),
+          )
+        : authRequest<Me>('/api/me');
+    fetchMe
       .then((result) => {
         // 로그아웃되면 status가 anonymous로 바뀌어 위에서 /login으로 보낸다
         if (result.role !== allowedRole) {

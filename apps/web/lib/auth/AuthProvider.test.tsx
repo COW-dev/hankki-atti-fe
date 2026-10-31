@@ -1,8 +1,14 @@
 import { StrictMode } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, renderHook, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { AuthProvider, useAuth } from '@/lib/auth/AuthProvider';
+
+const site = vi.hoisted(() => ({ sub: null as 'helper' | 'admin' | null }));
+vi.mock('@/lib/site', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/site')>()),
+  subdomainOf: () => site.sub,
+}));
 
 const ok = (data: unknown) =>
   new Response(
@@ -31,6 +37,7 @@ function Probe() {
 
 afterEach(() => {
   vi.unstubAllGlobals();
+  site.sub = null;
 });
 
 describe('AuthProvider', () => {
@@ -95,5 +102,29 @@ describe('AuthProvider', () => {
       '/api/me',
     ]);
     expect(fetchMock.mock.calls[3][1].headers.Authorization).toBe('Bearer new');
+  });
+
+  it('관리자 도메인이면 관리자 인증 API로 재발급·로그인하고 역할을 ADMIN으로 돌려준다', async () => {
+    // given — 사용자 /api/auth는 관리자 계정을 받지 않는다
+    site.sub = 'admin';
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(fail(401, 'AUTH_UNAUTHENTICATED'))
+      .mockResolvedValueOnce(
+        ok({ accessToken: 'a1', expiresIn: 1800, name: '김센터', grade: 'FULL' }),
+      );
+    vi.stubGlobal('fetch', fetchMock);
+    const { result: auth } = renderHook(() => useAuth(), { wrapper: AuthProvider });
+    await waitFor(() => expect(auth.current.status).toBe('anonymous'));
+
+    // when
+    const result = await act(() => auth.current.login('center01', 'pw'));
+
+    // then
+    expect(fetchMock.mock.calls.map(pathOf)).toEqual([
+      '/api/admin/auth/refresh',
+      '/api/admin/auth/login',
+    ]);
+    expect(result).toMatchObject({ role: 'ADMIN', mustChangePassword: false });
   });
 });
