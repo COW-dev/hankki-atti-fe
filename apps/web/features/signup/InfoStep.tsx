@@ -44,6 +44,7 @@ export function InfoStep({
   const titleRef = useRef<HTMLHeadingElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const rulesId = useId();
+  const smsGuideId = useId();
 
   // 1단계에서 넘어오면 이 단계 제목부터 읽는다
   useEffect(() => {
@@ -183,6 +184,19 @@ export function InfoStep({
         >
           아띠 소속이에요 (선택)
         </OptionTile>
+        {/* 목업에는 없지만 문자가 주 알림 채널이라 가입 때 고르게 한다. 나중에 마이페이지에서 바꿀 수 있다. 문구는 임시다 */}
+        <div className="flex w-full flex-col gap-(--space-xs)">
+          <OptionTile
+            selected={form.smsConsent}
+            aria-describedby={smsGuideId}
+            onClick={() => setForm((prev) => ({ ...prev, smsConsent: !prev.smsConsent }))}
+          >
+            알림 문자 받기 (선택)
+          </OptionTile>
+          <p id={smsGuideId} className="typo-caption w-full text-(--color-text-secondary)">
+            매칭 소식을 입력한 전화번호로 보내드려요. 안 받아도 메일과 앱 알림은 와요
+          </p>
+        </div>
         <Button type="submit" inactive={submitting} className="w-full">
           가입하기
         </Button>
