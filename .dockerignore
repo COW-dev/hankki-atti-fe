@@ -1,0 +1,19 @@
+# 허용 목록 방식 — 이미지 빌드에 필요한 파일만 컨텍스트에 넣는다 (.env 등 시크릿 유입 차단)
+# 바꾸면 .github/scripts/release-version.sh의 IMAGE_PATHS도 같이 맞춘다
+*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!tsconfig.json
+!apps/web/
+!packages/
+
+**/node_modules
+**/.next
+**/.env*
+**/*.test.ts
+**/*.test.tsx
+**/*.stories.tsx
+**/*.md
+**/*.tsbuildinfo
+**/next-env.d.ts

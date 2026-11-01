@@ -46,6 +46,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 도메인마다 한 역할만 받는다 (`SITE_ROLE`). refresh 쿠키는 서브도메인끼리 공유하지 않으므로 로그인도 도메인별로 하고, 다른 역할 계정은 로그아웃시킨다
 - 서브도메인 화면 안의 링크·`router` 경로에는 `/helper`·`/admin` 접두사를 붙이지 않는다 (`<Link href="/matches">`). 다른 도메인으로 가는 링크만 `siteUrl('helper', 경로)`
 - 메인 도메인에서 `/helper`·`/admin`으로 직접 들어오면 `/`로 보낸다
+- 배포에서는 인프라가 세 도메인의 `/api`를 백엔드로, 나머지를 프론트 3000 포트로 보낸다(Host 유지). 브라우저는 같은 도메인의 `/api`를 부른다
 
 **요구사항·디자인 원본**
 
@@ -94,6 +95,8 @@ bash scripts/setup-hooks.sh   # Git 훅 활성화 (main 직접 커밋 차단·�
 ## 디렉토리 구조
 
 ```text
+Dockerfile, .dockerignore  # 배포 이미지 (허용 목록 방식)
+.github/scripts/        # release-version.sh(배포 여부·버전), smoke-test.sh(이미지 스모크 테스트)
 apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
 ├── proxy.ts            # 서브도메인 → app 폴더 rewrite
 ├── app/                # 라우트·화면 조립 (helper/ = helper. 도메인, admin/ = admin. 도메인)
@@ -218,6 +221,34 @@ Figma A11Y 공통 규칙(31:2)을 코드 기준으로 옮겼다. 위반은 기�
 - **PR 제목 컨벤션**: 커밋 제목과 동일한 형식(`type: 명사형 제목`)
 - PR은 `.github/pull_request_template.md` 형식 준수. 화면 변경은 스크린샷(필요하면 큰 글씨 모드 포함)을 붙인다
 - PR은 CI(`.github/workflows/ci.yml`의 `check`, `secret-scan`, `agent-config`)가 모두 통과해야 병합할 수 있다
+
+---
+
+## 배포 (CD)
+
+main에 병합되고 CI 검사(`check`, `secret-scan`, `agent-config`)가 모두 통과하면 Docker 이미지를 GitHub Container Registry(GHCR)에 push한다. 클러스터 반영은 인프라 담당이 한다. 구조·라우팅 조건은 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md).
+
+| 항목 | 내용 |
+|---|---|
+| 이미지 | `ghcr.io/cow-dev/hankki-atti-fe` (COW-dev 조직 패키지). 레포가 공개이고 비밀값이 없으므로 이미지도 공개한다. 공개 범위는 레포를 따라가지 않으므로 **첫 push 후 패키지 설정에서 public으로 바꾼다** — 그 전에는 pull에 인증이 필요하다 |
+| 태그 | `vX.Y.Z` + `latest`. GHCR에는 불변 태그 설정이 없어, `docker` job이 같은 버전 태그가 이미 있으면 push하지 않고 실패한다 |
+| 플랫폼 | `linux/amd64`, `linux/arm64`. 빌드는 러너 아키텍처에서 한 번만 하고 결과물을 양쪽에 넣는다 |
+| 인증 | 별도 Secret 없음 — `docker` job의 `GITHUB_TOKEN`(`packages: write`)으로 push하고, 이때 패키지가 이 레포에 자동 연결된다. CI 밖에서 개인 토큰으로 먼저 push하면 레포에 연결되지 않은 패키지가 생겨 `GITHUB_TOKEN` push가 막히므로 **직접 push하지 않는다** |
+| 워크플로우 | `.github/workflows/ci.yml`의 `version` → `docker` job, 버전 계산은 `.github/scripts/release-version.sh`, 스모크 테스트는 `.github/scripts/smoke-test.sh` |
+
+**버전 규칙**
+- 병합마다 마이너를 올린다 (`v0.1.0` → `v0.2.0`). 마이너는 상한 없이 증가한다 (`v0.9.0` → `v0.10.0`). 첫 버전은 `v0.1.0`
+- 마지막 버전 이후 이미지에 들어가는 파일(`apps/web`, `packages`, `package.json`, `pnpm-lock.yaml`, `pnpm-workspace.yaml`, `tsconfig.json`, `Dockerfile`, `.dockerignore`. 테스트·스토리·문서·`.env*` 제외)과 `ci.yml`의 사이트 주소가 바뀌지 않았으면 배포하지 않는다. 포함할 파일을 바꾸면 `.dockerignore`와 `release-version.sh`를 같이 고친다
+- 메이저(`v1.0.0`)는 정식 운영 시작 때 사람이 main 커밋에 태그를 직접 찍는다. 이후 자동으로 `v1.1.0`부터 이어진다
+- git 태그를 먼저 push해 버전을 선점한 뒤 이미지를 push한다. 실패한 실행을 재실행하면 같은 버전으로 다시 시도한다
+
+**push 전 스모크 테스트**: `docker` job에서 amd64 이미지를 띄워 Host별 라우팅, 아이콘 내용, 비루트 실행, 번들의 API 주소를 확인한다. 실패하면 push하지 않는다. 로컬에서는 `docker build --build-arg NEXT_PUBLIC_SITE_URL=https://atti.bluerack.org -t 이름 .` 후 `bash .github/scripts/smoke-test.sh 이름 포트`.
+
+**빌드 값**: `NEXT_PUBLIC_API_BASE_URL`은 빈 문자열(`Dockerfile`), `NEXT_PUBLIC_SITE_URL`은 `ci.yml`의 `docker` job `env` 한 곳에서 정한다. 둘 다 번들에 박히므로 런타임 환경변수로 바꿀 수 없다.
+
+**이미지 실행**: 포트 3000, UID 1000, 실행 환경변수 필요 없음. 이미지에 들어가는 sharp는 빌드 아키텍처용이라 다른 아키텍처 이미지에서는 동작하지 않는다 — 지금은 `next/image`를 쓰지 않아 문제가 없고, 쓰게 되면 `Dockerfile` 빌드 방식을 다시 정한다.
+
+**롤백**: 이전 버전 태그로 다시 띄운다 (`docker pull ghcr.io/cow-dev/hankki-atti-fe:vX.Y.Z`).
 
 ---
 
