@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { Block, Button, Notice } from '@hankki/ui';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Block, Button, ButtonLink, Notice, Toast } from '@hankki/ui';
 import { Icon } from '@hankki/icons';
 import { Footer } from '@/components/layout/Footer';
 import { PageShell } from '@/components/layout/PageShell';
@@ -37,20 +36,21 @@ function actionErrorMessage(error: unknown): { message: string; reload: boolean 
 }
 
 /**
- * F-02 내 신청 — 빈 상태 206:1281 · 목록 204:2804 · 취소 확인 모달 207:1856 · 노쇼 신고 모달 207:1921.
+ * F-02 내 신청 — 빈 상태 14:822 · 목록 14:774 · 취소 확인 모달 14:2625 · 노쇼 신고 모달 14:2637 · 철회 토스트 14:2862.
  * 역할 확인은 /requests 라우트가 하고, 여기는 장애학생으로 확인된 뒤에만 그린다.
  */
 export function MyRequestsScreen() {
-  const router = useRouter();
   const { authRequest } = useAuth();
   const { state, reload, replace } = useMyRequests(true);
   const [notice, setNotice] = useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
+  const closeToast = useCallback(() => setToast(null), []);
   const [error, setError] = useState<string | null>(null);
   const [withdrawingId, setWithdrawingId] = useState<number | null>(null);
   const [cancelTarget, setCancelTarget] = useState<MyHelpRequest | null>(null);
   const [cancelSubmitting, setCancelSubmitting] = useState(false);
   const [cancelError, setCancelError] = useState<string | null>(null);
-  // 취소로 카드가 사라진 뒤 포커스를 섹션 제목으로 보낼 때마다 올린다
+  // 철회·취소로 카드가 사라진 뒤 포커스를 섹션 제목으로 보낼 때마다 올린다
   const [focusKey, setFocusKey] = useState(0);
   const [noShowTarget, setNoShowTarget] = useState<MyHelpRequest | null>(null);
   const [noShowSubmitting, setNoShowSubmitting] = useState(false);
@@ -63,7 +63,8 @@ export function MyRequestsScreen() {
     setError(null);
     try {
       replace(await withdrawRequest(authRequest, request.id));
-      setNotice('신청을 철회했어요');
+      setToast('신청을 철회했어요');
+      setFocusKey((key) => key + 1);
     } catch (caught) {
       const { message, reload: shouldReload } = actionErrorMessage(caught);
       setError(message);
@@ -130,6 +131,12 @@ export function MyRequestsScreen() {
   const isEmpty =
     state.status === 'ready' && state.data.upcoming.length === 0 && state.data.past.length === 0;
 
+  // 마지막 신청을 철회하면 섹션 제목이 없어지므로 빈 상태 제목으로 보낸다
+  const emptyHeadingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (focusKey > 0 && isEmpty) emptyHeadingRef.current?.focus();
+  }, [focusKey, isEmpty]);
+
   return (
     <PageShell
       size="L"
@@ -147,21 +154,23 @@ export function MyRequestsScreen() {
       )}
 
       {isEmpty && (
-        // F-02 내 신청 · 빈 상태 (Figma 206:1281)
+        // F-02 내 신청 · 빈 상태 (Figma 14:822)
         <Block>
           <div className="flex w-full flex-col items-center gap-2.5 pt-6 pb-2">
             <div className="flex size-14 items-center justify-center rounded-full bg-(--color-bg-muted)">
               <Icon name="list" />
             </div>
             <div className="h-0.5" />
-            <h2 className="typo-title w-full text-center">아직 신청한 건이 없어요</h2>
+            <h2 ref={emptyHeadingRef} tabIndex={-1} className="typo-title w-full text-center">
+              아직 신청한 건이 없어요
+            </h2>
             <p className="typo-body w-full text-center text-(--color-text-secondary)">
               날짜와 시간을 고르면 도우미가 지원해요
             </p>
           </div>
-          <Button onClick={() => router.push('/requests/new')} className="w-full">
+          <ButtonLink href="/requests/new" className="w-full">
             + 도우미 신청하기
-          </Button>
+          </ButtonLink>
         </Block>
       )}
 
@@ -195,6 +204,8 @@ export function MyRequestsScreen() {
         onClose={() => setNoShowTarget(null)}
         onSubmit={handleReportNoShow}
       />
+
+      <Toast message={toast} onClose={closeToast} withTabBar />
     </PageShell>
   );
 }

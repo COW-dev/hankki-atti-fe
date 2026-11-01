@@ -10,7 +10,7 @@ import type { MyHelpRequest, MyHelpRequests } from './types';
 const PAST_PREVIEW_COUNT = 3;
 
 /**
- * F-02 내 신청 · 목록 (Figma 204:2804). 데이터와 동작을 props로 받아 Storybook에서도 그릴 수 있다.
+ * F-02 내 신청 · 목록 (Figma 14:774). 데이터와 동작을 props로 받아 Storybook에서도 그릴 수 있다.
  */
 export function MyRequestsView({
   data,
@@ -26,13 +26,13 @@ export function MyRequestsView({
 }: {
   data: MyHelpRequests;
   now: Date;
-  // 철회·신고 완료 안내 (polite)
+  // 취소·신고 완료 안내 (polite). 철회 완료는 화면이 토스트로 알린다 (Figma 14:2862)
   notice: string | null;
   // 철회 실패 등 블록 안 오류 안내
   error: string | null;
   withdrawingId: number | null;
   cancelingId: number | null;
-  // 취소로 카드가 지난 신청으로 옮겨지면 연 버튼이 사라져 포커스가 돌아갈 곳이 없다 — 값이 바뀔 때 첫 섹션 제목으로 보낸다
+  // 철회·취소로 카드가 사라지면 연 버튼도 사라져 포커스가 돌아갈 곳이 없다 — 값이 바뀔 때 첫 섹션 제목으로 보낸다
   focusKey?: number;
   onWithdraw: (request: MyHelpRequest) => void;
   onCancel: (request: MyHelpRequest) => void;

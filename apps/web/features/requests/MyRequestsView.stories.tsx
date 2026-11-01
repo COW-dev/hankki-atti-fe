@@ -96,6 +96,10 @@ export const List: Story = {
   play: async ({ canvas, userEvent, args }) => {
     await expect(canvas.getByRole('heading', { name: '다가오는 신청' })).toBeInTheDocument();
     await expect(canvas.getByText('오늘 저녁 · 다음 식사')).toBeInTheDocument();
+    // 카드마다 일시를 이름으로 한 article이라 스크린리더가 한 건씩 구분한다 (U-10)
+    await expect(
+      canvas.getByRole('article', { name: '10월 13일 (화) 12:00 ~ 13:00' }),
+    ).toBeInTheDocument();
     await userEvent.click(canvas.getByRole('button', { name: '10월 12일 (월) 신청 철회' }));
     await expect(args.onWithdraw).toHaveBeenCalledOnce();
     // 매칭 완료 카드의 취소하기 — 이름에 날짜를 넣어 카드마다 구분한다
@@ -111,7 +115,7 @@ export const List: Story = {
     );
   },
 };
-export const WithNotice: Story = { args: { notice: '신청을 철회했어요', withdrawingId: 1 } };
+export const WithNotice: Story = { args: { notice: '취소됐어요. 도우미에게 알렸어요' } };
 export const Canceling: Story = {
   args: { notice: null, cancelingId: 2 },
   play: async ({ canvas }) => {
