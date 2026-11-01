@@ -15,8 +15,8 @@ import { siteUrl } from '@/lib/site';
 
 const STEPS = ['도우미를 신청해요', '지원하면 바로 알려드려요', '학식당에서 만나요'];
 
-// M-01 소개 (Figma 203:104). 로그인한 사람은 소개 없이 역할별 첫 화면으로 보낸다
-// Figma의 부제("신청하면 도우미 학생이 지원해요")와 계정 안내("장애학생 계정은 센터에서 만들어 드려요")는 명세에 없어 넣지 않는다
+// M-01 소개 (Figma 14:591). 로그인한 사람은 소개 없이 역할별 첫 화면으로 보낸다
+// Figma의 부제("신청하면 도우미 학생이 지원해요")는 명세에 없어 넣지 않는다
 export default function Home() {
   const router = useRouter();
   const { status, authRequest } = useAuth();
@@ -58,13 +58,17 @@ export default function Home() {
           <ButtonLink href={siteUrl('helper', '/signup')} variant="secondary" className="w-full">
             도우미로 회원가입
           </ButtonLink>
+          {/* Figma 14:616은 "센터에서"지만 문구는 명세 §3 M-01을 따른다 */}
+          <p className="typo-caption w-full text-center text-(--color-text-secondary)">
+            장애학생 계정은 장애학생지원센터에서 만들어 드려요
+          </p>
         </Block>
       </div>
     </PageShell>
   );
 }
 
-// 소개 화면은 상단 바 대신 접근성 토글과 히어로(로고·제목)를 한 흰 면에 둔다 (Figma Top 203:105 · Hero 203:110)
+// 소개 화면은 상단 바 대신 접근성 토글과 히어로(로고·제목)를 한 흰 면에 둔다 (Figma Top 14:592 · Hero 14:594)
 function IntroHeader() {
   return (
     <header className="flex w-full flex-col bg-(--color-bg-default)">
