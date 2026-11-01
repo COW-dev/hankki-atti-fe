@@ -13,6 +13,7 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 import { checkPassword, PASSWORD_MAX_LENGTH } from '@/lib/auth/password-policy';
 import { passwordChanged } from './password-changed';
 import { PasswordRules } from './PasswordRules';
+import { errorMessage } from '@/lib/api/error-message';
 
 export type PasswordChangeReader = 'STUDENT' | 'HELPER';
 
@@ -71,7 +72,7 @@ export function PasswordChangeScreen({
       } else if (error instanceof ApiError && error.code === ErrorCode.UNAUTHENTICATED) {
         router.replace('/login');
       } else {
-        setNotice(error instanceof Error ? error.message : '잠시 후 다시 시도해 주세요');
+        setNotice(errorMessage(error));
       }
     } finally {
       setSubmitting(false);

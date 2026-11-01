@@ -15,6 +15,7 @@ import {
   withHelpTypeToggled,
   type CreateFormState,
 } from './form-state';
+import { errorMessage } from '@/lib/api/error-message';
 
 type OptionsState =
   | { status: 'loading' }
@@ -29,7 +30,7 @@ function settle(
     ([dates, mine]): OptionsState => ({ status: 'ready', dates, upcoming: mine.upcoming }),
     (error: unknown): OptionsState => ({
       status: 'error',
-      message: error instanceof Error ? error.message : '선택지를 불러오지 못했어요',
+      message: errorMessage(error, '선택지를 불러오지 못했어요'),
     }),
   );
 }

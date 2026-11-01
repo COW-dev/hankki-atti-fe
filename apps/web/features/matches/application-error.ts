@@ -1,5 +1,6 @@
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
+import { errorMessage } from '@/lib/api/error-message';
 
 const RELOAD_SUFFIX = '. 목록을 다시 불러올게요';
 
@@ -23,7 +24,7 @@ export function applicationErrorMessage(error: unknown): { message: string; relo
       case ErrorCode.APPLICATION_INVALID_CANCEL_REASON:
         return { message: '고를 수 없는 사유예요. 다른 사유를 골라 주세요', reload: false };
       default:
-        return { message: error.message, reload: false };
+        return { message: errorMessage(error), reload: false };
     }
   }
   return { message: '잠시 후 다시 시도해 주세요', reload: false };

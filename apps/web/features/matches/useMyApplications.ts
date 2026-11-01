@@ -18,6 +18,7 @@ import type {
   MyApplication,
   MyApplications,
 } from './types';
+import { errorMessage } from '@/lib/api/error-message';
 
 type ListState =
   | { status: 'loading' }
@@ -34,7 +35,7 @@ function settle(promise: Promise<MyApplications>): Promise<ListState> {
     (data): ListState => ({ status: 'ready', data }),
     (error: unknown): ListState => ({
       status: 'error',
-      message: error instanceof Error ? error.message : '매칭 현황을 불러오지 못했어요',
+      message: errorMessage(error, '매칭 현황을 불러오지 못했어요'),
     }),
   );
 }

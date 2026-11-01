@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { confirmPasswordReset, verifyPasswordReset } from './api';
 import { resetFailure } from './reset-link';
+import { errorMessage } from '@/lib/api/error-message';
 
 // 메일 링크로 들어온 뒤: 확인 중 → 새 비밀번호 입력 → 완료, 언제든 만료로 갈 수 있다
 export type ResetLinkStatus = 'checking' | 'ready' | 'expired' | 'error' | 'done';
@@ -47,7 +48,7 @@ export function useResetLink(token: string) {
         if (failure === 'expired') setStatus('expired');
         else if (failure === 'sameAsCurrent')
           setPasswordError('지금 쓰는 비밀번호와 다르게 만들어 주세요');
-        else setNotice(error instanceof Error ? error.message : '잠시 후 다시 시도해 주세요');
+        else setNotice(errorMessage(error));
       } finally {
         setSubmitting(false);
       }

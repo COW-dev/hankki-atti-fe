@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/auth/AuthProvider';
 import { fetchMyRequests } from './api';
 import { applyUpdate } from './apply-update';
 import type { MyHelpRequest, MyHelpRequests } from './types';
+import { errorMessage } from '@/lib/api/error-message';
 
 type State =
   | { status: 'loading' }
@@ -17,7 +18,7 @@ function settle(promise: Promise<MyHelpRequests>): Promise<State> {
     (data): State => ({ status: 'ready', data }),
     (error: unknown): State => ({
       status: 'error',
-      message: error instanceof Error ? error.message : '신청을 불러오지 못했어요',
+      message: errorMessage(error, '신청을 불러오지 못했어요'),
     }),
   );
 }

@@ -170,7 +170,7 @@ describe('MyPageScreen', () => {
     await user.click(screen.getByRole('button', { name: '저장' }));
 
     // then
-    expect(await screen.findByRole('alert')).toHaveTextContent('서버 오류예요');
+    expect(await screen.findByRole('alert')).toHaveTextContent('잠시 후 다시 시도해 주세요');
     expect(kakaoId).toHaveValue('dowoom_kim2');
   });
 

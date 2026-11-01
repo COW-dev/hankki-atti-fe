@@ -2,7 +2,6 @@
 
 import { Block, Button, ErrorNotice, TextField } from '@hankki/ui';
 import { useRef, useState, type FormEvent } from 'react';
-import { ApiError } from '@/lib/api/client';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { updateContact } from './api';
 import {
@@ -13,6 +12,7 @@ import {
   type ContactForm,
 } from './contact-form';
 import type { MyProfile } from './types';
+import { errorMessage } from '@/lib/api/error-message';
 
 // F-05 도우미 연락 정보 수정 (Figma 14:1212). 저장 때 검증하고 첫 오류 칸으로 포커스한다. 오류 문구는 목업에 없어 임시로 둔다
 export function ContactSection({
@@ -54,7 +54,7 @@ export function ContactSection({
       setForm({ kakaoId: saved.kakaoId, phone: saved.phone });
       onSaved(saved);
     } catch (error) {
-      setFailure(error instanceof ApiError ? error.message : '잠시 후 다시 시도해 주세요');
+      setFailure(errorMessage(error));
     } finally {
       setSaving(false);
     }

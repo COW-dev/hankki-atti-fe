@@ -17,6 +17,7 @@ import { MyRequestsView } from './MyRequestsView';
 import { NoShowReportModal } from './NoShowReportModal';
 import type { MyHelpRequest } from './types';
 import { useMyRequests } from './useMyRequests';
+import { errorMessage } from '@/lib/api/error-message';
 
 // 이미 상태가 바뀐 신청에 철회·취소·신고하면 목록을 다시 받는다 (매칭 취소는 식사 시작도 INVALID_STATUS로 온다)
 function actionErrorMessage(error: unknown): { message: string; reload: boolean } {
@@ -30,7 +31,7 @@ function actionErrorMessage(error: unknown): { message: string; reload: boolean 
     if (error.code === ErrorCode.HELP_REQUEST_NO_SHOW_PERIOD_EXPIRED) {
       return { message: '신고할 수 있는 기간(이용 후 24시간)이 지났어요', reload: false };
     }
-    return { message: error.message, reload: false };
+    return { message: errorMessage(error), reload: false };
   }
   return { message: '잠시 후 다시 시도해 주세요', reload: false };
 }
