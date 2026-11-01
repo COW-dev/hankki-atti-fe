@@ -5,7 +5,7 @@ import { Icon } from '@hankki/icons';
 import { textSizeStore } from '@/lib/accessibility/text-size';
 
 /**
- * 접근성 모드 토글 (Figma A11yToggle 1:1220). 지금은 큰 글씨만 바꾼다 — 음성 읽기는 U-07.
+ * 접근성 모드 토글 (Figma A11yToggle 14:191). 켜면 큰 글씨로 바꾸고 상단 바 아래에 화면 읽어 주기 바(ReadAloudBar, U-07)가 생긴다.
  * 기기에 바로 저장하고, 로그인 중이면 AccessibilitySync가 계정에도 저장한다 (명세 §2.2).
  */
 export function A11yToggle() {

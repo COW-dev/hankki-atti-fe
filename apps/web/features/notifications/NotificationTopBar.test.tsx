@@ -11,6 +11,7 @@ vi.mock('@/lib/auth/AuthProvider', () => ({
 
 // 큰 글씨 토글은 이 테스트 대상이 아니고, 테스트 환경의 Node localStorage가 jsdom 것을 가린다
 vi.mock('@/components/ui/A11yToggle', () => ({ A11yToggle: () => null }));
+vi.mock('@/components/ui/ReadAloudBar', () => ({ ReadAloudBar: () => null }));
 
 const push = vi.fn();
 vi.mock('next/navigation', () => ({

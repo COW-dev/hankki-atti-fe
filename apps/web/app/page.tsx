@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { Block } from '@hankki/ui';
 import { PageShell } from '@/components/layout/PageShell';
 import { A11yToggle } from '@/components/ui/A11yToggle';
+import { ReadAloudBar } from '@/components/ui/ReadAloudBar';
 import { ButtonLink } from '@hankki/ui';
 import { Logo } from '@/components/ui/Logo';
 import { ApiError } from '@/lib/api/client';
@@ -84,6 +85,7 @@ function IntroHeader() {
           도우미와 함께해요
         </h1>
       </div>
+      <ReadAloudBar />
     </header>
   );
 }

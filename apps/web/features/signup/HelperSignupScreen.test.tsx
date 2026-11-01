@@ -12,6 +12,7 @@ vi.mock('@/lib/api/client', async (importOriginal) => ({
 
 // 큰 글씨 토글은 이 테스트 대상이 아니고, 테스트 환경의 Node localStorage가 jsdom 것을 가린다
 vi.mock('@/components/ui/A11yToggle', () => ({ A11yToggle: () => null }));
+vi.mock('@/components/ui/ReadAloudBar', () => ({ ReadAloudBar: () => null }));
 
 // 상단 바 뒤로 = 브라우저 뒤로. 2단계(#info)에서 뒤로 가면 해시가 빠진다
 vi.mock('next/navigation', () => ({

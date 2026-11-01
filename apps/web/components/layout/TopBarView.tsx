@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import type { ReactNode, Ref } from 'react';
 import { A11yToggle } from '@/components/ui/A11yToggle';
+import { ReadAloudBar } from '@/components/ui/ReadAloudBar';
 import { Icon } from '@hankki/icons';
 import { Logo } from '@/components/ui/Logo';
 
@@ -81,6 +82,7 @@ export function TopBarView({
         )}
         <A11yToggle />
       </div>
+      <ReadAloudBar />
       {children}
     </header>
   );
