@@ -23,9 +23,9 @@ describe('applyErrorMessage', () => {
     expect(applyErrorMessage(new ApiError(404, 'HELP_REQUEST_NOT_FOUND', 'x')).reload).toBe(true);
   });
 
-  it('모르는 API 오류는 서버 문구를, 그 밖의 오류는 기본 문구를 쓰고 목록은 그대로 둔다', () => {
+  it('모르는 오류는 서버 문구 대신 기본 문구를 쓰고 목록은 그대로 둔다', () => {
     expect(applyErrorMessage(new ApiError(403, 'AUTH_FORBIDDEN', '권한이 없어요'))).toEqual({
-      message: '권한이 없어요',
+      message: '잠시 후 다시 시도해 주세요',
       reload: false,
     });
     expect(applyErrorMessage(new TypeError('fetch failed'))).toEqual({

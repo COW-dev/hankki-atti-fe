@@ -92,7 +92,7 @@ describe('useOpenRequests', () => {
     await act(() => result.current.submitApply());
 
     expect(result.current.applyTarget).toBe(REQUEST);
-    expect(result.current.applyError).toBe('서버에 연결하지 못했어요');
+    expect(result.current.applyError).toBe('서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요');
     expect(result.current.submitting).toBe(false);
     expect(authRequest).toHaveBeenCalledTimes(2);
   });

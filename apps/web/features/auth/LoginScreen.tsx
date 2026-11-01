@@ -17,6 +17,7 @@ import { loginEvents } from '@/lib/accessibility/login-event';
 import { homePathOf, useAuth, type Role } from '@/lib/auth/AuthProvider';
 import { joinedSignup } from '@/features/signup/joined';
 import { siteUrl } from '@/lib/site';
+import { errorMessage } from '@/lib/api/error-message';
 
 const ROLE_LABEL: Record<Role, string> = { STUDENT: '장애학생', HELPER: '도우미', ADMIN: '관리자' };
 
@@ -61,12 +62,12 @@ export function LoginScreen({ role }: { role: Role }) {
       router.replace(result.mustChangePassword ? '/password/change' : homePathOf(result.role));
     } catch (error) {
       if (error instanceof ApiError && error.code === ErrorCode.ACCOUNT_DEACTIVATED) {
-        setNotice(error.message);
+        setNotice('사용이 중지된 계정이에요. 센터(02-300-1529)로 문의해 주세요');
       } else if (error instanceof ApiError && error.code === ErrorCode.LOGIN_FAILED) {
         setNotice('아이디 또는 비밀번호가 맞지 않아요');
         setPasswordError('비밀번호를 다시 확인해 주세요');
       } else {
-        setNotice(error instanceof Error ? error.message : '잠시 후 다시 시도해 주세요');
+        setNotice(errorMessage(error));
       }
     } finally {
       setSubmitting(false);

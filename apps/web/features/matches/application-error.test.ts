@@ -31,12 +31,12 @@ describe('applicationErrorMessage', () => {
     ).toEqual({ message: '고를 수 없는 사유예요. 다른 사유를 골라 주세요', reload: false });
     expect(
       applicationErrorMessage(new ApiError(422, 'COMMON_VALIDATION_FAILED', '200자 초과')),
-    ).toEqual({ message: '200자 초과', reload: false });
+    ).toEqual({ message: '잠시 후 다시 시도해 주세요', reload: false });
   });
 
   it('네트워크 오류나 알 수 없는 오류는 다시 시도하라고 한다', () => {
     expect(applicationErrorMessage(new ApiError(0, undefined, '서버에 연결하지 못했어요'))).toEqual(
-      { message: '서버에 연결하지 못했어요', reload: false },
+      { message: '서버에 연결하지 못했어요. 잠시 후 다시 시도해 주세요', reload: false },
     );
     expect(applicationErrorMessage(new Error('boom'))).toEqual({
       message: '잠시 후 다시 시도해 주세요',

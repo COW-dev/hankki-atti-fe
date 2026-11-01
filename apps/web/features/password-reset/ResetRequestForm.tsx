@@ -4,6 +4,7 @@ import { Block, Button, ErrorNotice, TextField } from '@hankki/ui';
 import { useState, type FormEvent } from 'react';
 import { requestPasswordReset } from './api';
 import { BackToLogin } from './BackToLogin';
+import { errorMessage } from '@/lib/api/error-message';
 
 /** L-03 요청 (Figma 204:601): 아이디 → [재설정 메일 받기]. 계정이 없어도 같은 "보냄" 화면으로 간다 (U-22). */
 export function ResetRequestForm({ onSent }: { onSent: (loginId: string) => void }) {
@@ -29,7 +30,7 @@ export function ResetRequestForm({ onSent }: { onSent: (loginId: string) => void
       await requestPasswordReset(trimmed);
       onSent(trimmed);
     } catch (error) {
-      setNotice(error instanceof Error ? error.message : '잠시 후 다시 시도해 주세요');
+      setNotice(errorMessage(error));
     } finally {
       setSubmitting(false);
     }

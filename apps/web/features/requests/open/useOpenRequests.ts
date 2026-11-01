@@ -6,6 +6,7 @@ import { applyToRequest, fetchOpenRequests } from '../api';
 import type { HelpRequestApplication, OpenHelpRequest, OpenHelpRequestDate } from '../types';
 import { applyErrorMessage } from './apply-error';
 import { DEFAULT_DATE_FILTER, openRange, type DateFilter } from './date-filter';
+import { errorMessage } from '@/lib/api/error-message';
 
 type ListState =
   | { status: 'loading' }
@@ -18,7 +19,7 @@ function settle(promise: Promise<OpenHelpRequestDate[]>): Promise<ListState> {
     (dates): ListState => ({ status: 'ready', dates }),
     (error: unknown): ListState => ({
       status: 'error',
-      message: error instanceof Error ? error.message : '요청 목록을 불러오지 못했어요',
+      message: errorMessage(error, '요청 목록을 불러오지 못했어요'),
     }),
   );
 }

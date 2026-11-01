@@ -65,10 +65,10 @@ describe('signupFailureOf', () => {
     });
   });
 
-  it('그 밖의 서버 오류(422·연결 실패)는 서버 문구를 화면 위에 보인다', () => {
+  it('그 밖의 서버 오류는 서버 문구 대신 기본 문구를 화면 위에 보인다', () => {
     expect(
       signupFailureOf(new ApiError(422, 'COMMON_INVALID_INPUT', '입력값을 확인해 주세요')),
-    ).toEqual({ message: '입력값을 확인해 주세요' });
+    ).toEqual({ message: '잠시 후 다시 시도해 주세요' });
     expect(signupFailureOf(new TypeError('boom'))).toEqual({
       message: '잠시 후 다시 시도해 주세요',
     });
