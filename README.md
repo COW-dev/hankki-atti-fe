@@ -37,4 +37,4 @@ pnpm dev                        # http://localhost:3000
 
 개발 시 [아키텍처](docs/ARCHITECTURE.md)와 [디자인 시스템](docs/design-system.md)을 함께 참고한다. 공유 패키지는 앱에 의존하지 않으며, 앱의 `@/`는 `apps/web`를 가리킨다. Storybook은 실제 구현을 가져오고 L·M·큰 글씨를 툴바에서 전환한다.
 
-기존 루트 `.env.local`은 `apps/web/.env.local`로 옮긴다. 아이콘은 `packages/icons/svg`에서 관리하고 `apps/web/public/icons` 심링크를 통해 기존 URL을 유지한다. 배포 시 Next.js 앱 루트는 `apps/web`, lockfile과 설치 기준은 저장소 루트다.
+기존 루트 `.env.local`은 `apps/web/.env.local`로 옮긴다. 아이콘은 `packages/icons/svg`에서 관리하고 `apps/web/public/icons` 심링크를 통해 기존 URL을 유지한다. 배포는 Vercel이다. Root Directory는 `apps/web`, lockfile과 설치 기준은 저장소 루트이고, 설정값은 [서브도메인 분리와 Vercel 배포](docs/subdomain-rewrite.md)에 있다.

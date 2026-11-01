@@ -46,6 +46,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 - 도메인마다 한 역할만 받는다 (`SITE_ROLE`). refresh 쿠키는 서브도메인끼리 공유하지 않으므로 로그인도 도메인별로 하고, 다른 역할 계정은 로그아웃시킨다
 - 서브도메인 화면 안의 링크·`router` 경로에는 `/helper`·`/admin` 접두사를 붙이지 않는다 (`<Link href="/matches">`). 다른 도메인으로 가는 링크만 `siteUrl('helper', 경로)`
 - 메인 도메인에서 `/helper`·`/admin`으로 직접 들어오면 `/`로 보낸다
+- 배포에서는 `API_PROXY_TARGET`이 있으면 `/api/*`를 `next.config.ts` rewrite가 백엔드로 넘기고, 브라우저는 같은 도메인의 `/api`를 부른다
 
 **요구사항·디자인 원본**
 
@@ -89,6 +90,8 @@ bash scripts/setup-hooks.sh   # Git 훅 활성화 (main 직접 커밋 차단·�
 - 로컬에 gitleaks가 없으면 훅은 grep 폴백으로 동작한다 (`brew install gitleaks` 권장)
 - 백엔드를 같이 띄우려면 `hankki-atti-be`에서 `./gradlew bootRun` (Docker Desktop 필요)
 
+**배포** — Vercel (Root Directory `apps/web`). 프로젝트 설정값과 백엔드 조건은 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md). API에 HTTPS가 붙기 전까지 Vercel과 백엔드 사이가 평문이므로 테스트 계정·테스트 데이터만 쓴다.
+
 ---
 
 ## 디렉토리 구조
@@ -96,6 +99,8 @@ bash scripts/setup-hooks.sh   # Git 훅 활성화 (main 직접 커밋 차단·�
 ```text
 apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
 ├── proxy.ts            # 서브도메인 → app 폴더 rewrite
+├── next.config.ts      # API_PROXY_TARGET이 있으면 /api/* → 백엔드 rewrite
+├── vercel.json         # Vercel 빌드 명령 (public/icons 심링크를 실제 파일로 바꾼 뒤 빌드)
 ├── app/                # 라우트·화면 조립 (helper/ = helper. 도메인, admin/ = admin. 도메인)
 ├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
 ├── features/           # 도메인별 화면 조각·훅 (auth/ = 도메인 공용 로그인·비밀번호 변경 화면, requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격, notifications/ = 상단 바 알림 개수·알림 패널 — 벨이 있는 TopBar가 연결, notices/ = 장애학생·도우미 공지 목록·상세, password-reset/ = 비밀번호 재설정 요청·메일 링크 흐름, signup/ = 도우미 회원가입 안내 자료 확인·정보 입력, mypage/ = 장애학생·도우미 내 정보·연락 정보 수정·설정·로그아웃)
