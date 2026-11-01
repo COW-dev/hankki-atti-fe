@@ -6,8 +6,8 @@ import { requestTitle } from './RequestDateTime';
 import type { MyHelpRequest } from './types';
 
 /**
- * F-02 다가오는 신청 카드 (Figma 204:2820 모집 중 · 204:2832 매칭 완료 · 207:1876 취소 버튼). RequestCard(70:142) 설명대로
- * 상태 태그 → 일시 → 도움 유형 → 상대 정보 → 동작 순서.
+ * F-02 다가오는 신청 카드 (Figma 14:783 모집 중 · 14:792 매칭 완료). RequestCard(70:142) 설명대로
+ * 상태 태그 → 일시 → 도움 유형 → 상대 정보 → 동작 순서. 스크린리더가 카드를 한 건씩 구분하도록 일시 제목을 이름으로 한 article로 묶는다 (U-10)
  */
 export function UpcomingRequestCard({
   request,
@@ -30,66 +30,71 @@ export function UpcomingRequestCard({
 }) {
   const startAt = parseLocalDateTime(request.startAt);
   const status = HELP_REQUEST_STATUS[request.status];
+  const titleId = `upcoming-request-${request.id}`;
 
   return (
-    <li className="flex w-full flex-col gap-1.5 border-t border-(--color-border-default) py-4 first:border-t-0">
-      {isNext && (
-        <p className="typo-caption-strong text-(--color-text-brand)">
-          {relativeMealLabel(startAt, now)} · 다음 식사
-        </p>
-      )}
-      <div className="flex flex-wrap items-center gap-(--space-xs)">
-        <StatusTag tone={status.tone}>{status.label}</StatusTag>
-        {request.helperChanged && <StatusTag tone="neutral">도우미 바뀜</StatusTag>}
-      </div>
-      <h3 className="typo-title w-full text-(--color-text-primary)">{requestTitle(request)}</h3>
-      {request.status === 'RECRUITING' ? (
-        <div className="flex w-full flex-wrap items-center justify-between gap-(--space-sm)">
-          <p className="typo-body min-w-px flex-1 text-(--color-text-secondary)">
-            {helpTypesText(request.helpTypes, request.otherHelpText)}
+    <li className="w-full border-t border-(--color-border-default) py-4 first:border-t-0">
+      <article aria-labelledby={titleId} className="flex w-full flex-col gap-1.5">
+        {isNext && (
+          <p className="typo-caption-strong text-(--color-text-brand)">
+            {relativeMealLabel(startAt, now)} · 다음 식사
           </p>
-          <Button
-            variant="secondary"
-            size="small"
-            inactive={withdrawing}
-            aria-label={`${formatDate(startAt)} 신청 철회`}
-            onClick={() => onWithdraw(request)}
-          >
-            신청 철회
-          </Button>
+        )}
+        <div className="flex flex-wrap items-center gap-(--space-xs)">
+          <StatusTag tone={status.tone}>{status.label}</StatusTag>
+          {request.helperChanged && <StatusTag tone="neutral">도우미 바뀜</StatusTag>}
         </div>
-      ) : (
-        <>
-          <p className="typo-body w-full text-(--color-text-secondary)">
-            {helpTypesText(request.helpTypes, request.otherHelpText)}
-          </p>
-          {/* 207:1883 partner + action: 도우미 정보 상자가 남는 폭을 쓰고 취소하기는 오른쪽. 좁으면 두 줄 */}
-          <div className="mt-0.5 flex w-full flex-wrap items-center gap-(--space-xs)">
-            {request.helper && (
-              <p className="flex min-h-(--control-height-sm) min-w-0 flex-1 flex-wrap items-center gap-(--space-xs) rounded-(--radius-md) bg-(--color-bg-muted) px-(--space-sm) py-(--space-xs)">
-                <Icon name="user" size="calc(var(--font-caption) * 9 / 7)" />
-                <span className="typo-caption-strong text-(--color-text-primary)">
-                  {request.helper.name}
-                </span>
-                <span className="typo-caption text-(--color-text-secondary)">
-                  카톡 {request.helper.kakaoId}
-                </span>
-              </p>
-            )}
-            {request.status === 'MATCHED' && (
-              <Button
-                variant="secondary"
-                size="small"
-                inactive={canceling}
-                aria-label={`${formatDate(startAt)} 매칭 취소하기`}
-                onClick={() => onCancel(request)}
-              >
-                취소하기
-              </Button>
-            )}
+        <h3 id={titleId} className="typo-title w-full text-(--color-text-primary)">
+          {requestTitle(request)}
+        </h3>
+        {request.status === 'RECRUITING' ? (
+          <div className="flex w-full flex-wrap items-center justify-between gap-(--space-sm)">
+            <p className="typo-body min-w-px flex-1 text-(--color-text-secondary)">
+              {helpTypesText(request.helpTypes, request.otherHelpText)}
+            </p>
+            <Button
+              variant="secondary"
+              size="small"
+              inactive={withdrawing}
+              aria-label={`${formatDate(startAt)} 신청 철회`}
+              onClick={() => onWithdraw(request)}
+            >
+              신청 철회
+            </Button>
           </div>
-        </>
-      )}
+        ) : (
+          <>
+            <p className="typo-body w-full text-(--color-text-secondary)">
+              {helpTypesText(request.helpTypes, request.otherHelpText)}
+            </p>
+            {/* 207:1883 partner + action: 도우미 정보 상자가 남는 폭을 쓰고 취소하기는 오른쪽. 좁으면 두 줄 */}
+            <div className="mt-0.5 flex w-full flex-wrap items-center gap-(--space-xs)">
+              {request.helper && (
+                <p className="flex min-h-(--control-height-sm) min-w-0 flex-1 flex-wrap items-center gap-(--space-xs) rounded-(--radius-md) bg-(--color-bg-muted) px-(--space-sm) py-(--space-xs)">
+                  <Icon name="user" size="calc(var(--font-caption) * 9 / 7)" />
+                  <span className="typo-caption-strong text-(--color-text-primary)">
+                    {request.helper.name}
+                  </span>
+                  <span className="typo-caption text-(--color-text-secondary)">
+                    카톡 {request.helper.kakaoId}
+                  </span>
+                </p>
+              )}
+              {request.status === 'MATCHED' && (
+                <Button
+                  variant="secondary"
+                  size="small"
+                  inactive={canceling}
+                  aria-label={`${formatDate(startAt)} 매칭 취소하기`}
+                  onClick={() => onCancel(request)}
+                >
+                  취소하기
+                </Button>
+              )}
+            </div>
+          </>
+        )}
+      </article>
     </li>
   );
 }
