@@ -2,7 +2,7 @@ import Link from 'next/link';
 import type { ComponentProps } from 'react';
 import { Icon } from '@hankki/icons';
 
-// 장애학생 탭 (Figma TabBar 1:1235, Role=장애학생). 아직 화면이 없는 탭은 링크만 둔다
+// 장애학생 탭 (Figma TabBar 1:1235, Role=장애학생)
 const STUDENT_TABS = [
   {
     href: '/requests/new',

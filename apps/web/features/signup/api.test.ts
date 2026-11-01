@@ -24,6 +24,7 @@ describe('signupHelper', () => {
       password: 'hankki!2026',
       passwordConfirm: 'hankki!2026',
       attiMember: true,
+      smsConsent: true,
     });
 
     expect(apiRequest).toHaveBeenCalledWith('/api/helpers/signup', {
@@ -37,6 +38,7 @@ describe('signupHelper', () => {
         password: 'hankki!2026',
         attiMember: true,
         guideConfirmed: true,
+        smsConsent: true,
       },
     });
   });

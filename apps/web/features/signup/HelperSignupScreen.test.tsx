@@ -87,4 +87,36 @@ describe('HelperSignupScreen', () => {
     expect(name).toHaveAccessibleDescription(/50자/);
     expect(apiRequest).not.toHaveBeenCalled();
   });
+
+  it('알림 문자는 기본으로 꺼져 있고, 고르면 동의로 가입 요청을 보낸다', async () => {
+    // given: 2단계 입력을 모두 채웠다
+    const user = userEvent.setup();
+    apiRequest.mockResolvedValueOnce(undefined);
+    render(<HelperSignupScreen />);
+    await readAllGuides(user);
+    await user.click(screen.getByRole('button', { name: '다음' }));
+    await user.type(screen.getByRole('textbox', { name: '이름' }), '이도움');
+    await user.type(screen.getByRole('textbox', { name: '학번' }), '60231234');
+    await user.type(screen.getByRole('textbox', { name: '이메일' }), 'helper@mju.ac.kr');
+    await user.type(screen.getByRole('textbox', { name: '카톡 ID' }), 'hankki_helper');
+    await user.type(screen.getByRole('textbox', { name: '전화번호' }), '010-1234-5678');
+    await user.type(screen.getByLabelText('비밀번호'), 'hankki!2026');
+    await user.type(screen.getByLabelText('비밀번호 확인'), 'hankki!2026');
+    const sms = screen.getByRole('checkbox', { name: '알림 문자 받기 (선택)' });
+    expect(sms).toHaveAttribute('aria-checked', 'false');
+    expect(sms).toHaveAccessibleDescription(/메일과 앱 알림은 와요/);
+
+    // when
+    await user.click(sms);
+    await user.click(screen.getByRole('button', { name: '가입하기' }));
+
+    // then
+    expect(apiRequest).toHaveBeenCalledWith(
+      '/api/helpers/signup',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.objectContaining({ smsConsent: true }),
+      }),
+    );
+  });
 });

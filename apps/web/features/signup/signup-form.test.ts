@@ -10,6 +10,7 @@ const VALID: SignupForm = {
   password: 'hankki!2026',
   passwordConfirm: 'hankki!2026',
   attiMember: false,
+  smsConsent: false,
 };
 
 describe('validateSignup', () => {
@@ -72,6 +73,7 @@ describe('toSignupRequest', () => {
       password: 'hankki!2026',
       attiMember: false,
       guideConfirmed: true,
+      smsConsent: false,
     });
   });
 });
