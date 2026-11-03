@@ -1,15 +1,6 @@
-'use client';
+import { redirect } from 'next/navigation';
 
-import { useSessionGuard } from '@/lib/auth/useSessionGuard';
-
-// admin.domain.com/ — 뼈대만 둔다. 관리자 목업이 정해지면 화면을 채운다
+// admin.domain.com/ — 첫 메뉴(장애학생 관리)로 보낸다. 로그인 확인은 그 화면의 AdminShell이 한다
 export default function AdminHome() {
-  const me = useSessionGuard('ADMIN');
-  if (!me) return null;
-
-  return (
-    <main className="flex flex-col gap-(--space-md) p-(--space-lg)">
-      <h1 className="typo-title text-(--color-text-primary)">관리자</h1>
-    </main>
-  );
+  redirect('/students');
 }
