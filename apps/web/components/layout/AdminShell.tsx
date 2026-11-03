@@ -4,7 +4,7 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { SidebarItem, StatusTag } from '@hankki/ui';
 import { Logo } from '@/components/ui/Logo';
 import { useAuth } from '@/lib/auth/AuthProvider';
-import { useSessionGuard } from '@/lib/auth/useSessionGuard';
+import { useSessionGuard, type AdminMe } from '@/lib/auth/useSessionGuard';
 import { ADMIN_GRADE_TAG } from '@/lib/labels/admin';
 
 export type AdminMenu = '/students' | '/helpers' | '/notices';
@@ -24,11 +24,14 @@ const MENUS: { href: AdminMenu; label: string; icon: string }[] = [
 export function AdminShell({
   active,
   title,
+  action,
   children,
 }: {
   active: AdminMenu;
   title: string;
-  children?: ReactNode;
+  action?: (me: AdminMe) => ReactNode;
+  // 권한별로 그리는 화면은 함수로 받아 확인된 내 정보(권한 등급)를 쓴다 — /api/admin/me를 다시 부르지 않는다
+  children?: ReactNode | ((me: AdminMe) => ReactNode);
 }) {
   const me = useSessionGuard('ADMIN');
   const { logout } = useAuth();
@@ -85,10 +88,18 @@ export function AdminShell({
         </div>
       </nav>
       <main id="admin-main" tabIndex={-1} className="flex min-w-0 flex-1 flex-col px-10 pt-8 pb-10">
-        <h1 ref={titleRef} tabIndex={-1} className="typo-display text-(--color-text-primary)">
-          {title}
-        </h1>
-        {children}
+        {/* 제목 줄 오른쪽 끝에 화면의 주 동작을 둔다 (Figma 14:1290 "+ 학생 등록") */}
+        <div className="flex items-center gap-2">
+          <h1
+            ref={titleRef}
+            tabIndex={-1}
+            className="typo-display flex-1 text-(--color-text-primary)"
+          >
+            {title}
+          </h1>
+          {action?.(me)}
+        </div>
+        {typeof children === 'function' ? children(me) : children}
       </main>
     </div>
   );

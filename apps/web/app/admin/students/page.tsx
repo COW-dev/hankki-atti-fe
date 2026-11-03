@@ -1,6 +1,6 @@
-import { AdminShell } from '@/components/layout/AdminShell';
+import { StudentsScreen } from '@/features/students/StudentsScreen';
 
-// admin.domain.com/students — 장애학생 관리. 화면은 A-03~ 이슈에서 채운다 (Figma 14:1274)
+// admin.domain.com/students — 장애학생 관리 · 학생 목록 (A-03)
 export default function AdminStudentsPage() {
-  return <AdminShell active="/students" title="장애학생 관리" />;
+  return <StudentsScreen />;
 }
