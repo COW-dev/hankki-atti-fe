@@ -166,7 +166,7 @@ Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만
 - RequestCard는 `title`, `meta`, `status`, `statusLabel`을 받는다. `partner`와 `action`은 선택이며 도메인·개인정보 판단은 호출부와 서버의 책임이다. `action` 이름에는 일시가 포함된다. 목록은 ul/li로 감싼다.
 - Modal은 `open`을 호출부가 관리한다. 제목 포커스, Tab/Shift+Tab 순환, Esc/닫기, 열었던 요소로 복귀와 배경 접근 차단을 제공한다. `onConfirm` 후 닫기 여부도 호출부가 정한다. 결과 모달처럼 제목 위에 아이콘 원이 오면 `icon`(목업 209:3514)을 준다. 장식이라 숨기고 의미는 제목이 전달한다.
 - Toast는 `message`(없으면 `null`)와 `onClose`를 받고, 문구가 생기면 2초 뒤 `onClose`를 부른다. live 영역(`status`)이 처음부터 있어야 문구가 읽히므로 조건부로 렌더링하지 말고 항상 둔다. 포커스는 옮기지 않는다. 탭바가 있는 화면은 `withTabBar`로 탭바 위 20, 없으면 바닥에서 40 띄운다(14:2862·14:2865).
-- SidebarItem은 `href`, 표시 문구, `active`를 받으며 `icon`으로 항목별 원본 아이콘 이름을 지정할 수 있다. 관리자 화면 자체는 구현하지 않는다.
+- SidebarItem은 `href`, 표시 문구, `active`를 받으며 `icon`으로 항목별 원본 아이콘 이름을 지정할 수 있다. 관리자 사이드바(`apps/web/components/layout/AdminShell.tsx`)는 목업(14:1275)대로 항목마다 `sidebar-student`·`sidebar-helper`·`sidebar-notice`(현재 항목은 `-active`, 관리자 18 그리드)를 쓴다.
 - 새 용도 토큰은 OptionTile의 표시 크기·외곽선·모서리, SidebarItem 높이, Modal 그림자다. 원본은 각각 Figma `1:1737`, `1:1352`, `1:1346`이다.
 
 ## 새 컴포넌트 추가 절차

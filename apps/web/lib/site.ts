@@ -5,11 +5,11 @@ export const SUBDOMAINS = ['helper', 'admin'] as const;
 export type Subdomain = (typeof SUBDOMAINS)[number];
 
 // 도메인마다 한 역할만 받는다. refresh 쿠키를 서브도메인끼리 공유하지 않으므로 로그인도 도메인별로 한다
-export const SITE_ROLE: Record<Subdomain | 'main', Role> = {
+export const SITE_ROLE = {
   main: 'STUDENT',
   helper: 'HELPER',
   admin: 'ADMIN',
-};
+} as const satisfies Record<Subdomain | 'main', Role>;
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 

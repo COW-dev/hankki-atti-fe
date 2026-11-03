@@ -19,11 +19,14 @@ import { joinedSignup } from '@/features/signup/joined';
 import { siteUrl } from '@/lib/site';
 import { errorMessage } from '@/lib/api/error-message';
 
-const ROLE_LABEL: Record<Role, string> = { STUDENT: '장애학생', HELPER: '도우미', ADMIN: '관리자' };
+// 관리자는 AdminLoginScreen을 쓴다
+type UserRole = Exclude<Role, 'ADMIN'>;
+
+const ROLE_LABEL: Record<UserRole, string> = { STUDENT: '장애학생', HELPER: '도우미' };
 
 // L-01 로그인 (Figma 203:240 기본 · 203:433 실패 · 203:635 비활성 계정).
-// 도메인마다 한 역할만 받는다 — 메인 STUDENT, helper. HELPER, admin. ADMIN (lib/site.ts SITE_ROLE)
-export function LoginScreen({ role }: { role: Role }) {
+// 도메인마다 한 역할만 받는다 — 메인 STUDENT, helper. HELPER (lib/site.ts SITE_ROLE)
+export function LoginScreen({ role }: { role: UserRole }) {
   const router = useRouter();
   const { login, logout } = useAuth();
   // 도우미 가입 직후면 가입한 이메일을 채우고 토스트로 알린다 (U-15)
@@ -106,27 +109,24 @@ export function LoginScreen({ role }: { role: Role }) {
             로그인
           </Button>
         </form>
-        {/* 관리자 계정은 백엔드가 비밀번호 재설정을 받지 않아(장애학생·도우미만) 두 링크 모두 숨긴다 */}
-        {role !== 'ADMIN' && (
-          <div className="flex w-full items-center justify-center gap-(--space-sm) whitespace-nowrap">
-            <Link
-              href={role === 'HELPER' ? '/signup' : siteUrl('helper', '/signup')}
-              className="typo-caption-strong text-(--color-text-secondary)"
-            >
-              도우미 회원가입
-            </Link>
-            <span aria-hidden className="typo-caption text-(--color-text-disabled)">
-              |
-            </span>
-            {/* 메일 링크와 같은 경로 (백엔드 PasswordResetService LINK_PATH) */}
-            <Link
-              href="/password-reset"
-              className="typo-caption-strong text-(--color-text-secondary)"
-            >
-              비밀번호를 잊었어요
-            </Link>
-          </div>
-        )}
+        <div className="flex w-full items-center justify-center gap-(--space-sm) whitespace-nowrap">
+          <Link
+            href={role === 'HELPER' ? '/signup' : siteUrl('helper', '/signup')}
+            className="typo-caption-strong text-(--color-text-secondary)"
+          >
+            도우미 회원가입
+          </Link>
+          <span aria-hidden className="typo-caption text-(--color-text-disabled)">
+            |
+          </span>
+          {/* 메일 링크와 같은 경로 (백엔드 PasswordResetService LINK_PATH) */}
+          <Link
+            href="/password-reset"
+            className="typo-caption-strong text-(--color-text-secondary)"
+          >
+            비밀번호를 잊었어요
+          </Link>
+        </div>
       </Block>
       <Toast message={toast} onClose={closeToast} />
     </PageShell>
