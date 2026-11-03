@@ -1,9 +1,9 @@
 'use client';
 
-import { useEffect, useState, type FormEvent } from 'react';
+import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { Icon } from '@hankki/icons';
-import { ButtonLink, ErrorNotice, InputCompact, Notice, StatusTag } from '@hankki/ui';
+import { Button, ErrorNotice, InputCompact, Notice, StatusTag, Toast } from '@hankki/ui';
 import { AdminShell } from '@/components/layout/AdminShell';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { errorMessage } from '@/lib/api/error-message';
@@ -37,36 +37,54 @@ const DISABILITY_OPTIONS = [
 
 const INITIAL_FILTER: StudentFilter = { q: '', status: '', disabilityType: '', page: 0 };
 
+// 등록·상세·전체 신청 현황 화면(A-04~A-06)이 생기기 전까지 관리자 화면을 벗어나지 않게 안내만 한다
+const PENDING_SCREEN_MESSAGE = '준비 중인 화면이에요';
+
+// Figma 14:1294 탭. 누르는 영역은 크기 모드 높이를 지킨다
+const TAB_CLASS = 'typo-label -mb-px flex min-h-(--control-height) items-end px-0.5 pb-2.5';
+const TAB_CURRENT = 'border-b-2 border-(--color-bg-brand-strong) text-(--color-text-brand)';
+const TAB_OTHER = 'text-(--color-text-secondary)';
+
 /**
  * AF-02 장애학생 목록 (A-03, Figma 14:1274 전체 권한 · 14:1435 제한 권한).
  * 제한 권한은 장애 유형 필터·열과 연락처 열, 등록 버튼이 없다 — 서버도 해당 필드를 주지 않는다.
  */
 export function StudentsScreen() {
+  const [toast, setToast] = useState<string | null>(null);
+  const closeToast = useCallback(() => setToast(null), []);
+  const showPending = () => setToast(PENDING_SCREEN_MESSAGE);
+
   return (
     <AdminShell
       active="/students"
       title="장애학생 관리"
-      // 등록 화면은 A-05
+      // 등록 화면(A-05)이 생기면 ButtonLink(/students/new)로 바꾼다
       action={(me) =>
         me.grade === 'FULL' && (
-          <ButtonLink href="/students/new" size="small">
+          <Button size="small" onClick={showPending}>
             + 학생 등록
-          </ButtonLink>
+          </Button>
         )
       }
     >
-      {(me) => <StudentList grade={me.grade} />}
+      {(me) => (
+        <>
+          <StudentList grade={me.grade} onPending={showPending} />
+          <Toast message={toast} onClose={closeToast} />
+        </>
+      )}
     </AdminShell>
   );
 }
 
-function StudentList({ grade }: { grade: AdminGrade }) {
+function StudentList({ grade, onPending }: { grade: AdminGrade; onPending: () => void }) {
   const { authRequest } = useAuth();
   const full = grade === 'FULL';
   const [filter, setFilter] = useState(INITIAL_FILTER);
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<AdminStudentPage | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [retry, setRetry] = useState(0);
 
   useEffect(() => {
     let ignore = false;
@@ -77,12 +95,15 @@ function StudentList({ grade }: { grade: AdminGrade }) {
         setError(null);
       })
       .catch((cause) => {
-        if (!ignore) setError(errorMessage(cause, '학생 목록을 불러오지 못했어요'));
+        if (ignore) return;
+        // 이전 조건의 결과를 새 조건 아래 남기지 않는다
+        setResult(null);
+        setError(errorMessage(cause, '학생 목록을 불러오지 못했어요'));
       });
     return () => {
       ignore = true;
     };
-  }, [authRequest, filter]);
+  }, [authRequest, filter, retry]);
 
   // 조건이 바뀌면 첫 페이지부터 본다
   const changeFilter = (next: Partial<StudentFilter>) =>
@@ -99,11 +120,13 @@ function StudentList({ grade }: { grade: AdminGrade }) {
         aria-label="장애학생 관리 보기"
         className="flex gap-6 border-b border-(--color-border-default)"
       >
-        {/* 전체 신청 현황은 A-04에서 화면을 만든다 */}
-        <TabLink href="/students" current>
+        <Link href="/students" aria-current="page" className={`${TAB_CLASS} ${TAB_CURRENT}`}>
           학생 목록
-        </TabLink>
-        <TabLink href="/students/requests">전체 신청 현황</TabLink>
+        </Link>
+        {/* 전체 신청 현황(A-04)이 생기면 /students/requests 링크로 바꾼다 */}
+        <button type="button" onClick={onPending} className={`${TAB_CLASS} ${TAB_OTHER}`}>
+          전체 신청 현황
+        </button>
       </nav>
 
       {!full && <Notice>제한 권한이라 장애 유형·연락처 같은 민감 정보는 보이지 않아요</Notice>}
@@ -150,9 +173,19 @@ function StudentList({ grade }: { grade: AdminGrade }) {
         </p>
       </div>
 
-      {error && <ErrorNotice message={error} />}
+      {error && (
+        <div className="flex flex-col items-start gap-2">
+          <ErrorNotice message={error} />
+          <Button variant="secondary" size="small" onClick={() => setRetry((count) => count + 1)}>
+            다시 시도
+          </Button>
+        </div>
+      )}
 
-      <div className="overflow-hidden rounded-(--radius-lg) bg-(--color-bg-default)">
+      <div
+        hidden={!result}
+        className="overflow-hidden rounded-(--radius-lg) bg-(--color-bg-default)"
+      >
         <table className="w-full table-fixed text-left">
           <caption className="sr-only">장애학생 목록</caption>
           <thead className="typo-caption-strong bg-(--color-bg-muted) text-(--color-text-secondary)">
@@ -191,7 +224,12 @@ function StudentList({ grade }: { grade: AdminGrade }) {
           </thead>
           <tbody className="typo-body text-(--color-text-primary)">
             {result?.students.map((student) => (
-              <StudentRow key={student.accountId} student={student} full={full} />
+              <StudentRow
+                key={student.accountId}
+                student={student}
+                full={full}
+                onPending={onPending}
+              />
             ))}
             {result?.students.length === 0 && (
               <tr>
@@ -215,44 +253,30 @@ function StudentList({ grade }: { grade: AdminGrade }) {
   );
 }
 
-function TabLink({
-  href,
-  current = false,
-  children,
+function StudentRow({
+  student,
+  full,
+  onPending,
 }: {
-  href: string;
-  current?: boolean;
-  children: string;
+  student: AdminStudentSummary;
+  full: boolean;
+  onPending: () => void;
 }) {
-  return (
-    <Link
-      href={href}
-      aria-current={current ? 'page' : undefined}
-      className={`typo-label -mb-px flex min-h-(--control-height) items-end px-0.5 pb-2.5 ${
-        current
-          ? 'border-b-2 border-(--color-bg-brand-strong) text-(--color-text-brand)'
-          : 'text-(--color-text-secondary)'
-      }`}
-    >
-      {children}
-    </Link>
-  );
-}
-
-function StudentRow({ student, full }: { student: AdminStudentSummary; full: boolean }) {
   const status = ACCOUNT_STATUS_TAG[student.status];
   const recent = student.recentRequestAt ? parseLocalDateTime(student.recentRequestAt) : null;
   return (
-    // 행 전체를 누를 수 있게 이름 링크를 행 위로 넓힌다. 링크는 하나만 둬 Tab이 행마다 한 번 멈춘다
+    // 행 전체를 누를 수 있게 이름 버튼을 행 위로 넓힌다. 하나만 둬 Tab이 행마다 한 번 멈춘다
+    // 학생 상세(A-06)가 생기면 /students/{accountId} 링크로 바꾼다
     <tr className="relative h-13.5 border-b border-(--color-border-default) last:border-b-0 hover:bg-(--color-bg-subtle)">
       <th scope="row" className="typo-body-strong pl-5">
-        <Link
-          href={`/students/${student.accountId}`}
-          className="after:absolute after:inset-0 after:content-['']"
+        <button
+          type="button"
+          onClick={onPending}
+          aria-label={`${student.name} 상세`}
+          className="text-left after:absolute after:inset-0 after:content-['']"
         >
           {student.name}
-          <span className="sr-only"> 상세</span>
-        </Link>
+        </button>
       </th>
       <td>{student.studentNo}</td>
       {full && (
