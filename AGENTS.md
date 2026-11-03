@@ -40,7 +40,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 | 비로그인 | 메인 (`app/`) | 소개, 로그인, 회원가입, 비밀번호 재설정 | L |
 | 장애학생 | 메인 (`app/`) | 도우미 신청, 내 신청, 공지사항, 마이페이지 (모바일 웹, 계정은 센터가 발급) | L |
 | 도우미 | `helper.` (`app/helper/`) | 요청 목록, 매칭 현황, 공지사항, 마이페이지, 로그인·회원가입 (모바일 웹, 직접 회원가입) | M |
-| 관리자 | `admin.` (`app/admin/`) | 데스크톱 — 지금은 권한 가드·로그인 뼈대만, 목업이 정해지면 채운다 | admin |
+| 관리자 | `admin.` (`app/admin/`) | 데스크톱 — 로그인, 공통 레이아웃(`AdminShell`: 사이드바·권한 태그·로그아웃). 장애학생·도우미·공지 관리는 이슈별로 채운다 | admin |
 
 **서브도메인** — `apps/web/proxy.ts`가 host를 보고 `helper.x/matches` → `/helper/matches`로 rewrite한다 (판단은 `lib/site.ts`, 배경은 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md)).
 - 도메인마다 한 역할만 받는다 (`SITE_ROLE`). refresh 쿠키는 서브도메인끼리 공유하지 않으므로 로그인도 도메인별로 하고, 다른 역할 계정은 로그아웃시킨다
