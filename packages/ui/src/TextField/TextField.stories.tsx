@@ -75,3 +75,19 @@ export const Helper: Story = {
   },
 };
 export const LargeText: Story = { globals: { textSize: 'large' } };
+// AF-01 장애 유형처럼 고를 값이 정해진 칸 (options)
+export const Select: Story = {
+  render: () => (
+    <TextField
+      label="장애 유형 *"
+      options={[
+        { value: '', label: '선택하세요 (센터 분류 7개)' },
+        { value: 'VISUAL', label: '시각' },
+      ]}
+      defaultValue=""
+    />
+  ),
+  play: async ({ canvas }) => {
+    await expect(canvas.getByRole('combobox', { name: '장애 유형 *' })).toHaveValue('');
+  },
+};

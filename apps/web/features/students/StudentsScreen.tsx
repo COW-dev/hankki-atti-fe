@@ -2,7 +2,15 @@
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
 import { Icon } from '@hankki/icons';
-import { Button, ErrorNotice, InputCompact, Notice, StatusTag, Toast } from '@hankki/ui';
+import {
+  Button,
+  ButtonLink,
+  ErrorNotice,
+  InputCompact,
+  Notice,
+  StatusTag,
+  Toast,
+} from '@hankki/ui';
 import { AdminShell } from '@/components/layout/AdminShell';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { errorMessage } from '@/lib/api/error-message';
@@ -37,7 +45,7 @@ const DISABILITY_OPTIONS = [
 
 const INITIAL_FILTER: StudentFilter = { q: '', status: '', disabilityType: '', page: 0 };
 
-// 등록·상세 화면(A-05·A-06)이 생기기 전까지 관리자 화면을 벗어나지 않게 안내만 한다
+// 상세 화면(A-06)이 생기기 전까지 관리자 화면을 벗어나지 않게 안내만 한다
 export const PENDING_SCREEN_MESSAGE = '준비 중인 화면이에요';
 
 /**
@@ -53,12 +61,11 @@ export function StudentsScreen() {
     <AdminShell
       active="/students"
       title="장애학생 관리"
-      // 등록 화면(A-05)이 생기면 ButtonLink(/students/new)로 바꾼다
       action={(me) =>
         me.grade === 'FULL' && (
-          <Button size="small" onClick={showPending}>
+          <ButtonLink href="/students/new" size="small">
             + 학생 등록
-          </Button>
+          </ButtonLink>
         )
       }
     >

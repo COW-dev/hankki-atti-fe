@@ -1,5 +1,13 @@
 import { describe, expect, it, vi } from 'vitest';
-import { fetchHelpRequestSummary, fetchHelpRequests, fetchStudents } from '@/features/students/api';
+import {
+  createStudent,
+  fetchHelpRequestSummary,
+  fetchHelpRequests,
+  fetchStudents,
+  studentCreateFailureOf,
+} from '@/features/students/api';
+import { EMPTY_STUDENT_CREATE_FORM } from '@/features/students/create-form';
+import { ApiError } from '@/lib/api/client';
 
 describe('fetchStudents', () => {
   it('빈 조건은 빼고 page만 보낸다', async () => {
@@ -67,5 +75,35 @@ describe('fetchHelpRequestSummary', () => {
     expect(authRequest).toHaveBeenCalledWith(
       '/api/admin/help-requests/summary?from=2026-11-03&to=2026-11-10',
     );
+  });
+});
+
+describe('createStudent', () => {
+  it('등록 요청을 POST로 보낸다', async () => {
+    const authRequest = vi.fn().mockResolvedValue({});
+
+    await createStudent(authRequest, { ...EMPTY_STUDENT_CREATE_FORM, name: '김민지' });
+
+    expect(authRequest).toHaveBeenCalledWith(
+      '/api/admin/students',
+      expect.objectContaining({
+        method: 'POST',
+        body: expect.objectContaining({ name: '김민지' }),
+      }),
+    );
+  });
+});
+
+describe('studentCreateFailureOf', () => {
+  it('학번 중복이면 학번 칸 오류다', () => {
+    expect(
+      studentCreateFailureOf(new ApiError(409, 'STUDENT_DUPLICATE_STUDENT_NO', '중복')),
+    ).toEqual({ field: 'studentNo', message: '이미 등록된 학번이에요' });
+  });
+
+  it('그 밖의 오류는 칸 없이 화면 위 오류다', () => {
+    expect(
+      studentCreateFailureOf(new ApiError(409, 'STUDENT_REGISTRATION_CONFLICT', '충돌')),
+    ).toEqual({ message: '학생을 등록하지 못했어요. 잠시 후 다시 시도해 주세요' });
   });
 });

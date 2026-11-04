@@ -5,6 +5,7 @@ import {
   useState,
   type ChangeEvent,
   type InputHTMLAttributes,
+  type SelectHTMLAttributes,
   type TextareaHTMLAttributes,
 } from 'react';
 import { Icon } from '@hankki/icons';
@@ -22,22 +23,29 @@ type CommonProps = {
   className?: string;
 };
 
-export type SingleLineTextFieldProps = CommonProps & { multiline?: false } & Omit<
-    InputHTMLAttributes<HTMLInputElement>,
-    'id' | 'className'
-  >;
-export type MultilineTextFieldProps = CommonProps & { multiline: true } & Omit<
+// options 유무로 select와 구분해야 onChange의 event 타입이 추론된다
+export type SingleLineTextFieldProps = CommonProps & {
+  multiline?: false;
+  options?: undefined;
+} & Omit<InputHTMLAttributes<HTMLInputElement>, 'id' | 'className'>;
+export type MultilineTextFieldProps = CommonProps & { multiline: true; options?: undefined } & Omit<
     TextareaHTMLAttributes<HTMLTextAreaElement>,
     'id' | 'className'
   >;
-export type TextFieldProps = SingleLineTextFieldProps | MultilineTextFieldProps;
+// 고를 값이 정해진 칸 (AF-01 장애 유형). value ''인 첫 항목이 placeholder 역할을 한다
+export type SelectTextFieldProps = CommonProps & {
+  multiline?: false;
+  options: readonly { value: string; label: string }[];
+} & Omit<SelectHTMLAttributes<HTMLSelectElement>, 'id' | 'className' | 'children'>;
+export type TextFieldProps =
+  SingleLineTextFieldProps | MultilineTextFieldProps | SelectTextFieldProps;
 
 const FIELD_CLASS =
   'typo-body w-full min-w-px flex-1 bg-transparent outline-none focus-visible:outline-none';
 
 /**
  * Figma TextField (1:1181): 테두리 없음 + bg/muted, 포커스는 border/focus, 오류는 border/danger + 아래 안내.
- * multiline이면 같은 모양의 textarea (F-01 메모).
+ * multiline이면 같은 모양의 textarea (F-01 메모), options를 주면 같은 모양의 select (AF-01 장애 유형).
  */
 export function TextField(props: TextFieldProps) {
   const { label, error, helper, describedBy, count, className } = props;
@@ -89,6 +97,33 @@ export function TextField(props: TextFieldProps) {
           onChange?.(event);
         }}
       />
+    );
+  } else if (props.options) {
+    const { multiline, options, ...selectProps } = stripCommon(props);
+    void multiline;
+    // 아직 고르지 않았으면 placeholder처럼 흐리게 보인다
+    const empty = selectProps.value === '' || selectProps.value === undefined;
+    field = (
+      <>
+        <select
+          {...selectProps}
+          id={id}
+          aria-invalid={ariaInvalid}
+          aria-describedby={ariaDescribedBy}
+          className={`${FIELD_CLASS} ${empty ? 'text-(--color-text-secondary)' : text} appearance-none pr-(--space-xl)`}
+        >
+          {options.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+        <Icon
+          name="compact-chevron"
+          size="var(--space-md)"
+          className="pointer-events-none -ml-(--space-md) rotate-90"
+        />
+      </>
     );
   } else {
     const { multiline, onChange, ...inputProps } = stripCommon(props);
