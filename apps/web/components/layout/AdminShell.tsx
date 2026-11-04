@@ -1,6 +1,8 @@
 'use client';
 
+import Link from 'next/link';
 import { useEffect, useRef, type ReactNode } from 'react';
+import { Icon } from '@hankki/icons';
 import { SidebarItem, StatusTag } from '@hankki/ui';
 import { Logo } from '@/components/ui/Logo';
 import { useAuth } from '@/lib/auth/AuthProvider';
@@ -24,11 +26,14 @@ const MENUS: { href: AdminMenu; label: string; icon: string }[] = [
 export function AdminShell({
   active,
   title,
+  back,
   action,
   children,
 }: {
   active: AdminMenu;
   title: string;
+  // 제목 위 돌아가기 링크 (Figma 14:1739 "‹ 학생 목록")
+  back?: { href: string; label: string };
   action?: (me: AdminMe) => ReactNode;
   // 권한별로 그리는 화면은 함수로 받아 확인된 내 정보(권한 등급)를 쓴다 — /api/admin/me를 다시 부르지 않는다
   children?: ReactNode | ((me: AdminMe) => ReactNode);
@@ -88,6 +93,16 @@ export function AdminShell({
         </div>
       </nav>
       <main id="admin-main" tabIndex={-1} className="flex min-w-0 flex-1 flex-col px-10 pt-8 pb-10">
+        {/* 목업은 글자 높이뿐이지만 조작 영역은 크기 모드 높이를 지킨다 */}
+        {back && (
+          <Link
+            href={back.href}
+            className="typo-caption-strong -mt-3 flex min-h-(--control-height) items-center gap-1 self-start text-(--color-text-brand)"
+          >
+            <Icon name="breadcrumb-back" size={6.125} />
+            {back.label}
+          </Link>
+        )}
         {/* 제목 줄 오른쪽 끝에 화면의 주 동작을 둔다 (Figma 14:1290 "+ 학생 등록") */}
         <div className="flex items-center gap-2">
           <h1
