@@ -12,3 +12,4 @@ export * from './SidebarItem';
 export * from './Modal';
 export * from './Toast';
 export * from './TabNav';
+export * from './Pagination';
