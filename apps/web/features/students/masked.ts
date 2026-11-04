@@ -8,3 +8,10 @@ export function maskedReading(value: string): string {
   }
   return value.replace(/\*+/g, ', 가림, ').replace(/^, |, $/g, '');
 }
+
+// 등록 결과처럼 화면에서 이메일을 가려 보일 때 (Figma 14:1801 "2023****@mju.ac.kr") — 아이디 앞 4글자만 남긴다
+export function maskEmail(email: string): string {
+  const at = email.indexOf('@');
+  if (at < 0) return email;
+  return `${email.slice(0, Math.min(4, at))}****${email.slice(at)}`;
+}
