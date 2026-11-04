@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   createStudent,
+  deactivateStudent,
+  updateStudent,
   fetchHelpRequestSummary,
   fetchHelpRequests,
   fetchStudents,
@@ -105,5 +107,45 @@ describe('studentCreateFailureOf', () => {
     expect(
       studentCreateFailureOf(new ApiError(409, 'STUDENT_REGISTRATION_CONFLICT', '충돌')),
     ).toEqual({ message: '학생을 등록하지 못했어요. 잠시 후 다시 시도해 주세요' });
+  });
+});
+
+describe('updateStudent', () => {
+  it('학번은 빼고 PATCH로 보내며, 빈 메모는 null로 보내 지운다', async () => {
+    const authRequest = vi.fn().mockResolvedValue({});
+
+    await updateStudent(authRequest, 7, {
+      name: ' 김민지 ',
+      studentNo: '20231234',
+      phone: '010-1234-1234',
+      kakaoId: 'min_k',
+      schoolEmail: 'Min@MJU.ac.kr',
+      disabilityType: 'VISUAL',
+      specialNote: '  ',
+    });
+
+    expect(authRequest).toHaveBeenCalledWith('/api/admin/students/7', {
+      method: 'PATCH',
+      body: {
+        name: '김민지',
+        phone: '010-1234-1234',
+        kakaoId: 'min_k',
+        schoolEmail: 'min@mju.ac.kr',
+        disabilityType: 'VISUAL',
+        specialNote: null,
+      },
+    });
+  });
+});
+
+describe('deactivateStudent', () => {
+  it('학생 계정 비활성화를 POST로 보낸다', async () => {
+    const authRequest = vi.fn().mockResolvedValue({});
+
+    await deactivateStudent(authRequest, 7);
+
+    expect(authRequest).toHaveBeenCalledWith('/api/admin/students/7/deactivate', {
+      method: 'POST',
+    });
   });
 });

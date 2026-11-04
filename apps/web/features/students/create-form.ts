@@ -77,3 +77,16 @@ export function toStudentCreateRequest(form: StudentCreateForm) {
     ...(specialNote && { specialNote }),
   };
 }
+
+// 정보 수정 (PATCH /api/admin/students/{id}). 빈 메모는 null로 보내 지운다.
+// 문자 수신 동의는 보내지 않아 지금 상태를 그대로 둔다
+export function toStudentUpdateRequest(form: StudentCreateForm) {
+  return {
+    name: form.name.trim(),
+    phone: form.phone.trim(),
+    kakaoId: form.kakaoId.trim(),
+    schoolEmail: form.schoolEmail.trim().toLowerCase(),
+    disabilityType: form.disabilityType,
+    specialNote: form.specialNote.trim() || null,
+  };
+}
