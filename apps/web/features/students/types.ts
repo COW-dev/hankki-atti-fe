@@ -67,3 +67,25 @@ export type HelpRequestFilter = {
   status: HelpRequestStatus | '';
   q: string;
 };
+
+// 계정정보 메일 상태 (백엔드 CredentialMailStatus). 메일은 서버가 따로 보내 등록 직후는 보통 PENDING이다
+export type CredentialMailStatus = 'PENDING' | 'SENT' | 'FAILED';
+
+// POST /api/admin/students 응답 (AdminStudentCreateResponseDto)
+export type AdminStudentCreated = {
+  accountId: number;
+  loginId: string;
+  name: string;
+  studentNo: string;
+  schoolEmail: string;
+  disabilityType: DisabilityType;
+  credentialMailStatus: CredentialMailStatus;
+};
+
+// POST /api/admin/students/{id}/credentials 응답 (AdminStudentCredentialMailResponseDto)
+export type AdminStudentCredentialMail = {
+  accountId: number;
+  loginId: string;
+  schoolEmail: string;
+  credentialMailStatus: CredentialMailStatus;
+};
