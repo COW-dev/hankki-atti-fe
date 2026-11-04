@@ -52,7 +52,11 @@ describe('StudentsScreen', () => {
 
     render(<StudentsScreen />);
 
-    expect(await screen.findByRole('button', { name: '김민지 상세' })).toBeInTheDocument();
+    // 정보 탭은 전체 권한만 볼 수 있어 매칭현황 탭으로 바로 간다
+    expect(await screen.findByRole('link', { name: '김민지 상세' })).toHaveAttribute(
+      'href',
+      '/students/7/requests',
+    );
     expect(screen.getByText(/민감 정보는 보이지 않아요/)).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: '+ 학생 등록' })).not.toBeInTheDocument();
     expect(screen.queryByRole('combobox', { name: '장애 유형' })).not.toBeInTheDocument();
@@ -67,29 +71,29 @@ describe('StudentsScreen', () => {
       .mockResolvedValueOnce(page('정유나'));
     const user = userEvent.setup();
     render(<StudentsScreen />);
-    await screen.findByRole('button', { name: '김민지 상세' });
+    await screen.findByRole('link', { name: '김민지 상세' });
 
     // when
     await user.selectOptions(screen.getByRole('combobox', { name: '상태' }), 'INACTIVE');
 
     // then
     expect(await screen.findByRole('alert')).toHaveTextContent('학생 목록을 불러오지 못했어요');
-    expect(screen.queryByRole('button', { name: '김민지 상세' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: '김민지 상세' })).not.toBeInTheDocument();
     expect(screen.queryByText('총 1명')).not.toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: '다시 시도' }));
 
-    expect(await screen.findByRole('button', { name: '정유나 상세' })).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: '정유나 상세' })).toBeInTheDocument();
     expect(authRequest).toHaveBeenLastCalledWith('/api/admin/students?page=0&status=INACTIVE');
   });
 
-  it('아직 없는 화면으로 가는 동작은 화면을 벗어나지 않고 준비 중이라고 알린다', async () => {
+  it('학생 이름은 권한에 맞는 상세 탭으로 가는 링크다', async () => {
     authRequest.mockResolvedValue(page('김민지'));
-    const user = userEvent.setup();
     render(<StudentsScreen />);
 
-    await user.click(await screen.findByRole('button', { name: '김민지 상세' }));
-
-    expect(await screen.findByText('준비 중인 화면이에요')).toBeInTheDocument();
+    expect(await screen.findByRole('link', { name: '김민지 상세' })).toHaveAttribute(
+      'href',
+      '/students/7',
+    );
   });
 });

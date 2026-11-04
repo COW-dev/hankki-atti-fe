@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Icon } from '@hankki/icons';
 import {
   Button,
@@ -14,7 +14,7 @@ import {
   Table,
   TableEmpty,
   TableRow,
-  Toast,
+  TableRowLink,
 } from '@hankki/ui';
 import { AdminShell } from '@/components/layout/AdminShell';
 import { useAuth } from '@/lib/auth/AuthProvider';
@@ -50,18 +50,11 @@ const DISABILITY_OPTIONS = [
 
 const INITIAL_FILTER: StudentFilter = { q: '', status: '', disabilityType: '', page: 0 };
 
-// 상세 화면(A-06)이 생기기 전까지 관리자 화면을 벗어나지 않게 안내만 한다
-export const PENDING_SCREEN_MESSAGE = '준비 중인 화면이에요';
-
 /**
  * AF-02 장애학생 목록 (A-03, Figma 14:1274 전체 권한 · 14:1435 제한 권한).
  * 제한 권한은 장애 유형 필터·열과 연락처 열, 등록 버튼이 없다 — 서버도 해당 필드를 주지 않는다.
  */
 export function StudentsScreen() {
-  const [toast, setToast] = useState<string | null>(null);
-  const closeToast = useCallback(() => setToast(null), []);
-  const showPending = () => setToast(PENDING_SCREEN_MESSAGE);
-
   return (
     <AdminShell
       active="/students"
@@ -74,17 +67,12 @@ export function StudentsScreen() {
         )
       }
     >
-      {(me) => (
-        <>
-          <StudentList grade={me.grade} onPending={showPending} />
-          <Toast message={toast} onClose={closeToast} />
-        </>
-      )}
+      {(me) => <StudentList grade={me.grade} />}
     </AdminShell>
   );
 }
 
-function StudentList({ grade, onPending }: { grade: AdminGrade; onPending: () => void }) {
+function StudentList({ grade }: { grade: AdminGrade }) {
   const { authRequest } = useAuth();
   const full = grade === 'FULL';
   const [filter, setFilter] = useState(INITIAL_FILTER);
@@ -217,7 +205,7 @@ function StudentList({ grade, onPending }: { grade: AdminGrade; onPending: () =>
         }
       >
         {result?.students.map((student) => (
-          <StudentRow key={student.accountId} student={student} full={full} onPending={onPending} />
+          <StudentRow key={student.accountId} student={student} full={full} />
         ))}
         {result?.students.length === 0 && (
           <TableEmpty colSpan={full ? 9 : 5}>조건에 맞는 학생이 없어요</TableEmpty>
@@ -236,28 +224,19 @@ function StudentList({ grade, onPending }: { grade: AdminGrade; onPending: () =>
   );
 }
 
-function StudentRow({
-  student,
-  full,
-  onPending,
-}: {
-  student: AdminStudentSummary;
-  full: boolean;
-  onPending: () => void;
-}) {
+function StudentRow({ student, full }: { student: AdminStudentSummary; full: boolean }) {
   const status = ACCOUNT_STATUS_TAG[student.status];
   const recent = student.recentRequestAt ? parseLocalDateTime(student.recentRequestAt) : null;
   return (
     <TableRow linked>
       <th scope="row" className="typo-body-strong pl-5">
-        <button
-          type="button"
-          onClick={onPending}
+        <TableRowLink
+          // 정보 탭은 전체 권한만 볼 수 있어 제한 권한은 매칭현황 탭으로 바로 간다
+          href={`/students/${student.accountId}${full ? '' : '/requests'}`}
           aria-label={`${student.name} 상세`}
-          className="text-left after:absolute after:inset-0 after:content-['']"
         >
           {student.name}
-        </button>
+        </TableRowLink>
       </th>
       <td>{student.studentNo}</td>
       {full && (

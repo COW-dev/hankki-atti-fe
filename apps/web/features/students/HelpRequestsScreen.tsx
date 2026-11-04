@@ -1,8 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import {
   Button,
+  ButtonLink,
   ErrorNotice,
   InputCompact,
   None,
@@ -11,7 +12,7 @@ import {
   Table,
   TableEmpty,
   TableRow,
-  Toast,
+  TableRowLink,
 } from '@hankki/ui';
 import { AdminShell } from '@/components/layout/AdminShell';
 import { ApiError } from '@/lib/api/client';
@@ -33,7 +34,6 @@ import {
 } from '@/lib/labels/help-request';
 import { DISABILITY_TYPE_LABEL } from '@/lib/labels/student';
 import { fetchHelpRequestSummary, fetchHelpRequests } from './api';
-import { PENDING_SCREEN_MESSAGE } from './StudentsScreen';
 import { StudentTabs } from './StudentTabs';
 import type { AdminHelpRequest, AdminHelpRequestSummary, HelpRequestFilter } from './types';
 
@@ -67,34 +67,24 @@ const SUMMARY_ITEMS: { key: keyof AdminHelpRequestSummary; label: string; color:
  * 제한 권한은 장애 유형 열이 없다 — 서버도 해당 필드를 주지 않는다 (목업은 전체 권한 1장)
  */
 export function HelpRequestsScreen() {
-  const [toast, setToast] = useState<string | null>(null);
-  const closeToast = useCallback(() => setToast(null), []);
-  const showPending = () => setToast(PENDING_SCREEN_MESSAGE);
-
   return (
     <AdminShell
       active="/students"
       title="장애학생 관리"
-      // 등록 화면(A-05)이 생기면 ButtonLink(/students/new)로 바꾼다
       action={(me) =>
         me.grade === 'FULL' && (
-          <Button size="small" onClick={showPending}>
+          <ButtonLink href="/students/new" size="small">
             + 학생 등록
-          </Button>
+          </ButtonLink>
         )
       }
     >
-      {(me) => (
-        <>
-          <HelpRequestList full={me.grade === 'FULL'} onPending={showPending} />
-          <Toast message={toast} onClose={closeToast} />
-        </>
-      )}
+      {(me) => <HelpRequestList full={me.grade === 'FULL'} />}
     </AdminShell>
   );
 }
 
-function HelpRequestList({ full, onPending }: { full: boolean; onPending: () => void }) {
+function HelpRequestList({ full }: { full: boolean }) {
   const { authRequest } = useAuth();
   const [filter, setFilter] = useState(initialFilter);
   const [query, setQuery] = useState('');
@@ -251,7 +241,7 @@ function HelpRequestList({ full, onPending }: { full: boolean; onPending: () => 
             }
           >
             {result.requests.map((request) => (
-              <RequestRow key={request.id} request={request} full={full} onPending={onPending} />
+              <RequestRow key={request.id} request={request} full={full} />
             ))}
             {result.requests.length === 0 && (
               <TableEmpty colSpan={full ? 8 : 7}>조건에 맞는 신청이 없어요</TableEmpty>
@@ -270,15 +260,7 @@ function HelpRequestList({ full, onPending }: { full: boolean; onPending: () => 
 // 예비 인원은 지원을 받는 동안(모집 중·매칭 완료)에만 의미가 있다 (Figma 14:1625·14:1677)
 const WAITING_SHOWN: HelpRequestStatus[] = ['RECRUITING', 'MATCHED'];
 
-function RequestRow({
-  request,
-  full,
-  onPending,
-}: {
-  request: AdminHelpRequest;
-  full: boolean;
-  onPending: () => void;
-}) {
+function RequestRow({ request, full }: { request: AdminHelpRequest; full: boolean }) {
   const startAt = parseLocalDateTime(request.startAt);
   const mealAt = `${formatDotMonthDayWeekday(startAt)} ${formatTime(startAt)}`;
   const requestedAt = parseLocalDateTime(request.requestedAt);
@@ -286,15 +268,13 @@ function RequestRow({
   return (
     <TableRow linked>
       <th scope="row" className="typo-body-strong pl-5">
-        <button
-          type="button"
-          onClick={onPending}
+        <TableRowLink
+          href={`/students/${request.student.id}/requests`}
           // 같은 학생이 여러 줄이라 식사 일시로 구분한다
           aria-label={`${request.student.name} ${mealAt} 상세`}
-          className="text-left after:absolute after:inset-0 after:content-['']"
         >
           {mealAt}
-        </button>
+        </TableRowLink>
       </th>
       <td className="truncate">{request.student.name}</td>
       {full && (

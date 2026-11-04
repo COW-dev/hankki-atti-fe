@@ -150,10 +150,14 @@ function CreatedResult({
       )}
       <div className="mt-2 flex gap-2">
         {failed ? (
-          // 목업의 "정보 수정"은 학생 상세(A-06)가 생기면 그 화면 링크로 붙인다
-          <Button onClick={resend} inactive={resending}>
-            계정정보 다시 보내기
-          </Button>
+          <>
+            <ButtonLink href={`/students/${student.accountId}/edit`} variant="secondary">
+              정보 수정
+            </ButtonLink>
+            <Button onClick={resend} inactive={resending}>
+              계정정보 다시 보내기
+            </Button>
+          </>
         ) : (
           <>
             <Button variant="secondary" onClick={onAgain}>
