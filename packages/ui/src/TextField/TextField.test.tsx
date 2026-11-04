@@ -135,3 +135,24 @@ describe('TextField', () => {
     expect(textarea).toHaveAccessibleDescription('5자까지 쓸 수 있어요 6 / 5자');
   });
 });
+
+describe('TextField 선택형', () => {
+  const options = [
+    { value: '', label: '선택하세요' },
+    { value: 'VISUAL', label: '시각' },
+  ];
+
+  it('options를 주면 label이 이름인 선택칸이 되고 오류를 설명으로 읽는다', async () => {
+    // given
+    render(<TextField label="장애 유형" options={options} error="장애 유형을 골라 주세요" />);
+    const select = screen.getByRole('combobox', { name: '장애 유형' });
+
+    // when
+    await userEvent.selectOptions(select, 'VISUAL');
+
+    // then
+    expect(select).toHaveValue('VISUAL');
+    expect(select).toHaveAttribute('aria-invalid', 'true');
+    expect(select).toHaveAccessibleDescription('장애 유형을 골라 주세요');
+  });
+});
