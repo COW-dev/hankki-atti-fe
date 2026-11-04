@@ -130,6 +130,7 @@ Figma 디자인 시스템 머리말(1:1359)과 2026-10-01 개정(1:1794)을 요�
 | Modal | 1:1346 | 확인·선택 모달 | `@hankki/ui` (`Modal`) | ✅ |
 | SidebarItem | 1:1352 | 관리자 사이드바 | `@hankki/ui` (`SidebarItem`) | ✅ |
 | Toast | real_page 14:2862 외 8종 | 완료·안내 한 줄 (2초 뒤 닫힘) | `@hankki/ui` (`Toast`) | ✅ |
+| TabNav | real_page 14:1294 · 14:1567 · 14:1880 (DS 컴포넌트 없음) | 관리자 화면 탭 | `@hankki/ui` (`TabNav`) — 탭마다 주소가 달라 nav 링크 + `aria-current` | ✅ |
 
 Figma 컴포넌트 설명란에 쓰임과 접근성 규칙이 적혀 있다. 만들기 전에 `get_design_context`로 꼭 읽는다.
 
