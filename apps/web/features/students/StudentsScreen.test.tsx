@@ -54,7 +54,7 @@ describe('StudentsScreen', () => {
 
     expect(await screen.findByRole('button', { name: '김민지 상세' })).toBeInTheDocument();
     expect(screen.getByText(/민감 정보는 보이지 않아요/)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: '+ 학생 등록' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: '+ 학생 등록' })).not.toBeInTheDocument();
     expect(screen.queryByRole('combobox', { name: '장애 유형' })).not.toBeInTheDocument();
     expect(screen.queryByRole('columnheader', { name: '전화번호' })).not.toBeInTheDocument();
   });
