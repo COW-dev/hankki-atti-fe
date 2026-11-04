@@ -1,7 +1,18 @@
 'use client';
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Button, ErrorNotice, InputCompact, Notice, StatusTag, Toast } from '@hankki/ui';
+import {
+  Button,
+  ErrorNotice,
+  InputCompact,
+  None,
+  Notice,
+  StatusTag,
+  Table,
+  TableEmpty,
+  TableRow,
+  Toast,
+} from '@hankki/ui';
 import { AdminShell } from '@/components/layout/AdminShell';
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
@@ -205,62 +216,47 @@ function HelpRequestList({ full, onPending }: { full: boolean; onPending: () => 
             ))}
           </dl>
 
-          <div className="overflow-hidden rounded-(--radius-lg) bg-(--color-bg-default)">
-            <table className="w-full table-fixed text-left">
-              <caption className="sr-only">전체 신청 현황</caption>
-              <thead className="typo-caption-strong bg-(--color-bg-muted) text-(--color-text-secondary)">
-                <tr className="h-11 border-b border-(--color-border-default)">
-                  {/* 열 폭은 Figma 14:1596 값 */}
-                  <th scope="col" className="w-40 pl-5">
-                    식사 일시
+          <Table
+            caption="전체 신청 현황"
+            columns={
+              <>
+                {/* 열 폭은 Figma 14:1596 값 */}
+                <th scope="col" className="w-40 pl-5">
+                  식사 일시
+                </th>
+                <th scope="col" className="w-25">
+                  학생
+                </th>
+                {full && (
+                  <th scope="col" className="w-27.5">
+                    장애 유형
                   </th>
-                  <th scope="col" className="w-25">
-                    학생
-                  </th>
-                  {full && (
-                    <th scope="col" className="w-27.5">
-                      장애 유형
-                    </th>
-                  )}
-                  <th scope="col" className="w-52.5">
-                    상태
-                  </th>
-                  <th scope="col" className="w-30">
-                    매칭된 도우미
-                  </th>
-                  <th scope="col" className="w-17.5">
-                    예비
-                  </th>
-                  <th scope="col" className="w-32.5">
-                    신청 시각
-                  </th>
-                  <th scope="col" className="pr-5 text-right">
-                    매칭 시각
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="typo-body text-(--color-text-primary)">
-                {result.requests.map((request) => (
-                  <RequestRow
-                    key={request.id}
-                    request={request}
-                    full={full}
-                    onPending={onPending}
-                  />
-                ))}
-                {result.requests.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={full ? 8 : 7}
-                      className="h-13.5 px-5 text-(--color-text-secondary)"
-                    >
-                      조건에 맞는 신청이 없어요
-                    </td>
-                  </tr>
                 )}
-              </tbody>
-            </table>
-          </div>
+                <th scope="col" className="w-52.5">
+                  상태
+                </th>
+                <th scope="col" className="w-30">
+                  매칭된 도우미
+                </th>
+                <th scope="col" className="w-17.5">
+                  예비
+                </th>
+                <th scope="col" className="w-32.5">
+                  신청 시각
+                </th>
+                <th scope="col" className="pr-5 text-right">
+                  매칭 시각
+                </th>
+              </>
+            }
+          >
+            {result.requests.map((request) => (
+              <RequestRow key={request.id} request={request} full={full} onPending={onPending} />
+            ))}
+            {result.requests.length === 0 && (
+              <TableEmpty colSpan={full ? 8 : 7}>조건에 맞는 신청이 없어요</TableEmpty>
+            )}
+          </Table>
 
           <p className="typo-caption text-(--color-text-secondary)">
             행을 누르면 학생 상세 › 매칭현황으로 가요
@@ -288,9 +284,7 @@ function RequestRow({
   const requestedAt = parseLocalDateTime(request.requestedAt);
   const matchedAt = request.firstMatchedAt ? parseLocalDateTime(request.firstMatchedAt) : null;
   return (
-    // 행 전체를 누를 수 있게 첫 칸 버튼을 행 위로 넓힌다. 하나만 둬 Tab이 행마다 한 번 멈춘다
-    // 학생 상세(A-06)가 생기면 /students/{student.id} 매칭현황 탭 링크로 바꾼다
-    <tr className="relative h-13.5 border-b border-(--color-border-default) last:border-b-0 hover:bg-(--color-bg-subtle)">
+    <TableRow linked>
       <th scope="row" className="typo-body-strong pl-5">
         <button
           type="button"
@@ -329,16 +323,6 @@ function RequestRow({
           <None />
         )}
       </td>
-    </tr>
-  );
-}
-
-// 줄표는 "대시"로 읽히지 않게 숨기고 뜻을 읽어 준다
-function None() {
-  return (
-    <>
-      <span aria-hidden>–</span>
-      <span className="sr-only">없음</span>
-    </>
+    </TableRow>
   );
 }
