@@ -1,7 +1,6 @@
 'use client';
 
 import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import Link from 'next/link';
 import { Icon } from '@hankki/icons';
 import { Button, ErrorNotice, InputCompact, Notice, StatusTag, Toast } from '@hankki/ui';
 import { AdminShell } from '@/components/layout/AdminShell';
@@ -17,6 +16,7 @@ import {
 } from '@/lib/labels/student';
 import { fetchStudents } from './api';
 import { maskedReading } from './masked';
+import { StudentTabs } from './StudentTabs';
 import type { AdminStudentPage, AdminStudentSummary, StudentFilter } from './types';
 
 const STATUS_OPTIONS = [
@@ -37,13 +37,8 @@ const DISABILITY_OPTIONS = [
 
 const INITIAL_FILTER: StudentFilter = { q: '', status: '', disabilityType: '', page: 0 };
 
-// 등록·상세·전체 신청 현황 화면(A-04~A-06)이 생기기 전까지 관리자 화면을 벗어나지 않게 안내만 한다
-const PENDING_SCREEN_MESSAGE = '준비 중인 화면이에요';
-
-// Figma 14:1294 탭. 누르는 영역은 크기 모드 높이를 지킨다
-const TAB_CLASS = 'typo-label -mb-px flex min-h-(--control-height) items-end px-0.5 pb-2.5';
-const TAB_CURRENT = 'border-b-2 border-(--color-bg-brand-strong) text-(--color-text-brand)';
-const TAB_OTHER = 'text-(--color-text-secondary)';
+// 등록·상세 화면(A-05·A-06)이 생기기 전까지 관리자 화면을 벗어나지 않게 안내만 한다
+export const PENDING_SCREEN_MESSAGE = '준비 중인 화면이에요';
 
 /**
  * AF-02 장애학생 목록 (A-03, Figma 14:1274 전체 권한 · 14:1435 제한 권한).
@@ -116,18 +111,7 @@ function StudentList({ grade, onPending }: { grade: AdminGrade; onPending: () =>
 
   return (
     <div className="mt-3 flex flex-col gap-3">
-      <nav
-        aria-label="장애학생 관리 보기"
-        className="flex gap-6 border-b border-(--color-border-default)"
-      >
-        <Link href="/students" aria-current="page" className={`${TAB_CLASS} ${TAB_CURRENT}`}>
-          학생 목록
-        </Link>
-        {/* 전체 신청 현황(A-04)이 생기면 /students/requests 링크로 바꾼다 */}
-        <button type="button" onClick={onPending} className={`${TAB_CLASS} ${TAB_OTHER}`}>
-          전체 신청 현황
-        </button>
-      </nav>
+      <StudentTabs active="/students" />
 
       {!full && <Notice>제한 권한이라 장애 유형·연락처 같은 민감 정보는 보이지 않아요</Notice>}
 

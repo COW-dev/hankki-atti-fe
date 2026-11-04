@@ -8,6 +8,7 @@ import {
   formatDateTimeRange,
   formatDotDate,
   formatDotMonthDay,
+  formatDotMonthDayWeekday,
   formatIsoDate,
   formatTimeRange,
   mealOf,
@@ -111,5 +112,9 @@ describe('formatDotDate · formatDotMonthDay', () => {
 
     expect(formatDotDate(date)).toBe('2026.09.05');
     expect(formatDotMonthDay(date)).toBe('09.05');
+  });
+
+  it('관리자 식사 일시는 월.일 뒤에 요일을 괄호로 붙인다', () => {
+    expect(formatDotMonthDayWeekday(new Date(2026, 8, 29, 12, 0))).toBe('09.29(화)');
   });
 });

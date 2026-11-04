@@ -50,3 +50,36 @@ export function helpTypesText(helpTypes: HelpType[], otherHelpText?: string | nu
     )
     .join(' · ');
 }
+
+// 취소된 신청의 취소 구분 (백엔드 RequestCancelType)
+export type RequestCancelType = 'STUDENT_WITHDRAW' | 'STUDENT_CANCEL' | 'ACCOUNT_DEACTIVATED';
+
+export const REQUEST_CANCEL_TYPE_LABEL: Record<RequestCancelType, string> = {
+  STUDENT_WITHDRAW: '신청 철회',
+  STUDENT_CANCEL: '학생 취소',
+  ACCOUNT_DEACTIVATED: '계정 비활성화',
+};
+
+/**
+ * 관리자 전체 신청 현황 상태 칸의 태그들 (Figma 14:1621·14:1656·14:1690).
+ * 바로 매칭이라 모집 중이면 확정 지원자가 없다. 승격 대기·취소 구분은 목업이 없어 2026-11-03 사용자 확인 문구
+ */
+export function adminRequestStatusTags(row: {
+  status: HelpRequestStatus;
+  cancelType: RequestCancelType | null;
+  promotionPending: boolean;
+  helperChanged: boolean;
+}): { label: string; tone: StatusTone }[] {
+  const { label, tone } = HELP_REQUEST_STATUS[row.status];
+  let main = label;
+  if (row.status === 'RECRUITING') {
+    main = `${label} · ${row.promotionPending ? '승격 응답 대기' : '지원자 없음'}`;
+  } else if (row.status === 'NO_SHOW') {
+    main = '노쇼 신고';
+  } else if (row.status === 'CANCELED' && row.cancelType) {
+    main = `${label} · ${REQUEST_CANCEL_TYPE_LABEL[row.cancelType]}`;
+  }
+  const tags = [{ label: main, tone }];
+  if (row.helperChanged) tags.push({ label: '도우미 바뀜', tone: 'neutral' });
+  return tags;
+}

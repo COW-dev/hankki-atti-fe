@@ -104,6 +104,11 @@ export function formatDotMonthDay(date: Date): string {
   return `${pad(date.getMonth() + 1)}.${pad(date.getDate())}`;
 }
 
+// 관리자 전체 신청 현황 식사 일시 "09.29(월)" (Figma 14:1615)
+export function formatDotMonthDayWeekday(date: Date): string {
+  return `${formatDotMonthDay(date)}(${WEEKDAYS[date.getDay()]})`;
+}
+
 export function addDays(date: Date, days: number): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate() + days);
 }

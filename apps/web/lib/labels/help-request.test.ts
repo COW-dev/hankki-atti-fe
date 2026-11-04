@@ -3,6 +3,7 @@ import {
   APPLY_OUTCOME,
   BLOCK_REASON_LABEL,
   HELP_REQUEST_STATUS,
+  adminRequestStatusTags,
   helpTypesText,
 } from '@/lib/labels/help-request';
 
@@ -42,5 +43,36 @@ describe('help-request labels', () => {
       '이동·운반 보조 · 기타: 식판 반납',
     );
     expect(helpTypesText(['OTHER'], null)).toBe('기타');
+  });
+
+  describe('adminRequestStatusTags', () => {
+    const row = {
+      status: 'MATCHED' as const,
+      cancelType: null,
+      promotionPending: false,
+      helperChanged: false,
+    };
+
+    it('모집 중이면 승격 응답 대기 여부를 붙이고, 노쇼는 신고로 쓴다', () => {
+      expect(adminRequestStatusTags({ ...row, status: 'RECRUITING' })).toEqual([
+        { label: '모집 중 · 지원자 없음', tone: 'progress' },
+      ]);
+      expect(
+        adminRequestStatusTags({ ...row, status: 'RECRUITING', promotionPending: true }),
+      ).toEqual([{ label: '모집 중 · 승격 응답 대기', tone: 'progress' }]);
+      expect(adminRequestStatusTags({ ...row, status: 'NO_SHOW' })).toEqual([
+        { label: '노쇼 신고', tone: 'error' },
+      ]);
+    });
+
+    it('취소면 취소 구분을 붙이고, 도우미가 바뀌었으면 중립 태그를 하나 더 둔다', () => {
+      expect(
+        adminRequestStatusTags({ ...row, status: 'CANCELED', cancelType: 'STUDENT_WITHDRAW' }),
+      ).toEqual([{ label: '취소 완료 · 신청 철회', tone: 'ended' }]);
+      expect(adminRequestStatusTags({ ...row, helperChanged: true })).toEqual([
+        { label: '매칭 완료', tone: 'success' },
+        { label: '도우미 바뀜', tone: 'neutral' },
+      ]);
+    });
   });
 });
