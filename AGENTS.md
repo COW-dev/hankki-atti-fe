@@ -101,7 +101,7 @@ apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
 ├── proxy.ts            # 서브도메인 → app 폴더 rewrite
 ├── app/                # 라우트·화면 조립 (helper/ = helper. 도메인, admin/ = admin. 도메인)
 ├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
-├── features/           # 도메인별 화면 조각·훅 (auth/ = 도메인 공용 로그인·비밀번호 변경 화면, requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격, notifications/ = 상단 바 알림 개수·알림 패널 — 벨이 있는 TopBar가 연결, notices/ = 장애학생·도우미 공지 목록·상세, password-reset/ = 비밀번호 재설정 요청·메일 링크 흐름, signup/ = 도우미 회원가입 안내 자료 확인·정보 입력, mypage/ = 장애학생·도우미 내 정보·연락 정보 수정·설정·로그아웃, students/ = 관리자 장애학생 목록·전체 신청 현황, helpers/ = 관리자 도우미 목록·상세·봉사시간 수정·비활성화)
+├── features/           # 도메인별 화면 조각·훅 (auth/ = 도메인 공용 로그인·비밀번호 변경 화면, requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격, notifications/ = 상단 바 알림 개수·알림 패널 — 벨이 있는 TopBar가 연결, notices/ = 장애학생·도우미 공지 목록·상세, password-reset/ = 비밀번호 재설정 요청·메일 링크 흐름, signup/ = 도우미 회원가입 안내 자료 확인·정보 입력, mypage/ = 장애학생·도우미 내 정보·연락 정보 수정·설정·로그아웃, students/ = 관리자 장애학생 목록·전체 신청 현황, helpers/ = 관리자 도우미 목록·상세·봉사시간 수정·비활성화, admin-notices/ = 관리자 공지 목록·작성·수정·삭제)
 ├── lib/                # API·인증·도메인 로직 (site.ts = 서브도메인·역할, labels/ = 상태 enum 표시 문구, format/ = 날짜·시각, accessibility/ = 큰 글씨 기기 저장소·계정 동기화)
 └── public/             # 앱 이미지, icons는 packages/icons/svg 심링크
 packages/
