@@ -39,4 +39,8 @@ export const ErrorCode = {
   // 관리자 장애학생 등록 (POST /api/admin/students, 409)·계정정보 재발송 (POST …/credentials, 발송 중 409)
   STUDENT_DUPLICATE_STUDENT_NO: 'STUDENT_DUPLICATE_STUDENT_NO',
   STUDENT_CREDENTIAL_MAIL_PENDING: 'STUDENT_CREDENTIAL_MAIL_PENDING',
+  // 관리자 장애학생 상세·수정·비활성화 — 없는 학생 (404)
+  STUDENT_NOT_FOUND: 'STUDENT_NOT_FOUND',
+  // 제한 권한이 전체 권한 API(학생 상세 정보 탭 등)를 부르면 403
+  ACCESS_DENIED: 'AUTH_ACCESS_DENIED',
 } as const;

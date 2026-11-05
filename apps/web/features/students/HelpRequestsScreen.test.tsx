@@ -62,7 +62,7 @@ describe('HelpRequestsScreen', () => {
     render(<HelpRequestsScreen />);
 
     expect(
-      await screen.findByRole('button', { name: '이서준 09.29(화) 12:30 상세' }),
+      await screen.findByRole('link', { name: '이서준 09.29(화) 12:30 상세' }),
     ).toBeInTheDocument();
     expect(screen.getByText('09.27 20:55 (14분)')).toBeInTheDocument();
     expect(screen.getByText('2명')).toBeInTheDocument();
@@ -79,7 +79,7 @@ describe('HelpRequestsScreen', () => {
 
     render(<HelpRequestsScreen />);
 
-    await screen.findByRole('button', { name: /이서준/ });
+    await screen.findByRole('link', { name: /이서준/ });
     expect(screen.getByText(/민감 정보는 보이지 않아요/)).toBeInTheDocument();
     expect(screen.queryByRole('columnheader', { name: '장애 유형' })).not.toBeInTheDocument();
   });

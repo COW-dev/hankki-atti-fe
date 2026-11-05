@@ -1,3 +1,4 @@
+import type { CancelReason } from '@/lib/labels/application';
 import type { HelpRequestStatus, HelpType, RequestCancelType } from '@/lib/labels/help-request';
 import type { AccountStatus, DisabilityType } from '@/lib/labels/student';
 
@@ -88,4 +89,87 @@ export type AdminStudentCredentialMail = {
   loginId: string;
   schoolEmail: string;
   credentialMailStatus: CredentialMailStatus;
+};
+
+// 상세 화면 위 프로필 (AdminStudentHeader). 장애 유형은 전체 권한에게만 온다
+export type AdminStudentHeader = {
+  id: number;
+  name: string;
+  studentNo: string;
+  status: AccountStatus;
+  disabilityType?: DisabilityType;
+};
+
+// GET /api/admin/students/{id} 정보 탭 (AdminStudentInfoResponseDto, 전체 권한만)
+export type AdminStudentInfo = Required<AdminStudentHeader> & {
+  phone: string;
+  schoolEmail: string;
+  kakaoId: string;
+  loginId: string;
+  accessibilityMode: boolean;
+  registeredAt: string;
+  credentialMailStatus: CredentialMailStatus;
+  specialNote: string | null;
+  smsConsentedAt: string | null;
+};
+
+// GET /api/admin/students/{id}/help-requests 한 줄 (최근 식사부터)
+export type AdminStudentHelpRequest = {
+  id: number;
+  startAt: string;
+  endAt: string;
+  status: HelpRequestStatus;
+  helpTypes: HelpType[];
+  cancelType: RequestCancelType | null;
+  helper: { id: number; name: string } | null;
+  // 예비에서 승격된 도우미면 그때 순번. 기록 전 승격이면 promoted만 true
+  promotedWaitingOrder: number | null;
+  promoted: boolean;
+  promotionPending: boolean;
+  helperChanged: boolean;
+  requestedAt: string;
+  firstMatchedAt: string | null;
+};
+
+export type AdminStudentHistoryType = 'HELPER_CANCELED' | 'STUDENT_CANCELED' | 'NO_SHOW';
+
+// GET /api/admin/students/{id}/histories 한 줄 (AdminStudentHistoryResponseDto)
+export type AdminStudentHistory = {
+  type: AdminStudentHistoryType;
+  helpRequestId: number;
+  startAt: string;
+  helper: { id: number; name: string } | null;
+  cancelReason: CancelReason | null;
+  cancelReasonDetail: string | null;
+  occurredAt: string;
+  minutesBeforeMeal: number | null;
+  minutesAfterCompletion: number | null;
+  afterAction: 'PROMOTED' | 'REOPENED' | null;
+  promotedHelper: { id: number; name: string } | null;
+  promotedWaitingOrder: number | null;
+  requestStatus: HelpRequestStatus;
+};
+
+export type AdminStudentHelpRequests = {
+  student: AdminStudentHeader;
+  helpRequests: AdminStudentHelpRequest[];
+};
+
+export type AdminStudentHistories = {
+  student: AdminStudentHeader;
+  histories: AdminStudentHistory[];
+};
+
+// GET /api/admin/students/{id}/deactivation-preview — 취소될 신청은 건수만 온다
+export type AdminStudentDeactivationPreview = {
+  accountId: number;
+  alreadyInactive: boolean;
+  activeRequestCount: number;
+};
+
+// POST …/deactivate · …/activate 응답
+export type AdminStudentAccountStatus = {
+  accountId: number;
+  status: AccountStatus;
+  deactivatedAt: string | null;
 };

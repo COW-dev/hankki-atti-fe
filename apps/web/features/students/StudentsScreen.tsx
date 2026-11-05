@@ -1,15 +1,20 @@
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent } from 'react';
 import { Icon } from '@hankki/icons';
 import {
   Button,
   ButtonLink,
   ErrorNotice,
   InputCompact,
+  None,
   Notice,
+  Pagination,
   StatusTag,
-  Toast,
+  Table,
+  TableEmpty,
+  TableRow,
+  TableRowLink,
 } from '@hankki/ui';
 import { AdminShell } from '@/components/layout/AdminShell';
 import { useAuth } from '@/lib/auth/AuthProvider';
@@ -45,18 +50,11 @@ const DISABILITY_OPTIONS = [
 
 const INITIAL_FILTER: StudentFilter = { q: '', status: '', disabilityType: '', page: 0 };
 
-// 상세 화면(A-06)이 생기기 전까지 관리자 화면을 벗어나지 않게 안내만 한다
-export const PENDING_SCREEN_MESSAGE = '준비 중인 화면이에요';
-
 /**
  * AF-02 장애학생 목록 (A-03, Figma 14:1274 전체 권한 · 14:1435 제한 권한).
  * 제한 권한은 장애 유형 필터·열과 연락처 열, 등록 버튼이 없다 — 서버도 해당 필드를 주지 않는다.
  */
 export function StudentsScreen() {
-  const [toast, setToast] = useState<string | null>(null);
-  const closeToast = useCallback(() => setToast(null), []);
-  const showPending = () => setToast(PENDING_SCREEN_MESSAGE);
-
   return (
     <AdminShell
       active="/students"
@@ -69,17 +67,12 @@ export function StudentsScreen() {
         )
       }
     >
-      {(me) => (
-        <>
-          <StudentList grade={me.grade} onPending={showPending} />
-          <Toast message={toast} onClose={closeToast} />
-        </>
-      )}
+      {(me) => <StudentList grade={me.grade} />}
     </AdminShell>
   );
 }
 
-function StudentList({ grade, onPending }: { grade: AdminGrade; onPending: () => void }) {
+function StudentList({ grade }: { grade: AdminGrade }) {
   const { authRequest } = useAuth();
   const full = grade === 'FULL';
   const [filter, setFilter] = useState(INITIAL_FILTER);
@@ -173,68 +166,55 @@ function StudentList({ grade, onPending }: { grade: AdminGrade; onPending: () =>
         </div>
       )}
 
-      <div
+      <Table
         hidden={!result}
-        className="overflow-hidden rounded-(--radius-lg) bg-(--color-bg-default)"
-      >
-        <table className="w-full table-fixed text-left">
-          <caption className="sr-only">장애학생 목록</caption>
-          <thead className="typo-caption-strong bg-(--color-bg-muted) text-(--color-text-secondary)">
-            <tr className="h-11 border-b border-(--color-border-default)">
-              {/* 열 폭은 Figma 값 (전체 권한 14:1306 · 제한 권한 14:1466) */}
-              <th scope="col" className={`pl-5 ${full ? 'w-30' : 'w-50'}`}>
-                이름
-              </th>
-              <th scope="col" className={full ? 'w-25' : 'w-45'}>
-                학번
-              </th>
-              {full && (
-                <>
-                  <th scope="col" className="w-27.5">
-                    장애 유형
-                  </th>
-                  <th scope="col" className="w-47.5">
-                    학교 이메일
-                  </th>
-                  <th scope="col" className="w-32.5">
-                    전화번호
-                  </th>
-                  <th scope="col" className="w-27.5">
-                    카톡 ID
-                  </th>
-                </>
-              )}
-              <th scope="col" className={full ? 'w-42.5' : 'w-55'}>
-                상태
-              </th>
-              <th scope="col" className={full ? 'w-25' : 'w-45'}>
-                최근 신청
-              </th>
-              <td aria-hidden />
-            </tr>
-          </thead>
-          <tbody className="typo-body text-(--color-text-primary)">
-            {result?.students.map((student) => (
-              <StudentRow
-                key={student.accountId}
-                student={student}
-                full={full}
-                onPending={onPending}
-              />
-            ))}
-            {result?.students.length === 0 && (
-              <tr>
-                <td colSpan={full ? 9 : 5} className="h-13.5 px-5 text-(--color-text-secondary)">
-                  조건에 맞는 학생이 없어요
-                </td>
-              </tr>
+        caption="장애학생 목록"
+        columns={
+          <>
+            {/* 열 폭은 Figma 값 (전체 권한 14:1306 · 제한 권한 14:1466) */}
+            <th scope="col" className={`pl-5 ${full ? 'w-30' : 'w-50'}`}>
+              이름
+            </th>
+            <th scope="col" className={full ? 'w-25' : 'w-45'}>
+              학번
+            </th>
+            {full && (
+              <>
+                <th scope="col" className="w-27.5">
+                  장애 유형
+                </th>
+                <th scope="col" className="w-47.5">
+                  학교 이메일
+                </th>
+                <th scope="col" className="w-32.5">
+                  전화번호
+                </th>
+                <th scope="col" className="w-27.5">
+                  카톡 ID
+                </th>
+              </>
             )}
-          </tbody>
-        </table>
-      </div>
+            <th scope="col" className={full ? 'w-42.5' : 'w-55'}>
+              상태
+            </th>
+            <th scope="col" className={full ? 'w-25' : 'w-45'}>
+              최근 신청
+            </th>
+            <td aria-hidden />
+          </>
+        }
+      >
+        {result?.students.map((student) => (
+          <StudentRow key={student.accountId} student={student} full={full} />
+        ))}
+        {result?.students.length === 0 && (
+          <TableEmpty colSpan={full ? 9 : 5}>조건에 맞는 학생이 없어요</TableEmpty>
+        )}
+      </Table>
 
       {result && result.totalPages > 0 && (
         <Pagination
+          label="학생 목록 페이지"
           page={result.page}
           totalPages={result.totalPages}
           onChange={(page) => setFilter((current) => ({ ...current, page }))}
@@ -244,30 +224,19 @@ function StudentList({ grade, onPending }: { grade: AdminGrade; onPending: () =>
   );
 }
 
-function StudentRow({
-  student,
-  full,
-  onPending,
-}: {
-  student: AdminStudentSummary;
-  full: boolean;
-  onPending: () => void;
-}) {
+function StudentRow({ student, full }: { student: AdminStudentSummary; full: boolean }) {
   const status = ACCOUNT_STATUS_TAG[student.status];
   const recent = student.recentRequestAt ? parseLocalDateTime(student.recentRequestAt) : null;
   return (
-    // 행 전체를 누를 수 있게 이름 버튼을 행 위로 넓힌다. 하나만 둬 Tab이 행마다 한 번 멈춘다
-    // 학생 상세(A-06)가 생기면 /students/{accountId} 링크로 바꾼다
-    <tr className="relative h-13.5 border-b border-(--color-border-default) last:border-b-0 hover:bg-(--color-bg-subtle)">
+    <TableRow linked>
       <th scope="row" className="typo-body-strong pl-5">
-        <button
-          type="button"
-          onClick={onPending}
+        <TableRowLink
+          // 정보 탭은 전체 권한만 볼 수 있어 제한 권한은 매칭현황 탭으로 바로 간다
+          href={`/students/${student.accountId}${full ? '' : '/requests'}`}
           aria-label={`${student.name} 상세`}
-          className="text-left after:absolute after:inset-0 after:content-['']"
         >
           {student.name}
-        </button>
+        </TableRowLink>
       </th>
       <td>{student.studentNo}</td>
       {full && (
@@ -282,14 +251,7 @@ function StudentRow({
         <StatusTag tone={status.tone}>{status.label}</StatusTag>
       </td>
       <td>
-        {recent ? (
-          `${formatDotMonthDay(recent)} ${formatTime(recent)}`
-        ) : (
-          <>
-            <span aria-hidden>–</span>
-            <span className="sr-only">신청 없음</span>
-          </>
-        )}
+        {recent ? `${formatDotMonthDay(recent)} ${formatTime(recent)}` : <None label="신청 없음" />}
       </td>
       <td aria-hidden className="pr-5">
         <span className="typo-caption-strong flex items-center justify-end gap-1 text-(--color-text-brand)">
@@ -297,7 +259,7 @@ function StudentRow({
           <Icon name="detail-chevron" size={4.5} />
         </span>
       </td>
-    </tr>
+    </TableRow>
   );
 }
 
@@ -309,60 +271,5 @@ function MaskedCell({ value }: { value?: string }) {
       <span aria-hidden>{value}</span>
       <span className="sr-only">{maskedReading(value)}</span>
     </td>
-  );
-}
-
-// Figma 14:1424. 누르는 영역은 크기 모드 높이를 지킨다 (목업 현재 페이지 32 → control/height)
-function Pagination({
-  page,
-  totalPages,
-  onChange,
-}: {
-  page: number;
-  totalPages: number;
-  onChange: (page: number) => void;
-}) {
-  const arrow =
-    'typo-body flex size-(--control-height) items-center justify-center text-(--color-text-secondary) aria-disabled:text-(--color-text-disabled)';
-  const move = (next: number) => {
-    if (next >= 0 && next < totalPages && next !== page) onChange(next);
-  };
-  return (
-    <nav aria-label="학생 목록 페이지" className="flex items-center justify-center gap-4">
-      <button
-        type="button"
-        aria-label="이전 페이지"
-        aria-disabled={page === 0 || undefined}
-        onClick={() => move(page - 1)}
-        className={arrow}
-      >
-        ‹
-      </button>
-      {Array.from({ length: totalPages }, (_, index) => (
-        <button
-          key={index}
-          type="button"
-          aria-label={`${index + 1}페이지`}
-          aria-current={index === page ? 'page' : undefined}
-          onClick={() => move(index)}
-          className={`typo-caption-strong flex size-(--control-height) items-center justify-center rounded-(--radius-sm) ${
-            index === page
-              ? 'bg-(--color-bg-brand-selected) text-(--color-text-brand)'
-              : 'text-(--color-text-secondary)'
-          }`}
-        >
-          {index + 1}
-        </button>
-      ))}
-      <button
-        type="button"
-        aria-label="다음 페이지"
-        aria-disabled={page === totalPages - 1 || undefined}
-        onClick={() => move(page + 1)}
-        className={arrow}
-      >
-        ›
-      </button>
-    </nav>
   );
 }

@@ -27,6 +27,7 @@ export function AdminShell({
   active,
   title,
   back,
+  meta,
   action,
   children,
 }: {
@@ -34,6 +35,8 @@ export function AdminShell({
   title: string;
   // 제목 위 돌아가기 링크 (Figma 14:1739 "‹ 학생 목록")
   back?: { href: string; label: string };
+  // 제목 바로 옆 정보 (Figma 14:1873 학번·상태 태그)
+  meta?: (me: AdminMe) => ReactNode;
   action?: (me: AdminMe) => ReactNode;
   // 권한별로 그리는 화면은 함수로 받아 확인된 내 정보(권한 등급)를 쓴다 — /api/admin/me를 다시 부르지 않는다
   children?: ReactNode | ((me: AdminMe) => ReactNode);
@@ -105,13 +108,11 @@ export function AdminShell({
         )}
         {/* 제목 줄 오른쪽 끝에 화면의 주 동작을 둔다 (Figma 14:1290 "+ 학생 등록") */}
         <div className="flex items-center gap-2">
-          <h1
-            ref={titleRef}
-            tabIndex={-1}
-            className="typo-display flex-1 text-(--color-text-primary)"
-          >
+          <h1 ref={titleRef} tabIndex={-1} className="typo-display text-(--color-text-primary)">
             {title}
           </h1>
+          {meta?.(me)}
+          <div className="flex-1" />
           {action?.(me)}
         </div>
         {typeof children === 'function' ? children(me) : children}

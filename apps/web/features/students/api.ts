@@ -4,14 +4,20 @@ import { ErrorCode } from '@/lib/api/error-codes';
 import { errorMessage } from '@/lib/api/error-message';
 import {
   toStudentCreateRequest,
+  toStudentUpdateRequest,
   type StudentCreateField,
   type StudentCreateForm,
 } from './create-form';
 import type {
   AdminHelpRequest,
   AdminHelpRequestSummary,
+  AdminStudentAccountStatus,
   AdminStudentCreated,
   AdminStudentCredentialMail,
+  AdminStudentDeactivationPreview,
+  AdminStudentHelpRequests,
+  AdminStudentHistories,
+  AdminStudentInfo,
   AdminStudentPage,
   HelpRequestFilter,
   StudentFilter,
@@ -80,6 +86,68 @@ export function resendStudentCredentials(
   accountId: number,
 ): Promise<AdminStudentCredentialMail> {
   return authRequest<AdminStudentCredentialMail>(`/api/admin/students/${accountId}/credentials`, {
+    method: 'POST',
+  });
+}
+
+// 학생 상세 3탭. 정보 탭은 전체 권한만 (제한 권한은 403), 나머지 두 탭은 프로필을 같이 준다
+export function fetchStudentInfo(
+  authRequest: AuthRequest,
+  accountId: number,
+): Promise<AdminStudentInfo> {
+  return authRequest<AdminStudentInfo>(`/api/admin/students/${accountId}`);
+}
+
+export function fetchStudentHelpRequests(
+  authRequest: AuthRequest,
+  accountId: number,
+): Promise<AdminStudentHelpRequests> {
+  return authRequest<AdminStudentHelpRequests>(`/api/admin/students/${accountId}/help-requests`);
+}
+
+export function fetchStudentHistories(
+  authRequest: AuthRequest,
+  accountId: number,
+): Promise<AdminStudentHistories> {
+  return authRequest<AdminStudentHistories>(`/api/admin/students/${accountId}/histories`);
+}
+
+// 학번(로그인 아이디)은 바꿀 수 없어 보내지 않는다
+export function updateStudent(
+  authRequest: AuthRequest,
+  accountId: number,
+  form: StudentCreateForm,
+): Promise<AdminStudentInfo> {
+  return authRequest<AdminStudentInfo>(`/api/admin/students/${accountId}`, {
+    method: 'PATCH',
+    body: toStudentUpdateRequest(form),
+  });
+}
+
+export function previewStudentDeactivation(
+  authRequest: AuthRequest,
+  accountId: number,
+): Promise<AdminStudentDeactivationPreview> {
+  return authRequest<AdminStudentDeactivationPreview>(
+    `/api/admin/students/${accountId}/deactivation-preview`,
+  );
+}
+
+// 식사 전 진행 중 신청은 서버가 학생 취소처럼 취소하고 도우미에게 알린다
+export function deactivateStudent(
+  authRequest: AuthRequest,
+  accountId: number,
+): Promise<AdminStudentAccountStatus> {
+  return authRequest<AdminStudentAccountStatus>(`/api/admin/students/${accountId}/deactivate`, {
+    method: 'POST',
+  });
+}
+
+export function activateStudent(
+  authRequest: AuthRequest,
+  accountId: number,
+): Promise<AdminStudentAccountStatus> {
+  return authRequest<AdminStudentAccountStatus>(`/api/admin/students/${accountId}/activate`, {
     method: 'POST',
   });
 }

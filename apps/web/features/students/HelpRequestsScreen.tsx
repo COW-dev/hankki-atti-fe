@@ -1,7 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useState, type FormEvent } from 'react';
-import { Button, ErrorNotice, InputCompact, Notice, StatusTag, Toast } from '@hankki/ui';
+import { useEffect, useState, type FormEvent } from 'react';
+import {
+  Button,
+  ButtonLink,
+  ErrorNotice,
+  InputCompact,
+  None,
+  Notice,
+  StatusTag,
+  Table,
+  TableEmpty,
+  TableRow,
+  TableRowLink,
+} from '@hankki/ui';
 import { AdminShell } from '@/components/layout/AdminShell';
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
@@ -22,7 +34,6 @@ import {
 } from '@/lib/labels/help-request';
 import { DISABILITY_TYPE_LABEL } from '@/lib/labels/student';
 import { fetchHelpRequestSummary, fetchHelpRequests } from './api';
-import { PENDING_SCREEN_MESSAGE } from './StudentsScreen';
 import { StudentTabs } from './StudentTabs';
 import type { AdminHelpRequest, AdminHelpRequestSummary, HelpRequestFilter } from './types';
 
@@ -56,34 +67,24 @@ const SUMMARY_ITEMS: { key: keyof AdminHelpRequestSummary; label: string; color:
  * 제한 권한은 장애 유형 열이 없다 — 서버도 해당 필드를 주지 않는다 (목업은 전체 권한 1장)
  */
 export function HelpRequestsScreen() {
-  const [toast, setToast] = useState<string | null>(null);
-  const closeToast = useCallback(() => setToast(null), []);
-  const showPending = () => setToast(PENDING_SCREEN_MESSAGE);
-
   return (
     <AdminShell
       active="/students"
       title="장애학생 관리"
-      // 등록 화면(A-05)이 생기면 ButtonLink(/students/new)로 바꾼다
       action={(me) =>
         me.grade === 'FULL' && (
-          <Button size="small" onClick={showPending}>
+          <ButtonLink href="/students/new" size="small">
             + 학생 등록
-          </Button>
+          </ButtonLink>
         )
       }
     >
-      {(me) => (
-        <>
-          <HelpRequestList full={me.grade === 'FULL'} onPending={showPending} />
-          <Toast message={toast} onClose={closeToast} />
-        </>
-      )}
+      {(me) => <HelpRequestList full={me.grade === 'FULL'} />}
     </AdminShell>
   );
 }
 
-function HelpRequestList({ full, onPending }: { full: boolean; onPending: () => void }) {
+function HelpRequestList({ full }: { full: boolean }) {
   const { authRequest } = useAuth();
   const [filter, setFilter] = useState(initialFilter);
   const [query, setQuery] = useState('');
@@ -205,62 +206,47 @@ function HelpRequestList({ full, onPending }: { full: boolean; onPending: () => 
             ))}
           </dl>
 
-          <div className="overflow-hidden rounded-(--radius-lg) bg-(--color-bg-default)">
-            <table className="w-full table-fixed text-left">
-              <caption className="sr-only">전체 신청 현황</caption>
-              <thead className="typo-caption-strong bg-(--color-bg-muted) text-(--color-text-secondary)">
-                <tr className="h-11 border-b border-(--color-border-default)">
-                  {/* 열 폭은 Figma 14:1596 값 */}
-                  <th scope="col" className="w-40 pl-5">
-                    식사 일시
+          <Table
+            caption="전체 신청 현황"
+            columns={
+              <>
+                {/* 열 폭은 Figma 14:1596 값 */}
+                <th scope="col" className="w-40 pl-5">
+                  식사 일시
+                </th>
+                <th scope="col" className="w-25">
+                  학생
+                </th>
+                {full && (
+                  <th scope="col" className="w-27.5">
+                    장애 유형
                   </th>
-                  <th scope="col" className="w-25">
-                    학생
-                  </th>
-                  {full && (
-                    <th scope="col" className="w-27.5">
-                      장애 유형
-                    </th>
-                  )}
-                  <th scope="col" className="w-52.5">
-                    상태
-                  </th>
-                  <th scope="col" className="w-30">
-                    매칭된 도우미
-                  </th>
-                  <th scope="col" className="w-17.5">
-                    예비
-                  </th>
-                  <th scope="col" className="w-32.5">
-                    신청 시각
-                  </th>
-                  <th scope="col" className="pr-5 text-right">
-                    매칭 시각
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="typo-body text-(--color-text-primary)">
-                {result.requests.map((request) => (
-                  <RequestRow
-                    key={request.id}
-                    request={request}
-                    full={full}
-                    onPending={onPending}
-                  />
-                ))}
-                {result.requests.length === 0 && (
-                  <tr>
-                    <td
-                      colSpan={full ? 8 : 7}
-                      className="h-13.5 px-5 text-(--color-text-secondary)"
-                    >
-                      조건에 맞는 신청이 없어요
-                    </td>
-                  </tr>
                 )}
-              </tbody>
-            </table>
-          </div>
+                <th scope="col" className="w-52.5">
+                  상태
+                </th>
+                <th scope="col" className="w-30">
+                  매칭된 도우미
+                </th>
+                <th scope="col" className="w-17.5">
+                  예비
+                </th>
+                <th scope="col" className="w-32.5">
+                  신청 시각
+                </th>
+                <th scope="col" className="pr-5 text-right">
+                  매칭 시각
+                </th>
+              </>
+            }
+          >
+            {result.requests.map((request) => (
+              <RequestRow key={request.id} request={request} full={full} />
+            ))}
+            {result.requests.length === 0 && (
+              <TableEmpty colSpan={full ? 8 : 7}>조건에 맞는 신청이 없어요</TableEmpty>
+            )}
+          </Table>
 
           <p className="typo-caption text-(--color-text-secondary)">
             행을 누르면 학생 상세 › 매칭현황으로 가요
@@ -274,33 +260,21 @@ function HelpRequestList({ full, onPending }: { full: boolean; onPending: () => 
 // 예비 인원은 지원을 받는 동안(모집 중·매칭 완료)에만 의미가 있다 (Figma 14:1625·14:1677)
 const WAITING_SHOWN: HelpRequestStatus[] = ['RECRUITING', 'MATCHED'];
 
-function RequestRow({
-  request,
-  full,
-  onPending,
-}: {
-  request: AdminHelpRequest;
-  full: boolean;
-  onPending: () => void;
-}) {
+function RequestRow({ request, full }: { request: AdminHelpRequest; full: boolean }) {
   const startAt = parseLocalDateTime(request.startAt);
   const mealAt = `${formatDotMonthDayWeekday(startAt)} ${formatTime(startAt)}`;
   const requestedAt = parseLocalDateTime(request.requestedAt);
   const matchedAt = request.firstMatchedAt ? parseLocalDateTime(request.firstMatchedAt) : null;
   return (
-    // 행 전체를 누를 수 있게 첫 칸 버튼을 행 위로 넓힌다. 하나만 둬 Tab이 행마다 한 번 멈춘다
-    // 학생 상세(A-06)가 생기면 /students/{student.id} 매칭현황 탭 링크로 바꾼다
-    <tr className="relative h-13.5 border-b border-(--color-border-default) last:border-b-0 hover:bg-(--color-bg-subtle)">
+    <TableRow linked>
       <th scope="row" className="typo-body-strong pl-5">
-        <button
-          type="button"
-          onClick={onPending}
+        <TableRowLink
+          href={`/students/${request.student.id}/requests`}
           // 같은 학생이 여러 줄이라 식사 일시로 구분한다
           aria-label={`${request.student.name} ${mealAt} 상세`}
-          className="text-left after:absolute after:inset-0 after:content-['']"
         >
           {mealAt}
-        </button>
+        </TableRowLink>
       </th>
       <td className="truncate">{request.student.name}</td>
       {full && (
@@ -329,16 +303,6 @@ function RequestRow({
           <None />
         )}
       </td>
-    </tr>
-  );
-}
-
-// 줄표는 "대시"로 읽히지 않게 숨기고 뜻을 읽어 준다
-function None() {
-  return (
-    <>
-      <span aria-hidden>–</span>
-      <span className="sr-only">없음</span>
-    </>
+    </TableRow>
   );
 }
