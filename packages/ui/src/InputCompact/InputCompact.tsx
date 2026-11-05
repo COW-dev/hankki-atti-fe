@@ -33,10 +33,11 @@ export function InputCompact({ label, className, ...props }: InputCompactProps) 
             </option>
           ))}
         </select>
+        {/* Icon이 늘 relative를 붙여 absolute!로 이긴다 — 안 그러면 화살표가 칸 아래 줄로 밀린다 */}
         <Icon
           name="compact-chevron"
           size="var(--space-md)"
-          className="pointer-events-none absolute right-(--space-sm) top-1/2 -translate-y-1/2 rotate-90"
+          className="pointer-events-none absolute! right-(--space-sm) top-1/2 -translate-y-1/2 rotate-90"
         />
       </>
     );

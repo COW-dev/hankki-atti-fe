@@ -41,6 +41,13 @@ export const ErrorCode = {
   STUDENT_CREDENTIAL_MAIL_PENDING: 'STUDENT_CREDENTIAL_MAIL_PENDING',
   // 관리자 장애학생 상세·수정·비활성화 — 없는 학생 (404)
   STUDENT_NOT_FOUND: 'STUDENT_NOT_FOUND',
+  // 관리자 도우미 상세·임시 비밀번호·계정 상태 (없는 도우미 404, 상태가 먼저 바뀌었으면 409)
+  HELPER_NOT_FOUND: 'HELPER_NOT_FOUND',
+  HELPER_INACTIVE: 'HELPER_INACTIVE',
+  HELPER_ALREADY_INACTIVE: 'HELPER_ALREADY_INACTIVE',
+  HELPER_ALREADY_ACTIVE: 'HELPER_ALREADY_ACTIVE',
+  // 봉사시간 수정 (PATCH /api/admin/applications/{id}/volunteer-hours, 422)
+  APPLICATION_VOLUNTEER_HOURS_UNCHANGED: 'APPLICATION_VOLUNTEER_HOURS_UNCHANGED',
   // 제한 권한이 전체 권한 API(학생 상세 정보 탭 등)를 부르면 403
   ACCESS_DENIED: 'AUTH_ACCESS_DENIED',
 } as const;
