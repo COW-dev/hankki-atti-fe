@@ -34,21 +34,26 @@ export function durationText(minutes: number): string {
   return rest === 0 ? `${hours}시간` : `${hours}시간 ${rest}분`;
 }
 
+// 도우미 취소 사유 칸 (학생 이력과 도우미 활동 이력이 같이 쓴다)
+export function helperCancelReasonText(reason: CancelReason, detail: string | null): string {
+  const label = HISTORY_REASON_LABEL[reason];
+  if (reason === 'OTHER') return detail ? `${label} · "${detail}"` : label;
+  // 관리자 비활성화는 도우미가 고른 사유가 아니다
+  if (reason === 'ADMIN_DEACTIVATED') return label;
+  return `인정 사유 · ${label}`;
+}
+
+export function noShowReasonText(minutesAfterCompletion: number | null): string {
+  return minutesAfterCompletion === null
+    ? '학생 신고'
+    : `학생 신고 (이용 후 ${durationText(minutesAfterCompletion)})`;
+}
+
 // 이력 문구는 Figma 14:2090~14:2141 예시를 따른다. 없는 칸은 null (화면이 "–"로 그린다)
 export function historyReason(history: AdminStudentHistory): string | null {
-  if (history.type === 'NO_SHOW') {
-    return history.minutesAfterCompletion === null
-      ? '학생 신고'
-      : `학생 신고 (이용 후 ${durationText(history.minutesAfterCompletion)})`;
-  }
+  if (history.type === 'NO_SHOW') return noShowReasonText(history.minutesAfterCompletion);
   if (history.type !== 'HELPER_CANCELED' || !history.cancelReason) return null;
-  const label = HISTORY_REASON_LABEL[history.cancelReason];
-  if (history.cancelReason === 'OTHER') {
-    return history.cancelReasonDetail ? `${label} · "${history.cancelReasonDetail}"` : label;
-  }
-  // 관리자 비활성화는 도우미가 고른 사유가 아니다
-  if (history.cancelReason === 'ADMIN_DEACTIVATED') return label;
-  return `인정 사유 · ${label}`;
+  return helperCancelReasonText(history.cancelReason, history.cancelReasonDetail);
 }
 
 export function historyTiming(history: AdminStudentHistory): string | null {
