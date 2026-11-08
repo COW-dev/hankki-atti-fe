@@ -39,14 +39,15 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 |---|---|---|---|
 | 비로그인 | 메인 (`app/`) | 소개, 로그인, 회원가입, 비밀번호 재설정 | L |
 | 장애학생 | 메인 (`app/`) | 도우미 신청, 내 신청, 공지사항, 마이페이지 (모바일 웹, 계정은 센터가 발급) | L |
-| 도우미 | `helper.` (`app/helper/`) | 요청 목록, 매칭 현황, 공지사항, 마이페이지, 로그인·회원가입 (모바일 웹, 직접 회원가입) | M |
+| 도우미 | 메인 `/helper` (`app/helper/`) | 요청 목록, 매칭 현황, 공지사항, 마이페이지, 회원가입 (모바일 웹, 직접 회원가입, 로그인은 메인 화면) | M |
 | 관리자 | `admin.` (`app/admin/`) | 데스크톱 — 로그인, 공통 레이아웃(`AdminShell`: 사이드바·권한 태그·로그아웃). 장애학생·도우미·공지 관리는 이슈별로 채운다 | admin |
 
-**서브도메인** — `apps/web/proxy.ts`가 host를 보고 `helper.x/matches` → `/helper/matches`로 rewrite한다 (판단은 `lib/site.ts`, 배경은 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md)).
-- 도메인마다 한 역할만 받는다 (`SITE_ROLE`). refresh 쿠키는 서브도메인끼리 공유하지 않으므로 로그인도 도메인별로 하고, 다른 역할 계정은 로그아웃시킨다
-- 서브도메인 화면 안의 링크·`router` 경로에는 `/helper`·`/admin` 접두사를 붙이지 않는다 (`<Link href="/matches">`). 다른 도메인으로 가는 링크만 `siteUrl('helper', 경로)`
-- 메인 도메인에서 `/helper`·`/admin`으로 직접 들어오면 `/`로 보낸다
-- 배포에서는 인프라가 세 도메인의 `/api`를 백엔드로, 나머지를 프론트 3000 포트로 보낸다(Host 유지). 브라우저는 같은 도메인의 `/api`를 부른다
+**서브도메인** — `apps/web/proxy.ts`가 host를 보고 `admin.x/users` → `/admin/users`로 rewrite한다 (판단은 `lib/site.ts`, 배경은 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md)).
+- 장애학생·도우미는 메인 도메인의 `/login` 하나로 로그인하고 역할별 첫 화면으로 간다. 다른 역할의 화면에 들어오면 자기 첫 화면으로 보낸다
+- 도우미 화면의 링크·`router` 경로에는 `/helper`를 붙인다. 두 역할이 같이 쓰는 화면은 `rolePath(역할, 경로)`를 쓴다
+- admin 화면 안의 링크·`router` 경로에는 `/admin` 접두사를 붙이지 않는다 (`<Link href="/students">`). refresh 쿠키는 admin 도메인과 공유하지 않으므로 관리자 로그인은 따로 한다
+- 메인 도메인에서 `/admin`으로 직접 들어오면 `/`로 보낸다. 없어진 `helper.` 도메인은 메인의 `/helper` 경로로 redirect한다
+- 배포에서는 인프라가 도메인들의 `/api`를 백엔드로, 나머지를 프론트 3000 포트로 보낸다(Host 유지). 브라우저는 같은 도메인의 `/api`를 부른다
 
 **요구사항·디자인 원본**
 
@@ -70,7 +71,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ```bash
 pnpm install          # 의존성 설치
-pnpm dev              # 로컬 실행 (http://localhost:3000, 도우미 http://helper.localhost:3000, 관리자 http://admin.localhost:3000) — 백엔드는 apps/web/.env.local의 NEXT_PUBLIC_API_BASE_URL (기본 http://localhost:8080)
+pnpm dev              # 로컬 실행 (http://localhost:3000, 도우미 http://localhost:3000/helper, 관리자 http://admin.localhost:3000) — 백엔드는 apps/web/.env.local의 NEXT_PUBLIC_API_BASE_URL (기본 http://localhost:8080)
 pnpm lint             # ESLint
 pnpm format           # Prettier 적용 (pnpm format:check는 검사만)
 pnpm typecheck        # 라우트 타입 생성 후 tsc
@@ -99,10 +100,10 @@ Dockerfile, .dockerignore  # 배포 이미지 (허용 목록 방식)
 .github/scripts/        # release-version.sh(배포 여부·버전), smoke-test.sh(이미지 스모크 테스트)
 apps/web/               # Next.js 사용자 앱 (@/ 별칭의 기준)
 ├── proxy.ts            # 서브도메인 → app 폴더 rewrite
-├── app/                # 라우트·화면 조립 (helper/ = helper. 도메인, admin/ = admin. 도메인)
+├── app/                # 라우트·화면 조립 (helper/ = 메인 도메인의 도우미 화면, admin/ = admin. 도메인)
 ├── components/         # 앱 전용 레이아웃·브랜드·접근성 설정
 ├── features/           # 도메인별 화면 조각·훅 (auth/ = 도메인 공용 로그인·비밀번호 변경 화면, requests/ = 내 신청, requests/create/ = 도우미 신청 폼, requests/open/ = 도우미 요청 목록·지원, matches/ = 도우미 매칭 현황·취소·예비 빠지기·승격, notifications/ = 상단 바 알림 개수·알림 패널 — 벨이 있는 TopBar가 연결, notices/ = 장애학생·도우미 공지 목록·상세, password-reset/ = 비밀번호 재설정 요청·메일 링크 흐름, signup/ = 도우미 회원가입 안내 자료 확인·정보 입력, mypage/ = 장애학생·도우미 내 정보·연락 정보 수정·설정·로그아웃, students/ = 관리자 장애학생 목록·전체 신청 현황, helpers/ = 관리자 도우미 목록·상세·봉사시간 수정·비활성화)
-├── lib/                # API·인증·도메인 로직 (site.ts = 서브도메인·역할, labels/ = 상태 enum 표시 문구, format/ = 날짜·시각, accessibility/ = 큰 글씨 기기 저장소·계정 동기화)
+├── lib/                # API·인증·도메인 로직 (site.ts = 서브도메인·역할별 경로, labels/ = 상태 enum 표시 문구, format/ = 날짜·시각, accessibility/ = 큰 글씨 기기 저장소·계정 동기화)
 └── public/             # 앱 이미지, icons는 packages/icons/svg 심링크
 packages/
 ├── ui/src/             # 공용 UI: 컴포넌트별 구현·스토리·테스트·index

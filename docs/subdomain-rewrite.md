@@ -7,18 +7,18 @@ aliases: [서브도메인 분리, admin 서브도메인, 배포 구조]
 
 # 서브도메인 분리와 배포 구조
 
-`apps/web` 하나의 Next.js 앱을 Host에 따라 나눠서 보여 준다. 이미지 빌드·버전 규칙은 [AGENTS.md](../AGENTS.md) "배포 (CD)".
+`apps/web` 하나의 Next.js 앱을 Host에 따라 나눠서 보여 준다. 장애학생과 도우미는 메인 도메인을 같이 쓰고 관리자만 서브도메인이다. 이미지 빌드·버전 규칙은 [AGENTS.md](../AGENTS.md) "배포 (CD)".
 
 | 도메인 | 사용자 | `app/` 폴더 |
 |---|---|---|
 | `atti.bluerack.org` | 장애학생·비로그인 | `app/` |
-| `helper.atti.bluerack.org` | 도우미 | `app/helper/` |
+| `atti.bluerack.org/helper` | 도우미 | `app/helper/` |
 | `admin.atti.bluerack.org` | 관리자 | `app/admin/` |
 
 ## 구조
 
 ```text
-브라우저 → 클러스터 라우팅 (세 도메인 모두, Host 유지)
+브라우저 → 클러스터 라우팅 (모든 도메인, Host 유지)
             ├─ /api/*  → 백엔드 (hankki-atti-be :8080), /api 접두사 유지
             └─ 나머지  → 프론트 (hankki-atti-fe :3000) → proxy.ts가 Host로 분기
 ```
@@ -30,10 +30,14 @@ aliases: [서브도메인 분리, admin 서브도메인, 배포 구조]
 App Router는 경로만 보고 페이지를 고르므로 `admin.x/users`와 `x/users`가 같은 페이지가 된다. 그래서 `apps/web/proxy.ts`가 Host를 경로로 바꾼다.
 
 - `admin.x/users` → `/admin/users`. redirect가 아니라 rewrite라 주소창은 그대로다
-- 메인 도메인에서 `/helper`·`/admin`으로 직접 들어오면 `/`로 보낸다
+- 메인 도메인에서 `/admin`으로 직접 들어오면 `/`로 보낸다
+- 없어진 `helper.` 도메인은 `NEXT_PUBLIC_SITE_URL`의 메인 주소로 redirect한다. `helper.x/matches` → `x/helper/matches`, 합쳐진 `/login`·`/password-reset`은 `/helper` 없이 같은 경로로 보낸다
 - 판단 로직은 `lib/site.ts`의 `resolveSiteRoute`이고 `site.test.ts`로 검증한다
 - proxy는 권한을 판단하지 않는다. 화면은 `useSessionGuard(역할)`, 최종 판단은 서버가 한다
-- 다른 도메인으로 가는 링크는 `siteUrl('helper', 경로)`. `NEXT_PUBLIC_SITE_URL` 앞에 서브도메인을 붙인다
+
+## 로그인과 역할
+
+장애학생과 도우미는 메인 도메인의 `/login`으로 로그인하고 역할별 첫 화면으로 간다(`homePathOf`). 다른 역할의 화면에 들어오면 `useSessionGuard`가 자기 첫 화면으로 보낸다. 두 역할이 같이 쓰는 화면의 링크는 `rolePath(역할, 경로)`로 만든다. 관리자 화면은 `/api/admin/me`를 쓸 수 없는 토큰이면 `/login`으로 보낸다.
 
 ## API 주소
 
@@ -52,7 +56,7 @@ App Router는 경로만 보고 페이지를 고르므로 `admin.x/users`와 `x/u
 
 | 서비스 프로토콜 | `NEXT_PUBLIC_SITE_URL` | refresh 쿠키 `secure` | 그 밖의 조건 |
 |---|---|---|---|
-| HTTPS | `https://atti.bluerack.org` | `true` (백엔드 기본값) | `CORS_ALLOWED_ORIGINS`에 `https://` 도메인 3개 |
+| HTTPS | `https://atti.bluerack.org` | `true` (백엔드 기본값) | `CORS_ALLOWED_ORIGINS`에 메인·admin `https://` 도메인 |
 | HTTP | `http://atti.bluerack.org` | `false` — `Secure` 쿠키는 HTTP에서 저장되지 않아 새로고침하면 로그아웃된다 | 구간이 평문이므로 테스트 계정·테스트 데이터만 쓴다 |
 
 HTTPS를 라우팅 단계에서 끝내면 백엔드는 요청을 HTTP로 받는다. 그러면 브라우저가 POST에 붙이는 `Origin`(`https://…`)과 scheme이 달라 같은 출처여도 CORS 요청으로 판정되고, 목록에 없는 도메인은 403이 된다.
@@ -60,6 +64,7 @@ HTTPS를 라우팅 단계에서 끝내면 백엔드는 요청을 HTTP로 받는�
 ## 인프라 조건
 
 - `Host`를 그대로 넘긴다. 빠지면 서브도메인 분기 전체가 동작하지 않는다
+- 기존 주소 redirect가 필요한 동안 `helper.` 도메인도 프론트로 보낸다
 - 프론트 포트는 3000이고 실행 환경변수는 필요 없다. 준비 상태 확인은 `GET /`(200)로 한다
 - 이미지는 UID 1000으로 돈다. `runAsNonRoot`를 켜도 된다
 - 백엔드 refresh 쿠키에 Domain을 지정하지 않는다. 지정하면 서브도메인끼리 로그인이 섞인다
@@ -69,12 +74,13 @@ HTTPS를 라우팅 단계에서 끝내면 백엔드는 요청을 HTTP로 받는�
 | 증상 | 원인 |
 |---|---|
 | admin 도메인인데 메인 페이지가 나옴 | 라우팅이 `Host`를 바꿈, 또는 proxy matcher가 경로를 제외함 |
+| 도우미 링크가 장애학생 화면을 거쳐 홈으로 돌아옴 | 링크에 `/helper`가 빠짐 |
 | 주소창에 `/admin`이 보임 | 링크에 `/admin` 접두사를 붙임, 또는 rewrite 대신 redirect를 씀 |
 | API가 전부 404 | `/api`가 프론트로 라우팅됨 |
 | 특정 도메인에서만 API가 403 | 그 도메인이 `CORS_ALLOWED_ORIGINS`에 없음 |
 | 새로고침하면 로그아웃됨 | HTTP로 서비스하는데 refresh 쿠키가 `Secure` |
-| 다른 도메인 링크가 잘못된 주소로 감 | `ci.yml`의 `NEXT_PUBLIC_SITE_URL` (런타임 환경변수로는 안 바뀐다) |
-| 서브도메인을 옮기면 다시 로그인해야 함 | 의도한 동작 (쿠키 공유 안 함) |
+| `helper.` 주소가 잘못된 곳으로 redirect됨 | `ci.yml`의 `NEXT_PUBLIC_SITE_URL` (런타임 환경변수로는 안 바뀐다) |
+| 도메인을 옮기면 다시 로그인해야 함 | 의도한 동작 (쿠키 공유 안 함). 기존 `helper.` 세션도 메인에서 다시 로그인한다 |
 | `/administrator` 같은 경로가 차단됨 | `startsWith('/admin')` 사용 → `isUnder` 방식 사용 |
 
 Related: 관리자 화면이 커지거나 데스크톱 레이아웃이 사용자 앱과 많이 달라지면 `apps/admin`(모노레포 안 두 번째 Next 앱)으로 분리할 수 있다. `packages/ui`·`tokens`는 그대로 공유한다.
