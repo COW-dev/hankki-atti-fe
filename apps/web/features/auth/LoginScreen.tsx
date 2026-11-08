@@ -14,21 +14,16 @@ import { TopBar } from '@/components/layout/TopBar';
 import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
 import { loginEvents } from '@/lib/accessibility/login-event';
-import { homePathOf, useAuth, type Role } from '@/lib/auth/AuthProvider';
+import { homePathOf, useAuth } from '@/lib/auth/AuthProvider';
 import { joinedSignup } from '@/features/signup/joined';
-import { siteUrl } from '@/lib/site';
+import { rolePath } from '@/lib/site';
 import { errorMessage } from '@/lib/api/error-message';
 
-// 관리자는 AdminLoginScreen을 쓴다
-type UserRole = Exclude<Role, 'ADMIN'>;
-
-const ROLE_LABEL: Record<UserRole, string> = { STUDENT: '장애학생', HELPER: '도우미' };
-
 // L-01 로그인 (Figma 203:240 기본 · 203:433 실패 · 203:635 비활성 계정).
-// 도메인마다 한 역할만 받는다 — 메인 STUDENT, helper. HELPER (lib/site.ts SITE_ROLE)
-export function LoginScreen({ role }: { role: UserRole }) {
+// 장애학생·도우미가 함께 쓰고 로그인 후 역할별 첫 화면으로 보낸다. 관리자는 AdminLoginScreen을 쓴다
+export function LoginScreen() {
   const router = useRouter();
-  const { login, logout } = useAuth();
+  const { login } = useAuth();
   // 도우미 가입 직후면 가입한 이메일을 채우고 토스트로 알린다 (U-15)
   const [joinedEmail] = useState(joinedSignup.peek);
   const [loginId, setLoginId] = useState(joinedEmail ?? '');
@@ -56,13 +51,11 @@ export function LoginScreen({ role }: { role: UserRole }) {
       const result = await login(loginId.trim(), password);
       // 다른 계정으로 바로 로그인해도 그 계정의 접근성 설정으로 다시 맞춘다 (U-06)
       loginEvents.notify();
-      if (result.role !== role) {
-        // 이 도메인의 refresh 쿠키를 남기지 않는다. 문구는 목업에 없어 임시로 둔다
-        await logout();
-        setNotice(`이 주소에서는 ${ROLE_LABEL[role]} 계정으로만 로그인할 수 있어요`);
-        return;
-      }
-      router.replace(result.mustChangePassword ? '/password/change' : homePathOf(result.role));
+      router.replace(
+        result.mustChangePassword
+          ? rolePath(result.role, '/password/change')
+          : homePathOf(result.role),
+      );
     } catch (error) {
       if (error instanceof ApiError && error.code === ErrorCode.ACCOUNT_DEACTIVATED) {
         setNotice('사용이 중지된 계정이에요. 센터(02-300-1529)로 문의해 주세요');
@@ -110,10 +103,7 @@ export function LoginScreen({ role }: { role: UserRole }) {
           </Button>
         </form>
         <div className="flex w-full items-center justify-center gap-(--space-sm) whitespace-nowrap">
-          <Link
-            href={role === 'HELPER' ? '/signup' : siteUrl('helper', '/signup')}
-            className="typo-caption-strong text-(--color-text-secondary)"
-          >
+          <Link href="/helper/signup" className="typo-caption-strong text-(--color-text-secondary)">
             도우미 회원가입
           </Link>
           <span aria-hidden className="typo-caption text-(--color-text-disabled)">

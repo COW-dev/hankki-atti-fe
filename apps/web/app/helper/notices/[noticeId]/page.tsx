@@ -4,7 +4,7 @@ import { use } from 'react';
 import { NoticeDetailScreen } from '@/features/notices/NoticesScreen';
 import { useSessionGuard } from '@/lib/auth/useSessionGuard';
 
-// 도우미 F-03 공지 상세 (Figma 209:4138) — helper.domain.com/notices/{id}
+// 도우미 F-03 공지 상세 (Figma 209:4138) — /helper/notices/{id}
 export default function HelperNoticePage({ params }: PageProps<'/helper/notices/[noticeId]'>) {
   const { noticeId } = use(params);
   const me = useSessionGuard('HELPER');

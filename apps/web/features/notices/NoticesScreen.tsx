@@ -63,6 +63,7 @@ export function NoticesScreen({ reader }: { reader: NoticeReader }) {
       )}
       {list.status === 'ready' && (
         <NoticesView
+          reader={reader}
           notices={list.notices}
           hasMore={hasMore}
           loadingMore={loadingMore}
@@ -89,7 +90,7 @@ export function NoticeDetailScreen({
     <NoticeShell reader={reader} back>
       {state.status === 'ready' && <NoticeDetailView notice={state.notice} />}
       {(state.status === 'deleted' || state.status === 'notFound') && (
-        <NoticeUnavailable reason={state.status} />
+        <NoticeUnavailable reader={reader} reason={state.status} />
       )}
       {state.status === 'retry' && (
         <LoadFailed message="공지를 불러오지 못했어요" onRetry={() => void reload()} />

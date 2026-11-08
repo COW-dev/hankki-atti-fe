@@ -6,7 +6,9 @@ import Link from 'next/link';
 import { useId, useState, useSyncExternalStore } from 'react';
 import { textSizeStore } from '@/lib/accessibility/text-size';
 import { useAuth } from '@/lib/auth/AuthProvider';
+import { rolePath } from '@/lib/site';
 import { updateSmsConsent } from './api';
+import type { MyPageReader } from './MyPageScreen';
 import type { MyProfile } from './types';
 
 const ROW = 'flex w-full items-center gap-3 border-t border-(--color-border-default)';
@@ -17,10 +19,12 @@ const ROW = 'flex w-full items-center gap-3 border-t border-(--color-border-defa
  * 문자 알림은 목업에 없지만 문자가 주 알림 채널이고 동의를 바꿀 곳이 여기뿐이라 넣었다. 문구는 임시다.
  */
 export function SettingsSection({
+  reader,
   profile,
   onProfileChange,
   onToast,
 }: {
+  reader: MyPageReader;
   profile: MyProfile;
   onProfileChange: (profile: MyProfile) => void;
   onToast: (message: string) => void;
@@ -72,7 +76,10 @@ export function SettingsSection({
             onChange={(next) => void handleSmsChange(next)}
           />
         </div>
-        <Link href="/mypage/password" className={`${ROW} min-h-(--control-height) py-3.5`}>
+        <Link
+          href={rolePath(reader, '/mypage/password')}
+          className={`${ROW} min-h-(--control-height) py-3.5`}
+        >
           <span className="typo-body min-w-px flex-1 text-(--color-text-primary)">
             비밀번호 변경
           </span>

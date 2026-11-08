@@ -73,7 +73,7 @@ export function MatchesView({
             먼저 지원하면 바로 매칭돼요
           </p>
         </div>
-        <ButtonLink href="/requests" className="w-full">
+        <ButtonLink href="/helper/requests" className="w-full">
           요청 목록 보기
         </ButtonLink>
       </Block>

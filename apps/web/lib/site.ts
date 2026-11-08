@@ -1,31 +1,42 @@
 import type { Role } from '@/lib/auth/AuthProvider';
 
-// 서브도메인 이름 = app 안의 폴더 이름. 메인 도메인은 장애학생·비로그인 (docs/subdomain-rewrite.md)
-export const SUBDOMAINS = ['helper', 'admin'] as const;
+// 서브도메인 이름 = app 안의 폴더 이름. 메인 도메인은 장애학생·도우미·비로그인 (docs/subdomain-rewrite.md)
+export const SUBDOMAINS = ['admin'] as const;
 export type Subdomain = (typeof SUBDOMAINS)[number];
 
-// 도메인마다 한 역할만 받는다. refresh 쿠키를 서브도메인끼리 공유하지 않으므로 로그인도 도메인별로 한다
-export const SITE_ROLE = {
-  main: 'STUDENT',
-  helper: 'HELPER',
-  admin: 'ADMIN',
-} as const satisfies Record<Subdomain | 'main', Role>;
+export const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
+// 메인 화면으로 합쳐져 app/helper에 없는 경로
+const MERGED_HELPER_PATHS = ['/login', '/password-reset'];
 
-const isUnder = (pathname: string, segment: string) =>
+export const isUnder = (pathname: string, segment: string) =>
   pathname === `/${segment}` || pathname.startsWith(`/${segment}/`);
 
 export type SiteRoute =
-  { type: 'rewrite'; pathname: string } | { type: 'redirect'; pathname: string } | { type: 'next' };
+  | { type: 'rewrite'; pathname: string }
+  | { type: 'redirect'; pathname: string }
+  | { type: 'moved'; pathname: string }
+  | { type: 'next' };
 
-/** host의 첫 이름이 서브도메인이면 그 이름, 아니면(메인) null. helper.localhost:3000 → helper */
+const firstLabel = (host: string) => host.split(':')[0].split('.')[0];
+
+/** host의 첫 이름이 서브도메인이면 그 이름, 아니면(메인) null. admin.localhost:3000 → admin */
 export function subdomainOf(host: string): Subdomain | null {
-  return SUBDOMAINS.find((name) => host.split(':')[0].split('.')[0] === name) ?? null;
+  return SUBDOMAINS.find((name) => firstLabel(host) === name) ?? null;
 }
 
-/** host와 경로로 proxy가 할 일을 정한다. admin.x/users → /admin/users, 메인에서 /admin 직접 접근은 / 로 보낸다. */
+/**
+ * host와 경로로 proxy가 할 일을 정한다. admin.x/users → /admin/users, 메인에서 /admin 직접 접근은 / 로 보낸다.
+ * 없어진 helper. 도메인은 북마크가 끊기지 않게 메인 주소로 보낸다. helper.x/matches → x/helper/matches
+ */
 export function resolveSiteRoute(host: string, pathname: string): SiteRoute {
+  if (firstLabel(host) === 'helper') {
+    const merged = MERGED_HELPER_PATHS.includes(pathname) || isUnder(pathname, 'helper');
+    return {
+      type: 'moved',
+      pathname: merged ? pathname : `/helper${pathname === '/' ? '' : pathname}`,
+    };
+  }
   const sub = subdomainOf(host);
   if (sub) {
     return isUnder(pathname, sub)
@@ -37,9 +48,7 @@ export function resolveSiteRoute(host: string, pathname: string): SiteRoute {
     : { type: 'next' };
 }
 
-/** 다른 서브도메인 화면의 절대 주소. 메인 주소(NEXT_PUBLIC_SITE_URL) 앞에 서브도메인을 붙인다. */
-export function siteUrl(sub: Subdomain, path: string) {
-  const url = new URL(path, SITE_URL);
-  url.host = `${sub}.${url.host}`;
-  return url.toString();
+/** 역할에 맞는 화면 경로. 도우미 화면만 /helper 아래에 있어 장애학생 경로를 넘기면 된다. */
+export function rolePath(role: Role, path: string) {
+  return role === 'HELPER' ? `/helper${path}` : path;
 }

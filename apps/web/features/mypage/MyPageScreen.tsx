@@ -75,6 +75,7 @@ export function MyPageScreen({ reader }: { reader: MyPageReader }) {
               <ContactSection profile={state.profile} onSaved={handleContactSaved} />
             )}
             <SettingsSection
+              reader={reader}
               profile={state.profile}
               onProfileChange={setProfile}
               onToast={setToast}

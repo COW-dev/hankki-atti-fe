@@ -14,8 +14,11 @@ vi.mock('@/components/ui/A11yToggle', () => ({ A11yToggle: () => null }));
 vi.mock('@/components/ui/ReadAloudBar', () => ({ ReadAloudBar: () => null }));
 
 const push = vi.fn();
+let pathname = '/helper/notices';
+
 vi.mock('next/navigation', () => ({
   useRouter: () => ({ push, back: vi.fn() }),
+  usePathname: () => pathname,
 }));
 
 function notification(
@@ -117,18 +120,28 @@ describe('NotificationTopBar', () => {
     await user.click(screen.getByRole('button', { name: /10\/7 12:00 매칭됐어요/ }));
 
     expect(authRequest).toHaveBeenCalledWith('/api/notifications/2/read', { method: 'PATCH' });
-    expect(push).toHaveBeenCalledWith('/matches');
+    expect(push).toHaveBeenCalledWith('/helper/matches');
     await waitFor(() =>
       expect(screen.getByRole('button', { name: '알림, 안 읽은 알림 1개' })).toBeInTheDocument(),
     );
   });
 
   it('공지 알림을 누르면 읽음으로 바꾸고 그 공지의 상세로 간다', async () => {
+    pathname = '/notices';
     const { user } = await renderOpened();
 
     await user.click(screen.getByRole('button', { name: /새 공지가 올라왔어요/ }));
 
     expect(authRequest).toHaveBeenCalledWith('/api/notifications/1/read', { method: 'PATCH' });
     expect(push).toHaveBeenCalledWith('/notices/1');
+    pathname = '/helper/notices';
+  });
+
+  it('도우미 화면에서 공지 알림을 누르면 도우미 공지 상세로 간다', async () => {
+    const { user } = await renderOpened();
+
+    await user.click(screen.getByRole('button', { name: /새 공지가 올라왔어요/ }));
+
+    expect(push).toHaveBeenCalledWith('/helper/notices/1');
   });
 });

@@ -11,6 +11,7 @@ import { ApiError } from '@/lib/api/client';
 import { ErrorCode } from '@/lib/api/error-codes';
 import { useAuth } from '@/lib/auth/AuthProvider';
 import { checkPassword, PASSWORD_MAX_LENGTH } from '@/lib/auth/password-policy';
+import { rolePath } from '@/lib/site';
 import { passwordChanged } from './password-changed';
 import { PasswordRules } from './PasswordRules';
 import { errorMessage } from '@/lib/api/error-message';
@@ -62,7 +63,7 @@ export function PasswordChangeScreen({
         router.replace('/');
       } else {
         passwordChanged.mark();
-        router.replace('/mypage');
+        router.replace(rolePath(reader, '/mypage'));
       }
     } catch (error) {
       if (error instanceof ApiError && error.code === ErrorCode.CURRENT_PASSWORD_MISMATCH) {

@@ -144,7 +144,7 @@ export const Empty: Story = {
     await expect(canvas.getByRole('heading', { name: '아직 지원한 건이 없어요' })).toBeVisible();
     await expect(canvas.getByRole('link', { name: '요청 목록 보기' })).toHaveAttribute(
       'href',
-      '/requests',
+      '/helper/requests',
     );
   },
 };
