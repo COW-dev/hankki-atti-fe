@@ -24,6 +24,7 @@ const meta = {
   title: '공지/NoticesView',
   component: NoticesView,
   args: {
+    reader: 'STUDENT',
     notices: NOTICES,
     hasMore: false,
     loadingMore: false,

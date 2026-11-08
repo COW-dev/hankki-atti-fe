@@ -3,6 +3,7 @@
 import { Block, Button, Notice } from '@hankki/ui';
 import { useEffect, useRef } from 'react';
 import { NoticeRow } from './NoticeRow';
+import type { NoticeReader } from './NoticesScreen';
 import type { NoticeSummary } from './types';
 import type { LoadedMore } from './useNotices';
 
@@ -11,6 +12,7 @@ import type { LoadedMore } from './useNotices';
  * 더 보기로 받은 뒤에는 새로 붙은 첫 공지로 포커스를 옮기고 개수를 polite로 알린다.
  */
 export function NoticesView({
+  reader,
   notices,
   hasMore,
   loadingMore,
@@ -18,6 +20,7 @@ export function NoticesView({
   loadedMore,
   onLoadMore,
 }: {
+  reader: NoticeReader;
   notices: NoticeSummary[];
   hasMore: boolean;
   loadingMore: boolean;
@@ -46,6 +49,7 @@ export function NoticesView({
         {notices.map((notice) => (
           <NoticeRow
             key={notice.noticeId}
+            reader={reader}
             notice={notice}
             linkRef={(element) => {
               if (element) links.current.set(notice.noticeId, element);

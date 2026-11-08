@@ -22,14 +22,29 @@ const STUDENT_TABS = [
 
 const HELPER_TABS = [
   {
-    href: '/requests',
+    href: '/helper/requests',
     label: '요청 목록',
     icon: 'tab-my-requests',
     activeIcon: 'tab-my-requests-active',
   },
-  { href: '/matches', label: '매칭 현황', icon: 'tab-matches', activeIcon: 'tab-matches-active' },
-  { href: '/notices', label: '공지사항', icon: 'tab-notice', activeIcon: 'tab-notice-active' },
-  { href: '/mypage', label: '마이페이지', icon: 'tab-mypage', activeIcon: 'tab-mypage-active' },
+  {
+    href: '/helper/matches',
+    label: '매칭 현황',
+    icon: 'tab-matches',
+    activeIcon: 'tab-matches-active',
+  },
+  {
+    href: '/helper/notices',
+    label: '공지사항',
+    icon: 'tab-notice',
+    activeIcon: 'tab-notice-active',
+  },
+  {
+    href: '/helper/mypage',
+    label: '마이페이지',
+    icon: 'tab-mypage',
+    activeIcon: 'tab-mypage-active',
+  },
 ];
 
 type Tab = {
@@ -73,5 +88,5 @@ export function StudentTabBar({ active }: { active: (typeof STUDENT_TABS)[number
 }
 
 export function HelperTabBar({ active }: { active: string }) {
-  return <TabBar active={active} tabs={HELPER_TABS} />;
+  return <TabBar active={`/helper${active}`} tabs={HELPER_TABS} />;
 }

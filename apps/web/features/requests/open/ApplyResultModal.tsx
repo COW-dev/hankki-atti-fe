@@ -39,7 +39,7 @@ export function ApplyResultModal({
             <Button variant="secondary" className="min-w-0 flex-1" onClick={onClose}>
               계속 둘러보기
             </Button>
-            <ButtonLink href="/matches" className="min-w-0 flex-1">
+            <ButtonLink href="/helper/matches" className="min-w-0 flex-1">
               매칭 현황 보기
             </ButtonLink>
           </>
@@ -80,7 +80,7 @@ export function ApplyResultModal({
       dismissOnBackdrop={false}
       actions={
         <>
-          <ButtonLink href="/matches" variant="secondary" className="min-w-0 flex-1">
+          <ButtonLink href="/helper/matches" variant="secondary" className="min-w-0 flex-1">
             매칭 현황 보기
           </ButtonLink>
           <Button className="min-w-0 flex-1" onClick={onClose}>

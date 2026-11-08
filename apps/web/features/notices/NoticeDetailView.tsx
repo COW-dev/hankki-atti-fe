@@ -2,7 +2,9 @@ import { Block, ButtonLink, Notice, StatusTag } from '@hankki/ui';
 import { useId } from 'react';
 import { formatDotDate, formatDotMonthDay, parseLocalDateTime } from '@/lib/format/datetime';
 import { NOTICE_TARGET_LABEL } from '@/lib/labels/notice';
+import { rolePath } from '@/lib/site';
 import { splitNoticeBody } from './notice-body';
+import type { NoticeReader } from './NoticesScreen';
 import type { NoticeDetail } from './types';
 
 // "2026.09.28 · 수정됨 09.29 · 대상: 도우미" (명세 F-03 "게시일 · (수정됨 날짜) · 대상", Figma 209:4138)
@@ -61,11 +63,17 @@ const UNAVAILABLE_MESSAGE = {
 } as const;
 
 // 삭제된 공지(명세 F-03) · 없거나 내 대상이 아닌 공지. 이미 받은 알림으로 들어와도 같은 안내를 본다
-export function NoticeUnavailable({ reason }: { reason: keyof typeof UNAVAILABLE_MESSAGE }) {
+export function NoticeUnavailable({
+  reader,
+  reason,
+}: {
+  reader: NoticeReader;
+  reason: keyof typeof UNAVAILABLE_MESSAGE;
+}) {
   return (
     <Block gap="md">
       <Notice type="info" message={UNAVAILABLE_MESSAGE[reason]} />
-      <ButtonLink href="/notices" variant="secondary" className="w-full">
+      <ButtonLink href={rolePath(reader, '/notices')} variant="secondary" className="w-full">
         목록으로
       </ButtonLink>
     </Block>

@@ -84,7 +84,7 @@ describe('PasswordChangeScreen', () => {
     await user.click(screen.getByRole('button', { name: '비밀번호 바꾸기' }));
 
     // then
-    expect(replace).toHaveBeenCalledWith('/mypage');
+    expect(replace).toHaveBeenCalledWith('/helper/mypage');
     expect(passwordChanged.peek()).toBe(true);
   });
 

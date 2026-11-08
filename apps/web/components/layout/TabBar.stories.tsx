@@ -33,7 +33,7 @@ export const Helper: Story = {
   play: async ({ canvas }) => {
     await expect(canvas.getByRole('link', { name: '요청 목록' })).toHaveAttribute(
       'href',
-      '/requests',
+      '/helper/requests',
     );
     await expect(canvas.getByRole('link', { name: '매칭 현황' })).toHaveAttribute(
       'aria-current',

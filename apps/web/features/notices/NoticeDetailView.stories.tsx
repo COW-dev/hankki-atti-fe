@@ -63,7 +63,7 @@ export const Edited: Story = {
 export const LargeText: Story = { globals: { textSize: 'large' } };
 
 export const Deleted: Story = {
-  render: () => <NoticeUnavailable reason="deleted" />,
+  render: () => <NoticeUnavailable reader="STUDENT" reason="deleted" />,
   play: async ({ canvas }) => {
     await expect(canvas.getByText('삭제된 공지예요')).toBeVisible();
     await expect(canvas.getByRole('link', { name: '목록으로' })).toHaveAttribute(
@@ -73,4 +73,6 @@ export const Deleted: Story = {
   },
 };
 
-export const NotFound: Story = { render: () => <NoticeUnavailable reason="notFound" /> };
+export const NotFound: Story = {
+  render: () => <NoticeUnavailable reader="STUDENT" reason="notFound" />,
+};

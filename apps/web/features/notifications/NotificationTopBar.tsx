@@ -1,8 +1,9 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, useId, useRef } from 'react';
 import { TopBarView } from '@/components/layout/TopBarView';
+import { isUnder } from '@/lib/site';
 import { NotificationPanel } from './NotificationPanel';
 import { notificationPath } from './notification-target';
 import type { AppNotification } from './types';
@@ -25,6 +26,7 @@ export function NotificationTopBar({
   const notifications = useNotifications(true);
   const { open, close } = notifications;
   const router = useRouter();
+  const pathname = usePathname();
   const panelId = useId();
   const buttonRef = useRef<HTMLButtonElement>(null);
   const headingRef = useRef<HTMLHeadingElement>(null);
@@ -66,7 +68,8 @@ export function NotificationTopBar({
 
   const select = (item: AppNotification) => {
     notifications.markRead(item);
-    const path = notificationPath(item);
+    // 벨은 화면마다 있어 역할을 내려 주지 않고 지금 경로로 판단한다
+    const path = notificationPath(item, isUnder(pathname, 'helper') ? 'HELPER' : 'STUDENT');
     close();
     // 지금 보고 있는 화면이면 새로 그려 최신 상태를 받는다 (매칭 현황은 들어올 때 승격 모달을 연다)
     if (window.location.pathname === path) window.location.reload();
