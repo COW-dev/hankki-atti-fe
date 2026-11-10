@@ -227,7 +227,7 @@ Figma A11Y 공통 규칙(31:2)을 코드 기준으로 옮겼다. 위반은 기�
 
 ## 배포 (CD)
 
-main에 병합되고 CI 검사(`check`, `secret-scan`, `agent-config`)가 모두 통과하면 Docker 이미지를 GitHub Container Registry(GHCR)에 push한다. 클러스터 반영은 인프라 담당이 한다. 구조·라우팅 조건은 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md).
+main에 병합되고 CI 검사(`check`, `secret-scan`, `agent-config`)가 모두 통과하면 Docker 이미지를 GitHub Container Registry(GHCR)에 push한다. 업로드 성공 후 `deploy.yml`이 공용 배포 저장소 `COW-dev/hankki-atti-deploy`의 `main`에 있는 `k8s/fe/atti-fe.yaml`의 FE 이미지 버전만 갱신한다. 클러스터 동기화는 인프라 배포 구성이 담당한다. 구조·라우팅 조건은 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md).
 
 | 항목 | 내용 |
 |---|---|
@@ -235,7 +235,9 @@ main에 병합되고 CI 검사(`check`, `secret-scan`, `agent-config`)가 모두
 | 태그 | `vX.Y.Z` + `latest`. GHCR에는 불변 태그 설정이 없어, `docker` job이 같은 버전 태그가 이미 있으면 push하지 않고 실패한다 |
 | 플랫폼 | `linux/amd64`, `linux/arm64`. 빌드는 러너 아키텍처에서 한 번만 하고 결과물을 양쪽에 넣는다 |
 | 인증 | 별도 Secret 없음 — `docker` job의 `GITHUB_TOKEN`(`packages: write`)으로 push하고, 이때 패키지가 이 레포에 자동 연결된다. CI 밖에서 개인 토큰으로 먼저 push하면 레포에 연결되지 않은 패키지가 생겨 `GITHUB_TOKEN` push가 막히므로 **직접 push하지 않는다** |
-| 워크플로우 | `.github/workflows/ci.yml`의 `version` → `docker` job, 버전 계산은 `.github/scripts/release-version.sh`, 스모크 테스트는 `.github/scripts/smoke-test.sh` |
+| 워크플로우 | `.github/workflows/ci.yml`의 `version` → `docker` → `deploy`(`deploy.yml` 호출). 버전 계산은 `.github/scripts/release-version.sh`, 스모크 테스트는 `.github/scripts/smoke-test.sh` |
+
+**배포 매니페스트 갱신**: `DEPLOY_REPOSITORY` Actions Variable(`COW-dev/hankki-atti-deploy` 형식)과 `DEPLOY_SSH_KEY` Actions Secret(FE 전용 쓰기 가능한 SSH 배포 키)을 사용한다. 배포 저장소만 SSH로 checkout하고 `k8s/fe/atti-fe.yaml`의 FE 이미지 버전만 갱신한다. 같은 버전이면 커밋하지 않으며, push 실패는 작업 실패로 남긴다. BE와 동시 push로 거절되면 실패한 배포 job만 재실행한다. FE 소스 저장소 main에는 매니페스트를 push하지 않는다.
 
 **버전 규칙**
 - 병합마다 마이너를 올린다 (`v0.1.0` → `v0.2.0`). 마이너는 상한 없이 증가한다 (`v0.9.0` → `v0.10.0`). 첫 버전은 `v0.1.0`
@@ -249,7 +251,7 @@ main에 병합되고 CI 검사(`check`, `secret-scan`, `agent-config`)가 모두
 
 **이미지 실행**: 포트 3000, UID 1000, 실행 환경변수 필요 없음. 이미지에 들어가는 sharp는 빌드 아키텍처용이라 다른 아키텍처 이미지에서는 동작하지 않는다 — 지금은 `next/image`를 쓰지 않아 문제가 없고, 쓰게 되면 `Dockerfile` 빌드 방식을 다시 정한다.
 
-**롤백**: 이전 버전 태그로 다시 띄운다 (`docker pull ghcr.io/cow-dev/hankki-atti-fe:vX.Y.Z`).
+**배포 재시도·롤백**: Actions의 `Deploy FE`를 main에서 수동 실행하고 `image_tag`에 GHCR에 존재하는 `vX.Y.Z`를 입력한다. 이미지 재빌드 없이 해당 버전으로 배포 매니페스트를 갱신한다. CI에서 배포만 실패했다면 실패한 deploy job만 재실행할 수도 있다. 전체 CI 재실행은 기존 이미지 태그 중복 검사에 막히므로 사용하지 않는다. 명령 예시는 [docs/subdomain-rewrite.md](docs/subdomain-rewrite.md)를 참고한다.
 
 ---
 
