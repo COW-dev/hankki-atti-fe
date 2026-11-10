@@ -61,6 +61,27 @@ App Router는 경로만 보고 페이지를 고르므로 `admin.x/users`와 `x/u
 
 HTTPS를 라우팅 단계에서 끝내면 백엔드는 요청을 HTTP로 받는다. 그러면 브라우저가 POST에 붙이는 `Origin`(`https://…`)과 scheme이 달라 같은 출처여도 CORS 요청으로 판정되고, 목록에 없는 도메인은 403이 된다.
 
+## FE 이미지 배포·롤백
+
+`ci.yml`은 기존 검사 → 버전 결정 → 이미지 빌드·스모크 테스트·GHCR 업로드를 담당한다. 업로드에 성공한 경우에만 `deploy.yml`을 재사용 워크플로로 호출하고 업로드한 `vX.Y.Z`를 전달한다. GHCR 업로드 인증은 기존 `GITHUB_TOKEN`을 유지한다.
+
+`deploy.yml`은 이미지가 GHCR에 존재하는지 확인하고, `DEPLOY_SSH_KEY`로 `DEPLOY_REPOSITORY`를 checkout한다. 대상은 `COW-dev/hankki-atti-deploy`의 `main`, 파일은 `k8s/fe/atti-fe.yaml`, 이미지는 `ghcr.io/cow-dev/hankki-atti-fe:vX.Y.Z`다. `DEPLOY_REPOSITORY`는 `COW-dev/hankki-atti-deploy` 형식으로 설정한다. SSH 키는 배포 저장소에 쓰기 권한이 있어야 한다.
+
+FE 이미지 한 곳만 변경·커밋하고 일반 push한다. 같은 버전이면 변경 없이 성공한다. BE와 동시 push로 거절되면 실패한 배포 job만 재실행해 최신 main에서 다시 반영한다. force push는 하지 않으며 push 실패는 작업 실패로 남긴다. FE 배포 작업은 concurrency 그룹으로 직렬화한다. 매니페스트 갱신 성공은 클러스터의 실제 rollout 완료를 뜻하지 않으므로 운영 배포 도구에서 동기화·준비 상태를 확인한다.
+
+배포만 재시도하거나 이전 이미지로 롤백할 때는 `Deploy FE` 워크플로를 main에서 수동 실행한다. `latest`와 SHA는 받지 않으며, 지정한 버전 이미지가 없으면 매니페스트를 수정하기 전에 실패한다. 아래 명령은 GitHub CLI가 설치·인증된 환경에서 실행한다.
+
+```bash
+# 기존 이미지 배포·실패 재시도 (예시 버전은 실제 업로드된 버전으로 교체)
+gh workflow run deploy.yml --repo COW-dev/hankki-atti-fe --ref main -f image_tag=v0.2.0
+# 롤백: 이전에 업로드된 버전 지정
+gh workflow run deploy.yml --repo COW-dev/hankki-atti-fe --ref main -f image_tag=v0.1.0
+# 배포만 실패한 CI 실행은 실패 job만 재실행할 수 있다
+gh run rerun <실행_ID> --failed --repo COW-dev/hankki-atti-fe
+```
+
+전체 CI를 다시 실행하면 기존 버전 이미지 중복 방지에 걸린다. 배포 재시도는 위 수동 실행 또는 실패 job 재실행을 사용한다. 워크플로만 변경한 PR은 이미지 내용이 같아 자동 이미지 업로드·배포를 생략할 수 있다. 최초 적용 후 기존 이미지 배포는 수동 실행으로 확인한다.
+
 ## 인프라 조건
 
 - `Host`를 그대로 넘긴다. 빠지면 서브도메인 분기 전체가 동작하지 않는다
