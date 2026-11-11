@@ -41,4 +41,5 @@ USER 1000:1000
 EXPOSE 3000
 
 # 쿠버네티스가 HOSTNAME을 파드 이름으로 지정하므로 server.js는 0.0.0.0에 바인딩한다
+# Host별 라우팅은 .github/scripts/smoke-test.sh에서 검증한다
 CMD ["sh", "-c", "HOSTNAME=0.0.0.0 exec node apps/web/server.js"]
