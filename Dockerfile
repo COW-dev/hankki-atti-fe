@@ -40,5 +40,5 @@ COPY --from=build --chown=1000:1000 /app/apps/web/.next/standalone ./
 USER 1000:1000
 EXPOSE 3000
 
-# server.js는 HOSTNAME에 바인딩하는데, 쿠버네티스는 이 값을 파드 이름으로 덮어쓴다. 실행할 때 고정한다
+# 쿠버네티스가 HOSTNAME을 파드 이름으로 지정하므로 server.js는 0.0.0.0에 바인딩한다
 CMD ["sh", "-c", "HOSTNAME=0.0.0.0 exec node apps/web/server.js"]
