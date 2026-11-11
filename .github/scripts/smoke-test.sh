@@ -52,7 +52,10 @@ check "메인 /matches (도우미 화면 아님)" 404 "$(status "$MAIN" /matches
 check "메인 /admin 상태" 307 "$(status "$MAIN" /admin)"
 check "메인 /admin 이동 위치" / "$(curl -s -o /dev/null -D - -H "Host: $MAIN" "$base/admin" \
     | tr -d '\r' | awk 'tolower($1) == "location:" { print $2 }')"
-check "도우미 /matches" 200 "$(status "$HELPER" /matches)"
+check "메인 /helper/matches (도우미 화면)" 200 "$(status "$MAIN" /helper/matches)"
+check "기존 도우미 /matches 상태" 307 "$(status "$HELPER" /matches)"
+check "기존 도우미 /matches 이동 위치" "https://$MAIN/helper/matches" "$(curl -s -o /dev/null -D - -H "Host: $HELPER" "$base/matches" \
+    | tr -d '\r' | awk 'tolower($1) == "location:" { print $2 }')"
 check "관리자 제목" '<title>한끼아띠 관리자</title>' "$(curl -s -H "Host: $ADMIN" "$base/" \
     | grep -o '<title>[^<]*</title>' | head -n 1)"
 
